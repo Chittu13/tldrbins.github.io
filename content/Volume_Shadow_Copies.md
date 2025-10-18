@@ -1,6 +1,5 @@
 ---
 title: "Volume Shadow Copies"
-date: 2025-7-25
 tags: ["Data Leakage", "Data Exfiltration", "Volume Shadow Copies", "Enumeration", "Windows", "VSC"]
 ---
 

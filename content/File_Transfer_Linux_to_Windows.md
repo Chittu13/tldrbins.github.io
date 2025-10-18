@@ -1,6 +1,5 @@
 ---
 title: "File Transfer (Linux to Windows)"
-date: 2025-7-24
 tags: ["Curl", "Http File Transfer", "File Transfer", "Windows", "Evil-Winrm", "IEX", "IWR", "certutil"]
 ---
 

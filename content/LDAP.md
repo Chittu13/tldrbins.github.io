@@ -1,6 +1,5 @@
 ---
 title: "LDAP"
-date: 2025-7-23
 tags: ["Kerberos", "Ldap", "Nmap", "Ldap Search", "Enumeration", "Active Directory", "Windows", "Nxc", "ldapmodify", "ldif", "Permissions"]
 ---
 
@@ -27,7 +26,7 @@ ldapsearch -x -H ldap://<TARGET> -b 'DC=<EXAMPLE>,DC=<COM>' '(objectClass=person
 ```
 
 ```console
-# With creds
+# Password
 ldapsearch -x -H ldap://<TARGET> -D "CN=<USER>,CN=Users,DC=<EXAMPLE>,DC=<COM>" -w '<PASSWORD>' -b 'DC=<EXAMPLE>,DC=<COM>'
 ```
 
@@ -40,7 +39,7 @@ LDAPTLS_REQCERT=never ldapsearch -x -H ldaps://<TARGET> -D "CN=<USER>,CN=Users,D
 {{< tabcontent set1 tab2 >}}
 
 ```console
-# With creds
+# Password
 ldapdomaindump -u '<DOMAIN>\<USER>' -p '<PASSWORD>' <TARGET> -o ./ldap
 ```
 
@@ -53,6 +52,8 @@ sudo nmap -p 389 --script ldap-search <TARGET>
 ```
 
 {{< /tabcontent >}}
+
+---
 
 ### Enum with Kerberos
 
@@ -78,6 +79,8 @@ nxc ldap <TARGET> -u <USER> -p '<PASSWORD>' -k --users
 ```
 
 {{< /tabcontent >}}
+
+---
 
 ### Enum ACLs
 
@@ -107,6 +110,8 @@ bloodyAD -d <DOMAIN> -k --host <DC> get writable --detail
 ```
 
 {{< /tabcontent >}}
+
+---
 
 ### Modify Entries
 

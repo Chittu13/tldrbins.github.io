@@ -1,6 +1,5 @@
 ---
 title: "GPG"
-date: 2025-7-25
 tags: ["Cryptography", "Encryption", "File Encryption", "Gpg", "Pretty Good Privacy", "Public Key", "Private Key"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "AD Recycle Bin"
-date: 2025-7-24
 tags: ["Active Directory",  "AD Recycle Bin",  "Privilege Escalation",  "Object Recovery",  "Deleted Objects",  "Restore",  "Domain Controller",  "Windows",  "PowerShell"]
 ---
 
@@ -73,7 +72,7 @@ Restore-ADObject -Identity <OBJECT_GUID> -NewName '<DELETED_USER>.2' -TargetPath
 Restore-ADObject -Identity "<DISTINGUISHED_NAME>"
 ```
 
-```console
+```console {class="sample-code"}
 PS C:\programdata> Restore-ADObject -Identity "CN=Apple Seed\0ADEL:1c6---[SNIP]---9db,CN=Deleted Objects,DC=example,DC=com"
 Restore-ADObject -Identity "CN=Apple Seed\0ADEL:1c6---[SNIP]---9db,CN=Deleted Objects,DC=example,DC=com"
 ```

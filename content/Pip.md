@@ -1,6 +1,5 @@
 ---
 title: "Pip"
-date: 2025-7-25
 tags: ["Exploitation", "Pip", "Pip3", "Python", "Sudo"]
 ---
 

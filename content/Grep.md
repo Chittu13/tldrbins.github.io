@@ -1,6 +1,5 @@
 ---
 title: "Grep"
-date: 2025-7-25
 tags: ["Grep", "Regex", "Strings", "Enumeration", "Files"]
 ---
 

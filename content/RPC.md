@@ -1,6 +1,5 @@
 ---
 title: "RPC"
-date: 2025-3-31
 tags: ["Impacket", "Domain Controller", "Nxc", "Active Directory", "Windows", "Enumeration", "SID"]
 ---
 

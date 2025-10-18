@@ -1,6 +1,5 @@
 ---
 title: "Docker Registry"
-date: 2025-7-25
 tags: ["Database Dumping", "Docker", "Container", "Docker Registry"]
 ---
 

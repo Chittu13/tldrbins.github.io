@@ -1,6 +1,5 @@
 ---
 title: "AddSelf"
-date: 2025-7-23
 tags: ["Powerview", "Genericall", "AddMember", "Group Policy", "Domain Controller", "Addself", "Active Directory", "Windows", "BloodyAD"]
 ---
 

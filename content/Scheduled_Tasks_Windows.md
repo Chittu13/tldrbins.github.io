@@ -1,6 +1,5 @@
 ---
 title: "Scheduled tasks"
-date: 2025-7-25
 tags: ["Enumeration", "Scheduled Tasks", "Windows", "Enum"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Drupal"
-date: 2024-6-28
 tags: ["Reconnaissance", "Enumeration", "Drupal", "Droopescan"]
 ---
 

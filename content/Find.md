@@ -1,6 +1,5 @@
 ---
 title: "Find"
-date: 2025-7-24
 tags: ["File Metadata", "Enumeration", "File Attributes", "Hidden Files", "Find", "Linux", "File System", "SUID", "SGID", "Interesting Files", "Locate"]
 ---
 

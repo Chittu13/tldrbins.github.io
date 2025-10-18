@@ -1,6 +1,5 @@
 ---
 title: "MSSQL Agent Jobs"
-date: 2025-7-25
 tags: ["Database Dumping", "Privilege Escalation In Databases", "MSSQL", "Database", "Windows", "Agent Jobs"]
 ---
 

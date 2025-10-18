@@ -1,6 +1,5 @@
 ---
 title: "GPOs"
-date: 2025-3-16
 tags: ["GPOs", "Windows", "Group Policy Objects", "WriteGPLink"]
 ---
 

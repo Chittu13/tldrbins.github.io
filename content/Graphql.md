@@ -1,6 +1,5 @@
 ---
 title: "Graphql"
-date: 2024-7-9
 tags: ["Database Dumping", "Privilege Escalation In Databases", "Graphql", "Database"]
 ---
 

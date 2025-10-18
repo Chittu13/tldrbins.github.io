@@ -1,6 +1,5 @@
 ---
 title: "Memcache"
-date: 2025-7-25
 tags: ["Memcache", "Telnet", "Database Dumping"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "WriteOwner/Own"
-date: 2025-7-17
 tags: ["WriteOwner", "Permissions", "Powerview", "Impacket", "AddMember", "Domain Controller", "Active Directory", "Windows", "Dacledit", "Own"]
 ---
 

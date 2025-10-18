@@ -1,6 +1,5 @@
 ---
 title: "Android"
-date: 2025-7-25
 tags: ["Android", "Apk", "Decompile", "Java", "Reversing", "Apktool", "Adb", "Mobile App"]
 ---
 
@@ -8,7 +7,7 @@ tags: ["Android", "Apk", "Decompile", "Java", "Reversing", "Apktool", "Adb", "Mo
 
 ```console
 # Get .smali files
-java -jar apktool_2.9.3.jar d <FILE>
+java -jar apktool_2.12.0.jar d <FILE>
 ```
 
 ```console
@@ -27,7 +26,7 @@ jadx <FILE>
 #### 1. Initial Pack
 
 ```console
-java -jar apktool_2.9.3.jar b --use-aapt2 <APP> -o <APP>_repacked.apk
+java -jar apktool_2.12.0.jar b <APP> -o <APP>_repacked.apk
 ```
 
 #### 2. Zip Align

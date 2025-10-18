@@ -1,6 +1,5 @@
 ---
 title: "Winrm from Windows VM"
-date: 2025-7-25
 tags: ["Kerberos", "Pass-The-Ticket", "Domain", "Http File Transfer", "Authentication", "Ticket Granting Ticket", "Domain Controller", "Winrm", "Pssession", "Windows", "File Transfer", "Active Directory"]
 ---
 

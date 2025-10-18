@@ -1,6 +1,5 @@
 ---
 title: "SeImpresonate"
-date: 2025-7-25
 tags: ["SeImpresonate", "Windows", "Potato", "Privilege Escalation", "Fullpower", "Scheduled Tasks"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Nginx"
-date: 2025-7-25
 tags: ["Web Exploitation", "Nginx", "Web Server", "Reverse Proxy"]
 ---
 

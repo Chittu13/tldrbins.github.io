@@ -1,6 +1,5 @@
 ---
 title: "Apache Tomcat"
-date: 2025-7-25
 tags: ["Web Exploitation", "Tomcat", "Apache", "Web Server", "War", "Java", "RCE"]
 ---
 

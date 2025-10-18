@@ -1,6 +1,5 @@
 ---
 title: "IRC"
-date: 2024-7-9
 tags: ["IRC", "Internet Relay Chat", "Software"]
 ---
 

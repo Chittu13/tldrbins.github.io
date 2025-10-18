@@ -1,6 +1,5 @@
 ---
 title: "PostgreSQL"
-date: 2025-7-25
 tags: ["Database Dumping", "Privilege Escalation In Databases", "Postgresql", "RCE", "Database", "File Read"]
 ---
 

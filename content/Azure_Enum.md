@@ -1,6 +1,5 @@
 ---
 title: "Azure Enum"
-date: 2025-2-21
 tags: ["Cloud", "Azure", "Password Spraying", "Enumeration", "Microsoft", "Windows", "Reconnaissance"]
 ---
 
@@ -85,7 +84,7 @@ Import-Module MSOLSpray.ps1
 #### 2. Run
 
 ```console
-Invoke-MSOLSpray -UserList <USERS_FILE> -Password
+Invoke-MSOLSpray -UserList <USERS_FILE> -Password <PASSWORD>
 ```
 
 ```console {class="sample-code"}

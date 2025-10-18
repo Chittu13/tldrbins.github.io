@@ -1,6 +1,5 @@
 ---
 title: "R Services"
-date: 2025-7-16
 tags: ["R Services", "rlogin", "rexec", "rsh", "r-commands", "Shell", "Berkeley", "uid", "gid"]
 ---
 

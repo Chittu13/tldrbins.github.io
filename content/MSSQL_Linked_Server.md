@@ -1,6 +1,5 @@
 ---
 title: "MSSQL Linked Servers"
-date: 2025-7-25
 tags: ["Database Dumping", "Privilege Escalation In Databases", "MSSQL", "Database", "Windows", "Linked Server"]
 ---
 
@@ -14,7 +13,7 @@ tags: ["Database Dumping", "Privilege Escalation In Databases", "MSSQL", "Databa
 
 ```console
 # Show current server
-select @@servername
+select @@servername;
 ```
 
 ```console
@@ -24,7 +23,7 @@ select srvname from sysservers;
 
 ```console
 # Show linked servers
-enum_links
+enum_links;
 ```
 
 {{< /tabcontent >}}

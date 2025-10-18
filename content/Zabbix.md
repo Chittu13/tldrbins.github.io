@@ -1,6 +1,5 @@
 ---
 title: "Zabbix"
-date: 2025-3-2
 tags: ["Zabbix", "Api", "Monitoring", "Web Exploitation", "RCE"]
 ---
 

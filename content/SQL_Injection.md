@@ -1,6 +1,5 @@
 ---
 title: "SQL Injection"
-date: 2025-7-15
 tags: ["SQL", "SQL Injection", "MySQL", "Sqlmap", "Nosql", "Sqlite", "SQLi", "Burpsuite", "Database Dumping", "Database"]
 ---
 

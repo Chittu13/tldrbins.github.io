@@ -1,6 +1,5 @@
 ---
 title: "Sudoers"
-date: 2024-7-3
 tags: ["Sudoers", "Sudo", "Privilege Escalation", "/etc/sudoers"]
 ---
 

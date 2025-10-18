@@ -1,6 +1,5 @@
 ---
 title: "Disk Group"
-date: 2025-7-25
 tags: ["Privilege Escalation", "Data Exfiltration", "File System Mounting", "Disk", "Backup", "Privilege Read", "Container", "LVM", "Debugfs"]
 ---
 

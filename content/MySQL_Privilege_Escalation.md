@@ -1,6 +1,5 @@
 ---
 title: "MySQL Privilege Escalation"
-date: 2025-7-25
 tags: ["Exploitation", "Privilege Escalation In Databases", "Mysql", "RCE", "Database", "php", "UDF"]
 ---
 

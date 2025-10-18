@@ -1,6 +1,5 @@
 ---
 title: "Dotnet"
-date: 2025-7-25
 tags: ["Dotnet", "SDK", "C#", "Windows", "Compile", ".Net", "Programming"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Microsoft Access Database"
-date: 2025-7-23
 tags: ["Database Dumping", "Access", "Database", "Windows", "Mdb"]
 ---
 

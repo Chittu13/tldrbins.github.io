@@ -1,6 +1,5 @@
 ---
 title: "Metasploit Shellcode"
-date: 2025-7-29
 tags: ["Code Execution", "Metasploit", "Firewall", "Payload", "RCE", "Dll Hijacking", "Shellcode", "Reverse Shell", "Msfconsole", "Msfvenom", "Revshell"]
 ---
 

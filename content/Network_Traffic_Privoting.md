@@ -1,14 +1,14 @@
 ---
 title: "Network Traffic Pivoting"
-date: 2025-7-25
 tags: ["Pivoting", "Sliver", "Pivot", "Chisel", "Ssh", "Network", "Socat", "Port Forwarding", "Tunneling", "Metasploit"]
 ---
 
 {{< tab set1 tab1 >}}chisel{{< /tab >}}
 {{< tab set1 tab2 >}}metasploit{{< /tab >}}
-{{< tab set1 tab3 >}}ssh{{< /tab >}}
+{{< tab set1 tab3 >}}SSH{{< /tab >}}
 {{< tab set1 tab4 >}}socat{{< /tab >}}
-{{< tab set1 tab5 >}}sliver{{< /tab >}}
+{{< tab set1 tab5 >}}StreamDivert{{< /tab >}}
+{{< tab set1 tab6 >}}sliver{{< /tab >}}
 {{< tabcontent set1 tab1 >}} 
 
 ### General
@@ -573,6 +573,11 @@ sshpass -p '<PASSWORD>' ssh -N -L /tmp/<SOCKET_NAME>:<SOCKET> <USER>@<TARGET>
 $ ssh -N -L /tmp/.s.PGSQL.5432:/var/run/postgresql/.s.PGSQL.5432 service@10.10.127.97
 ```
 
+```console
+# Remote port forwarding without spawning a shell
+sshpass -p '<PASSWORD>' ssh -N -R <REMOTE_PORT>:<TARGET_IP>:<TARGET_PORT> <USER>@<TARGET>
+```
+
 {{< /tabcontent >}}
 {{< tabcontent set1 tab4 >}}
 
@@ -583,6 +588,53 @@ $ ssh -N -L /tmp/.s.PGSQL.5432:/var/run/postgresql/.s.PGSQL.5432 service@10.10.1
 
 {{< /tabcontent >}}
 {{< tabcontent set1 tab5 >}}
+
+### Relay All Incoming Connections to a Specific Port to Another Destination
+
+#### 1. Create a Config
+
+```console
+# config.txt
+tcp < <PORT> 0.0.0.0 -> <DEST_IP> <DEST_PORT>
+```
+
+```console {class=sample-code}
+tcp < 445 0.0.0.0 -> 127.0.0.1 445
+```
+
+#### 2. Start Relay Server
+
+```console
+.\StreamDivert.exe .\config.txt -f -v
+```
+
+```console {class=sample-code}
+PS C:\programdata\StreamDivert> .\StreamDivert.exe .\config.txt -f -v
+[*] Modifying firewall..
+[*] Authorized application C:\programdata\StreamDivert\StreamDivert.exe is now enabled in the firewall.
+
+[*] Parsing config file...
+[*] Parsed 1 inbound and 0 outbound relay entries.
+[*] Starting packet diverters...
+[*] InboundTCPDivertProxy(445:?) Start
+[*] InboundTCPDivertProxy(445:53073) Start
+[*] InboundTCPDivertProxy(445:53073) tcp and ((tcp.SrcPort == 53073) or (tcp.DstPort == 445))
+[*] InboundUDPDivertProxy() Start
+[*] InboundUDPDivertProxy() udp and ()
+[-] InboundUDPDivertProxy() failed to open the WinDivert device (87)
+[*] InboundUDPDivertProxy() Stop
+[*] InboundICMPDivertProxy() Start
+[*] InboundICMPDivertProxy() false
+[*] OutboundDivertProxy() Start
+[*] OutboundDivertProxy() ()
+[-] OutboundDivertProxy() failed to open the WinDivert device (87)
+[*] OutboundDivertProxy() Stop
+```
+
+<small>*Ref: [StreamDivert](https://github.com/jellever/StreamDivert)*</small>
+
+{{< /tabcontent >}}
+{{< tabcontent set1 tab6 >}}
 
 ```console
 # Port forwarding

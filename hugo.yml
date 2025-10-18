@@ -43,7 +43,7 @@ outputs:
 privacy:
   vimeo:
     disabled: true
-  twitter:
+  x:
     disabled: true
   instagram:
     disabled: true
@@ -53,5 +53,5 @@ privacy:
 services:
   instagram:
     disableInlineCSS: true
-  twitter:
+  x:
     disableInlineCSS: true

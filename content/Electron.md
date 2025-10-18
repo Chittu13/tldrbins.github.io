@@ -1,6 +1,5 @@
 ---
 title: "Electron"
-date: 2024-7-22
 tags: ["Web Exploitation", "Electron", "Web"]
 ---
 

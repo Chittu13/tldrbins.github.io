@@ -1,6 +1,5 @@
 ---
 title: "WebDriver"
-date: 2025-8-1
 tags: ["WebDriver", "ChromeDriver", "Privilege Escalation", "Chrome", "Selenium", "API"]
 ---
 

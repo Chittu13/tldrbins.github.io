@@ -1,6 +1,5 @@
 ---
 title: "Memory Dump"
-date: 2025-7-28
 tags: ["Forensics", "Credential Dumping", "Binwalk", "Dmp", "Memory Dump", "Reversing", "Minidump", "Backup", "Image"]
 ---
 

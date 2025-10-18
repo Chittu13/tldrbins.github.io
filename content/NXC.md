@@ -1,6 +1,5 @@
 ---
 title: "NetExec (nxc)"
-date: 2025-7-25
 tags: ["Ldap", "Crackmapexec", "Rid", "Brute Force", "Smb", "Ldap Search", "Enumeration", "Domain Controller", "Nxc", "Active Directory", "Windows", "Winrm"]
 ---
 
@@ -85,24 +84,31 @@ sudo ntpdate -s <DC_IP> && nxc <PROTOCOL> <TARGET> -u '<USER>' -d <DOMAIN> -k --
 #### Users Enum
 
 {{< tab set2 tab1 >}}Authenticated{{< /tab >}}
-{{< tab set2 tab2 >}}Brute-Force{{< /tab >}}
+{{< tab set2 tab2 >}}RID Brute{{< /tab >}}
 {{< tabcontent set2 tab1 >}}
-{{< tab set2-1 tab1 active >}}Password{{< /tab >}}{{< tab set2-1 tab2 >}}NTLM{{< /tab >}}{{< tab set2-1 tab3 >}}Kerberos{{< /tab >}}
+{{< tab set2-1 tab1 active >}}Null{{< /tab >}}{{< tab set2-1 tab2 >}}Password{{< /tab >}}{{< tab set2-1 tab3 >}}NTLM{{< /tab >}}{{< tab set2-1 tab4 >}}Kerberos{{< /tab >}}
 {{< tabcontent set2-1 tab1 >}}
 
 ```console
-nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> --users
+nxc smb <TARGET> -u '' -p '' -d <DOMAIN> --users
 ```
 
 {{< /tabcontent >}}
 {{< tabcontent set2-1 tab2 >}}
 
 ```console
-nxc smb <TARGET> -u '<USER>' -H <HASH> --users
+nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> --users
 ```
 
 {{< /tabcontent >}}
 {{< tabcontent set2-1 tab3 >}}
+
+```console
+nxc smb <TARGET> -u '<USER>' -H <HASH> --users
+```
+
+{{< /tabcontent >}}
+{{< tabcontent set2-1 tab4 >}}
 
 ```console
 nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --users

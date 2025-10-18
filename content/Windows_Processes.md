@@ -1,6 +1,5 @@
 ---
 title: "Windows Processes"
-date: 2025-7-24
 tags: ["Processes", "Tasklist", "Dll", "Services", "Monitor", "Background Tasks", "Windows"]
 ---
 

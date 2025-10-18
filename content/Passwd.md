@@ -1,6 +1,5 @@
 ---
 title: "Writable /etc/passwd"
-date: 2024-7-1
 tags: ["passwd", "shadow", "/etc/passwd", "Privilege Escalation"]
 ---
 

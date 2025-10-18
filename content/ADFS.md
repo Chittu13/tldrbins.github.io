@@ -1,6 +1,5 @@
 ---
 title: "ADFS"
-date: 2025-7-25
 tags: ["SAML", "Token-Based Authentication", "ADFS", "Active Directory", "Windows", "Federation Services"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Docker"
-date: 2025-7-25
 tags: ["Forensic", "Docker", "Container", "Dive", "Virtualization"]
 ---
 

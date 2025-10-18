@@ -1,6 +1,5 @@
 ---
 title: "DPAPI"
-date: 2025-7-25
 tags: ["Credential Dumping", "Mimikatz", "DPAPI", "Windows", "Password", "Donpapi"]
 ---
 

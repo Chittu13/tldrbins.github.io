@@ -1,6 +1,5 @@
 ---
 title: "Built-in Group"
-date: 2025-7-25
 tags: ["Built-In Group", "Windows", "Windows Service"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Windows Defender"
-date: 2025-7-24
 tags: ["Bypass", "Defender", "AV", "Anti-Virus", "Windows"]
 ---
 

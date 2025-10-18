@@ -1,29 +1,40 @@
 ---
 title: "WebDAV"
-date: 2025-7-24
-tags: ["Http File Transfer", "Curl", "Webdav", "Http", "Web", "Enumeration"]
+tags: ["Http File Transfer", "Curl", "WebDAV", "Http", "Web", "Enumeration", "WebClient Service", "Windows"]
 ---
 
-### Tools
+### Enum
 
 {{< tab set1 tab1 >}}davtest{{< /tab >}}
-{{< tab set1 tab2 >}}curl{{< /tab >}}
+{{< tab set1 tab2 >}}nxc{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
 ```console
-# Without creds
+# Anonymous
 davtest -url http://<TARGET>
 ```
 
 ```console
-# With creds
+# Password
 davtest -url http://<TARGET> -auth '<USER>:<PASSWORD>'
 ```
 
-<small>*Ref: [Download davtest](https://github.com/cldrn/davtest)*</small>
+<small>*Ref: [davtest](https://github.com/cldrn/davtest)*</small>
 
 {{< /tabcontent >}}
 {{< tabcontent set1 tab2 >}}
+
+```console
+# Check WebClient service in Windows
+nxc <PROTOCOL> <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M webdav
+```
+
+{{< /tabcontent >}}
+
+### General
+
+{{< tab set2 tab1 >}}curl{{< /tab >}}
+{{< tabcontent set2 tab1 >}}
 
 ```console
 # Rename a remote file

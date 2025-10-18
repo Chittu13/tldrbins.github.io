@@ -1,6 +1,5 @@
 ---
 title: "rbash"
-date: 2025-7-25
 tags: ["Rbash", "Shell", "Escape", "Tar", "Bypass", "Breakout", "Restricted Shell"]
 ---
 

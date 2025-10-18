@@ -1,7 +1,25 @@
 ---
 title: "Apt"
-date: 2025-7-25
-tags: ["Mitm", "Mitmproxy", "Apt", "Sudo", "Ubuntu", "Debian", "Package Management"]
+tags: ["Mitm", "Mitmproxy", "apt", "apt-get", "Sudo", "Ubuntu", "Debian", "Package Management"]
+---
+
+### Proxy apt / apt-get Requeset
+
+#### 1. Start Proxy In Local Machine
+
+```console
+mitmproxy --listen-host 0.0.0.0 --listen-port <LOCAL_PORT>
+```
+
+#### 2. Add Proxy Path in Target Machine
+
+```console
+# For target with no internet
+sudo http_proxy=http://<LOCAL_IP>:<LOCAL_PORT> apt install <PACKEGE>
+```
+
+<small>*Ref: [mitmproxy](https://mitmproxy.org/)*</small>
+
 ---
 
 ### MITM (Man-in-the-Middle)
@@ -9,7 +27,7 @@ tags: ["Mitm", "Mitmproxy", "Apt", "Sudo", "Ubuntu", "Debian", "Package Manageme
 #### 1. Add Proxy Path in Target Machine
 
 ```console
-export http_proxy=http://<LOCAL_IP>:<LOCAL_PROXY_PORT>
+export http_proxy=http://<LOCAL_IP>:<LOCAL_PORT>
 ```
 
 #### 2. Start Proxy in Local Machine
@@ -21,7 +39,7 @@ pip3 install --upgrade proxy.py
 
 ```console
 # Start a proxy server
-proxy --hostname 0.0.0.0 --port <LOCAL_PROXY_PORT>
+proxy --hostname 0.0.0.0 --port <LOCAL_PORT>
 ```
 
 #### 3. Redirect Traffic to Our Server

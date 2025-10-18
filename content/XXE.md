@@ -1,6 +1,5 @@
 ---
 title: "XXE (XML External Entity)"
-date: 2025-7-17
 tags: ["Web Exploitation", "XXE", "Xml", "Dtd", "Web", "Remote File Inclusion", "Data Exfiltration", "PHP FIlter", "LFI", "Local File Inclusion"]
 ---
 

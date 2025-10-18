@@ -1,6 +1,5 @@
 ---
 title: "ForceChangePassword"
-date: 2024-7-18
 tags: ["Forcechangepassword", "Powerview", "Active Directory", "Windows", "bloodyAD"]
 ---
 

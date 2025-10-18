@@ -1,6 +1,5 @@
 ---
 title: "Cron Jobs"
-date: 2025-7-25
 tags: ["Cron", "Scheduled Tasks", "Linux"]
 ---
 

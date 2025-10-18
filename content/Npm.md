@@ -1,6 +1,5 @@
 ---
 title: "Npm"
-date: 2025-7-25
 tags: ["Npm", "Nodejs", "Sudo", "Exploitation"]
 ---
 

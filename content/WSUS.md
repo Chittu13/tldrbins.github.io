@@ -1,6 +1,5 @@
 ---
 title: "WSUS"
-date: 2025-8-6
 tags: ["WSUS", "Windows Server Update Services", "SharpWSUS", "Patch Management", "Update Deployment", "Lateral Movement", "Microsoft Updates", "System Administration", "Network Security"]
 ---
 

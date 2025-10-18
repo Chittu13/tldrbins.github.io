@@ -1,6 +1,5 @@
 ---
 title: "Hydra"
-date: 2025-7-24
 tags: ["Hydra", "Password Cracking", "Brute Force", "Authentication", "Web Exploitation", "Credential"]
 ---
 

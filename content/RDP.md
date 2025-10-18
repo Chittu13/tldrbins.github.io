@@ -1,18 +1,17 @@
 ---
 title: "RDP"
-date: 2025-7-25
 tags: ["RDP", "Remote Desktop", "Windows", "xfreerdp"]
 ---
 
 ### Enable RDP
 
 ```console
-# Enable Terminal Server
+# Enable terminal server
 Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0
 ```
 
 ```console
-# Allow Inbound Traffic
+# Allow inbound traffic
 netsh advfirewall firewall add rule name="Open Port 3389 IN" dir=in action=allow protocol=TCP localport=3389
 ```
 
@@ -20,7 +19,7 @@ netsh advfirewall firewall add rule name="Open Port 3389 IN" dir=in action=allow
 {{< tab set1 tab2 >}}remmina{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
-#### freerdp
+#### xfreerdp
 
 ```console
 # Password

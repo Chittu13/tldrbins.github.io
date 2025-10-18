@@ -1,6 +1,5 @@
 ---
 title: "Secure String"
-date: 2024-7-10
 tags: ["Powershell", "Secure Strings", "Windows", "Decrypt"]
 ---
 

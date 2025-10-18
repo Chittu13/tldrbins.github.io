@@ -1,6 +1,5 @@
 ---
 title: "Kubelet"
-date: 2025-7-25
 tags: ["Kubelet", "Kubernetes", "Container", "RCE"]
 ---
 

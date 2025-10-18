@@ -1,6 +1,5 @@
 ---
 title: "IMAP"
-date: 2024-7-9
 tags: ["Imap", "Imaps", "Mail", "Email", "Openssl", "Enumeration"]
 ---
 
@@ -126,6 +125,17 @@ a SELECT "INBOX.Sent Items"
 * OK [UIDVALIDITY 589480766] Ok
 * OK [MYRIGHTS "acdilrsw"] ACL
 a OK [READ-WRITE] Ok
+```
+
+```console
+# List all mail IDs
+a SEARCH ALL
+```
+
+```console {class="sample-code"}
+a SEARCH ALL
+* SEARCH 1 2
+a OK Search completed (0.001 + 0.000 secs).
 ```
 
 ```console

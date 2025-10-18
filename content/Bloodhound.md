@@ -1,6 +1,5 @@
 ---
 title: "Bloodhound"
-date: 2025-8-2
 tags: ["Bloodhound", "Sharphound", "Sliver", "Enumeration", "Active Directory", "Windows", "Neo4J", "DNS", "dnschef", "LDAP", "ldapsearch"]
 ---
 
@@ -171,6 +170,12 @@ Valid starting       Expires              Service principal
 #### 5. LDAP Search
 
 ```console
+# Password
+ldapsearch -LLL -H ldap://<DC> -D '<DOMAIN>\<USER>' -w '<PASSWORD>' -b "DC=<EXAMPLE>,DC=<COM>" -N -o ldif-wrap=no -E '!1.2.840.113556.1.4.801=::MAMCAQc=' "(&(objectClass=*))" | tee ldap.txt
+```
+
+```console
+# Kerberos
 ldapsearch -LLL -H ldap://<DC> -Y GSSAPI -b "DC=<EXAMPLE>,DC=<COM>" -N -o ldif-wrap=no -E '!1.2.840.113556.1.4.801=::MAMCAQc=' "(&(objectClass=*))" | tee ldap.txt
 ```
 

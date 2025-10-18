@@ -1,6 +1,5 @@
 ---
 title: "Advance wget"
-date: 2025-8-1
 tags: ["Wget", "Http File Transfer", "File Transfer", "Http"]
 ---
 

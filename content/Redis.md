@@ -1,6 +1,5 @@
 ---
 title: "Redis"
-date: 2025-7-25
 tags: ["Redis-Cli", "Redis", "Exploitation", "Database"]
 ---
 

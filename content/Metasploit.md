@@ -1,6 +1,5 @@
 ---
 title: "Metasploit"
-date: 2025-7-25
 tags: ["Exploitation", "Post-Exploitation", "Searchsploit", "Metasploit", "Vulnerability Scanning", "Exploit", "Meterpreter", "Windows", "Msfconsole"]
 ---
 

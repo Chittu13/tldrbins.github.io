@@ -1,6 +1,5 @@
 ---
 title: "Squid Proxy"
-date: 2025-7-25
 tags: ["Port Scanning", "Enumeration", "Squid Proxy", "Web", "Proxy"]
 ---
 

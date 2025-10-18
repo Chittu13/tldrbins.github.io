@@ -1,6 +1,5 @@
 ---
 title: "ReadLAPSPassword"
-date: 2025-7-25
 tags: ["Credential Dumping", "Powerview", "ReadLAPSpassword", "Active Directory", "Windows", "LAPS"]
 ---
 

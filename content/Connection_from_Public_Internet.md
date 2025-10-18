@@ -1,6 +1,5 @@
 ---
 title: "Connection from Public Internet"
-date: 2025-7-25
 tags: ["Web Exploitation", "Http File Transfer", "Remote File Inclusion", "XSS", "File Transfer", "Public Ip", "Ngrok", "Serveo", "Webhook", "XXE"]
 ---
 

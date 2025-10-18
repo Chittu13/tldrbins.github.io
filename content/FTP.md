@@ -1,7 +1,6 @@
 ---
 title: "FTP"
-date: 2025-7-25
-tags: ["Lftp", "Ftp", "File Transfer"]
+tags: ["FTP", "LFTP", "File Transfer", "Secure Transfer"]
 ---
 
 ### Config Location
@@ -33,23 +32,23 @@ ftp <TARGET>
 ```
 
 ```console
-# Over SSL
+# Over SSL/TLS
 lftp <TARGET>
 ```
 
 ```console
-# Fix cert error
+# Disable SSL certificate verification
 echo -n 'set ssl:verify-certificate no' >> ~/.lftp/rc
 ```
 
 ```console
-# List
+# List directory
 ls
 ```
 
 ```console
-# Switch to binary transfer mode
-bin
+# Use for non-text files
+binary
 ```
 
 ```console
@@ -63,7 +62,7 @@ put "<FILE>"
 ```
 
 ```console
-# Connect over tunnel
+# For firewall/NAT compatibility
 passive
 ```
 

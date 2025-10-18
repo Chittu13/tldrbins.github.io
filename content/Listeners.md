@@ -1,6 +1,5 @@
 ---
 title: "Listeners"
-date: 2024-6-26
 tags: ["Ncat", "Listener", "Reverse Shell", "Nc", "Pwncat"]
 ---
 

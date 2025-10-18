@@ -1,6 +1,5 @@
 ---
 title: "Python Decompile"
-date: 2024-7-12
 tags: ["Python", "Pyc", "Decompile", "Uncompyle6", "Reversing", "Pyinstxtractor"]
 ---
 

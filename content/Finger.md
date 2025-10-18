@@ -1,6 +1,5 @@
 ---
 title: "Finger Protocol"
-date: 2025-7-25
 tags: ["Enumeration", "Finger", "File Transfer"]
 ---
 

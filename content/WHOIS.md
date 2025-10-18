@@ -1,6 +1,5 @@
 ---
 title: "WHOIS"
-date: 2025-7-24
 tags: ["Domain", "WHOIS", "DNS", "Reconnaissance", "Network", "Registrar", "Organisational", "Contact", "IP Address Block"]
 ---
 

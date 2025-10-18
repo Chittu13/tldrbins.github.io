@@ -1,6 +1,5 @@
 ---
 title: "DNS"
-date: 2025-7-30
 tags: ["Domain", "Reconnaissance", "Enumeration", "DNS", "Dig", "Zone Transfer", "BIND", "nsupdate", "nslookup"]
 ---
 

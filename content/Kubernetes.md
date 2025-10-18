@@ -1,6 +1,5 @@
 ---
 title: "Kubernetes"
-date: 2025-7-25
 tags: ["Token-Based Authentication", "File System Permissions Vulnerabilities", "File System Mounting", "Kubernetes", "Container"]
 ---
 

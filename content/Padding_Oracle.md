@@ -1,6 +1,5 @@
 ---
 title: "Padding Oracle"
-date: 2024-6-27
 tags: ["Encryption", "Cryptography", "Web Exploitation", "Padding Oracle", "Padbuster", "Aes", "Cbc", "Cipher"]
 ---
 

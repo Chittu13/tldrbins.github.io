@@ -1,6 +1,5 @@
 ---
 title: "Windows ACLs"
-date: 2025-7-23
 tags: ["Acls", "Icacls", "Windows", "Access Control Lists", "Files", "Permissions", "Encrypted File", "RunasCs"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "POP3"
-date: 2025-7-25
 tags: ["Pop3", "Telnet", "Mail", "Email", "Enumeration"]
 ---
 
@@ -9,6 +8,11 @@ tags: ["Pop3", "Telnet", "Mail", "Email", "Enumeration"]
 ```console
 # Connect to POP3 mail server
 telnet <TARGET> 110
+```
+
+```console
+# Connect with SSL
+openssl s_client -connect <TARGET>:995 -crlf -quiet
 ```
 
 ```console

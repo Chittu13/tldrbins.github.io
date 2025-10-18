@@ -1,6 +1,5 @@
 ---
 title: "Alternate Data Stream"
-date: 2025-7-25
 tags: ["File Metadata", "Alternate Data Stream", "ADS", "Windows", "Hidden Files"]
 ---
 

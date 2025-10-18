@@ -1,6 +1,5 @@
 ---
 title: "Firewall (Linux)"
-date: 2025-7-17
 tags: ["Firewall", "Inbound", "Outbound", "Network", "Linux", "Access Control", "Iptables"]
 ---
 

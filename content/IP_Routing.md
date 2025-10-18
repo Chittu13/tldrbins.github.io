@@ -1,6 +1,5 @@
 ---
 title: "IP Routing"
-date: 2025-7-24
 tags: ["Networking", "IPRouting", "Linux", "Windows", "iproute2", "netsh", "PowerShell", "NetworkAdministration", "SystemAdministration", "Routing"]
 ---
 
@@ -22,6 +21,11 @@ sudo ip route add <SUBNET> via <GATEWAY> dev <INTERFACE>
 
 ```console {class="sample-code"}
 sudo ip route add 172.16.0.0/16 via 192.168.1.10 dev eth0
+```
+
+```console
+# Treat the gateway as being directly connected
+sudo ip route add <SUBNET> via <GATEWAY> dev <INTERFACE> onlink
 ```
 
 #### Modify Route

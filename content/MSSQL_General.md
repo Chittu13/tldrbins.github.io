@@ -1,6 +1,5 @@
 ---
 title: "MSSQL General"
-date: 2024-6-27
 tags: ["Database Dumping", "Privilege Escalation In Databases", "MSSQL", "Database", "Windows"]
 ---
 
@@ -16,7 +15,7 @@ impacket-mssqlclient '<USER>:<PASSWORD>@<TARGET>'
 ```
 
 ```console
-# Without TLS
+# Windows auth
 impacket-mssqlclient -windows-auth '<USER>:<PASSWORD>@<TARGET>'
 ```
 
@@ -29,12 +28,12 @@ impacket-mssqlclient -k <TARGET>
 {{< tabcontent set1 tab2 >}}
 
 ```console
-# With Current User
+# Current user
 sqlcmd -S '<TARGET>' -Q "<QUERY>"
 ```
 
 ```console
-# With Cred
+# Password
 sqlcmd -S '<TARGET>' -U '<USER>' -P '<PASSWORD>' -d '<DB_NAME>' -Q "<QUERY>"
 ```
 
@@ -60,7 +59,7 @@ SELECT name FROM master..syslogins
 ```
 
 ```console
-# Check users
+# Check sysadmin
 SELECT name FROM master..syslogins WHERE sysadmin = '1';
 ```
 
@@ -85,8 +84,13 @@ SELECT entity_name collate DATABASE_DEFAULT,permission_name collate DATABASE_DEF
 ```
 
 ```console
-# Check privilege
+# Check current user privilege
 SELECT entity_name, permission_name FROM fn_my_permissions(NULL, 'SERVER');
+```
+
+```console
+# Check impersonate
+SELECT name FROM sys.server_principals WHERE HAS_PERMS_BY_NAME(name, 'SERVER', 'IMPERSONATE') = 1;
 ```
 
 ```console
@@ -115,13 +119,23 @@ SELECT DEFAULT_DOMAIN();
 ```
 
 ```console
-# Get domain RID
-SELECT master.dbo.fn_varbintohexstr(SUSER_SID('<DOMAIN>\Domain Admins'))
+# Get user SID
+SELECT master.dbo.fn_varbintohexstr(SUSER_SID('<DOMAIN>\<USER>'))
+```
+
+```console
+# Get group SID
+SELECT master.dbo.fn_varbintohexstr(SUSER_SID('<DOMAIN>\<GROUP>'))
 ```
 
 ```console
 # Read a text file
 SELECT * FROM OPENROWSET(BULK N'<FILE>', SINGLE_CLOB) AS Contents
+```
+
+```console
+# Read file system
+xp_dirtree C:\
 ```
 
 ---

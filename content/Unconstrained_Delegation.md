@@ -1,6 +1,5 @@
 ---
 title: "Unconstrained Delegation"
-date: 2025-8-4
 tags: ["Pass-The-Ticket", "S4U", "Ticket Granting Ticket", "Unconstrained Delegation", "Active Directory", "Windows", "PsExec"]
 ---
 

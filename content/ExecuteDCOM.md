@@ -1,6 +1,5 @@
 ---
 title: "ExecuteDCOM"
-date: 2024-8-3
 tags: ["Executedcom", "Active Directory", "Windows", "RCE"]
 ---
 

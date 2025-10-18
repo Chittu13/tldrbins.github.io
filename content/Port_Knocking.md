@@ -1,6 +1,5 @@
 ---
 title: "Port Knocking"
-date: 2025-7-25
 tags: ["Port Knocking", "Knockd", "Ssh", "Authentication"]
 ---
 

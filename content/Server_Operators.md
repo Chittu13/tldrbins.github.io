@@ -1,6 +1,5 @@
 ---
 title: "Windows Services"
-date: 2024-7-13
 tags: ["Server Operators", "Active Directory", "Windows", "Privilege Escalation", "Services", "Reverse Shell", "Unquoted Service Path"]
 ---
 

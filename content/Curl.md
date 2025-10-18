@@ -1,6 +1,5 @@
 ---
 title: "curl"
-date: 2025-7-25
 tags: ["Path Traversal", "Curl", "Http File Transfer", "Http", "File Transfer", "CRUD", "API"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Steganography"
-date: 2024-6-28
 tags: ["Steganography", "Steghide", "Steg", "Exiftool", "Ctf"]
 ---
 

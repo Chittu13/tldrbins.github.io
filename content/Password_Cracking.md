@@ -1,6 +1,5 @@
 ---
 title: "Password Cracking"
-date: 2025-7-25
 tags: ["Hash Cracking", "Password Cracking", "File Encryption", "John The Ripper", "Hashcat", "Wordlist", "Generate"]
 ---
 

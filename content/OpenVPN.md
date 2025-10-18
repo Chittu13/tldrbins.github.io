@@ -1,6 +1,5 @@
 ---
 title: "OpenVPN"
-date: 2025-7-25
 tags: ["Vpn", "Openvpn", "Network"]
 ---
 

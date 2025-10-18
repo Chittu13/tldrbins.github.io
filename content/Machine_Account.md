@@ -1,6 +1,5 @@
 ---
 title: "Machine Account"
-date: 2025-7-25
 tags: ["Kerberos", "Credential Dumping", "Pass-The-Ticket", "Rubeus", "Ticket Granting Ticket", "Domain Controller", "Machine Account", "Microsoft Virtual Account", "Active Directory", "Windows"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Krbrelayx"
-date: 2024-7-23
 tags: ["Dns Spoofing", "Krbrelayx", "Dnstools", "Active Directory", "Windows", "DNS", "Ntlm"]
 ---
 

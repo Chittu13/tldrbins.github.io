@@ -1,6 +1,5 @@
 ---
 title: "SQLite"
-date: 2024-7-25
 tags: ["Database Dumping", "Enumeration", "Sqlite", "Database"]
 ---
 

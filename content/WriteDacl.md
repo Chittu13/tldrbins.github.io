@@ -1,6 +1,5 @@
 ---
 title: "WriteDacl"
-date: 2025-7-25
 tags: ["Writedacl", "Dcsync", "Powerview", "Credential Dumping", "Active Directory", "Windows"]
 ---
 

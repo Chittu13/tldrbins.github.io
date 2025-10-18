@@ -1,7 +1,6 @@
 ---
 title: "SMB Enum"
-date: 2025-7-25
-tags: ["Kerberos", "Nmap", "SID", "Smbclient", "Mount", "Enumeration", "Smb", "Impacket", "Reconnaissance", "Windows", "ADS", "GPP", "Group Policy Preference", "SYSVOL"]
+tags: ["Kerberos", "nmap", "SID", "smbclient", "Mount", "Enumeration", "SMB", "Impacket", "Reconnaissance", "Windows", "ADS", "GPP", "Group Policy Preference", "SYSVOL"]
 ---
 
 ### SMB Share Enum
@@ -266,11 +265,11 @@ smbclient -L \\\\<TARGET>\\ -U '<DOMAIN>/<USER>%<HASH>' --pw-nt-hash
 
 ```console
 # After found an accessible share
-smbclient  \\\\<TARGET>\\<SHARE>\\ -U '<DOMAIN>/<USER>%<PASSWORD>'
+smbclient \\\\<TARGET>\\<SHARE>\\ -U '<DOMAIN>/<USER>%<PASSWORD>'
 ```
 
 ```console {class="sample-code"}
-$ smbclient  \\\\10.10.11.102\\Shared\\ -U 'windcorp.htb/localadmin%Secret123'
+$ smbclient \\\\10.10.11.102\\Shared\\ -U 'windcorp.htb/localadmin%Secret123'
 Try "help" to get a list of possible commands.
 smb: \>
 ```

@@ -1,6 +1,5 @@
 ---
 title: "Git"
-date: 2025-7-25
 tags: ["Git", "Git-Dumper", "Sudo", "Enumeration", "Web Exploitation", "Gitea", "Repo", "Clone"]
 ---
 

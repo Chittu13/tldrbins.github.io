@@ -1,6 +1,5 @@
 ---
 title: "Oracle Database"
-date: 2025-7-25
 tags: ["OracleDB", "File System Permissions Vulnerabilities", "Database Dumping", "Brute Force", "Enumeration", "Privilege Escalation In Databases", "Database", "Sqlplus", "Odat", "Reverse Shell", "RCE"]
 ---
 

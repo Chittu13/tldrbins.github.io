@@ -1,6 +1,5 @@
 ---
 title: "Custom Word List Generator"
-date: 2025-7-25
 tags: ["Password Cracking", "Wordlist", "Cewl", "Username"]
 ---
 

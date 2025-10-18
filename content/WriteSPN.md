@@ -1,6 +1,5 @@
 ---
 title: "WriteSPN"
-date: 2025-7-14
 tags: ["WriteSPN", "Targeted Kerberoast", "Domain Controller", "Active Directory", "Windows"]
 ---
 

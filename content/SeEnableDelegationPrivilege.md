@@ -1,6 +1,5 @@
 ---
 title: "SeEnableDelegationPrivilege"
-date: 2025-7-19
 tags: ["SeEnableDelegationPrivilege", "Pass-The-Ticket", "Service Ticket", "Ticket Granting Ticket", "Constrained Delegation", "Active Directory", "Windows", "KCD", "secretsdump", "Unonstrained Delegation"]
 ---
 

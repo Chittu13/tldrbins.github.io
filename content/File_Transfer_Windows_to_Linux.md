@@ -1,6 +1,5 @@
 ---
 title: "File Transfer (Windows To Linux)"
-date: 2025-7-25
 tags: ["Smb", "File System Mounting",  "Http File Transfer", "Remote File Inclusion", "File Transfer", "Windows", "Evil-Winrm"]
 ---
 
@@ -24,7 +23,7 @@ net use \\<LOCAL_IP>\share
 
 ```console
 # Connect to SMB server with creds
-net use \\<LOCAL_IP>\share /u:<USER> '<PASSWORD>'
+net use \\<LOCAL_IP>\share /u:<USER> <PASSWORD>
 ```
 
 ```console

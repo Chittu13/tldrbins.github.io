@@ -1,6 +1,5 @@
 ---
 title: "Linux hard disk encryption"
-date: 2025-7-25
 tags: ["Luks", "Password Cracking", "Brute Force", "Encryption", "File Encryption", "Linux Hard Disk Encryption", "Mount File System"]
 ---
 

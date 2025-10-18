@@ -1,6 +1,5 @@
 ---
 title: "Apache"
-date: 2025-7-25
 tags: ["Web Exploitation", "Waf (Web Application Firewall)", "Apache", "Web Server"]
 ---
 

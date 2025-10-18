@@ -1,6 +1,5 @@
 ---
 title: "Java Environment"
-date: 2024-6-27
 tags: ["Java", "Javac", "Update-Alternatives"]
 ---
 

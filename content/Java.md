@@ -1,6 +1,5 @@
 ---
 title: "Java"
-date: 2025-7-25
 tags: ["Java", "Jd-Gui", "Decompiler", "Reversing", "Programming"]
 ---
 

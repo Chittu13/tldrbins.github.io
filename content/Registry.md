@@ -1,6 +1,5 @@
 ---
 title: "Registry"
-date: 2025-7-24
 tags: ["Windows", "Registry", "reg.exe", "Windows Internals", "Persistence", "COM Hijacking", "DLL Injection"]
 ---
 

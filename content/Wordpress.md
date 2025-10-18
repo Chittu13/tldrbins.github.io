@@ -1,6 +1,5 @@
 ---
 title: "Wordpress"
-date: 2024-6-28
 tags: ["Wpscan", "Wordpress", "Reconnaissance", "Enumeration"]
 ---
 

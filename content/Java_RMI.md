@@ -1,6 +1,5 @@
 ---
 title: "Java RMI"
-date: 2025-7-30
 tags: ["Java", "RMI", "JMX", "Remote Method Invocation", "Api", "JVM", "Enum", "rmg", "beansshooter"]
 ---
 

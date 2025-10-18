@@ -1,6 +1,5 @@
 ---
 title: "Pypi"
-date: 2024-7-19
 tags: ["Exploitation", "Python", "Pypi", "Package", "RCE"]
 ---
 

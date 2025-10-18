@@ -1,6 +1,5 @@
 ---
 title: "AWS"
-date: 2024-7-21
 tags: ["AWS", "Cloud", "S3", "Bucket", "Dynamodb", "Lambda"]
 ---
 

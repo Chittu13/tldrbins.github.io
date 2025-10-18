@@ -1,6 +1,5 @@
 ---
 title: "Elasticsearch"
-date: 2025-7-25
 tags: ["Database Dumping", "Elasticsearch", "Database"]
 ---
 

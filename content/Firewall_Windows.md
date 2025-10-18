@@ -1,6 +1,5 @@
 ---
 title: "Firewall (Windows)"
-date: 2024-7-10
 tags: ["Firewall", "Inbound", "Outbound", "Network", "Windows", "Access Control"]
 ---
 
@@ -74,6 +73,11 @@ PolicyStoreSourceType : Local
 ```
 
 ```console
+# Check inbound rules (formatted)
+Get-NetFirewallRule | Where-Object { $_.Enabled -eq 'True' -and $_.Direction -eq 'Inbound' -and $_.Action -eq 'Allow' -and (Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).Protocol -eq 'TCP' -and (Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).LocalPort -ne $null } | Format-Table Name, Enabled, Direction, Action, @{Label="LocalPort";Expression={(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).LocalPort}}, @{Label="Protocol";Expression={(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).Protocol}} -AutoSize
+```
+
+```console
 # Check outbound rules
 Get-NetFirewallRule -Direction Outbound -Enabled True
 ```
@@ -102,6 +106,11 @@ PolicyStoreSource     : PersistentStore
 PolicyStoreSourceType : Local
 
 ---[SNIP]---
+```
+
+```console
+# Check outbound rules (formatted)
+Get-NetFirewallRule | Where-Object { $_.Enabled -eq 'True' -and $_.Direction -eq 'Outbound' -and $_.Action -eq 'Allow' -and (Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).Protocol -eq 'TCP' -and (Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).LocalPort -ne $null } | Format-Table Name, Enabled, Direction, Action, @{Label="LocalPort";Expression={(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).LocalPort}}, @{Label="Protocol";Expression={(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).Protocol}} -AutoSize
 ```
 
 {{< /tabcontent >}}
@@ -173,6 +182,12 @@ netsh advfirewall firewall add rule name="Open Port <PORT> IN" dir=in action=all
 {{< tabcontent set1-3 tab1 >}}
 
 ```console
+# Allow all outbound traffic to any address
+New-NetFirewallRule -DisplayName "Allow All Outbound" -Direction Outbound -RemoteAddress Any -Action Allow -Enabled True -Profile ANY
+```
+
+```console
+# Specific port
 New-NetFirewallRule -DisplayName "Allow Port <PORT> Outbound" -Direction Outbound -LocalPort <PORT> -Protocol TCP -Action Allow -Enabled True -Profile ANY
 ```
 

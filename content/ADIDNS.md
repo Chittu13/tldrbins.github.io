@@ -1,6 +1,5 @@
 ---
 title: "ADIDNS"
-date: 2025-7-25
 tags: ["Domain", "ADIDNS", "ADDS", "DNS", "PowerMad", "DNS Posioning", "Spoofing", "Windows", "Active Directory"]
 ---
 

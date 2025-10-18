@@ -1,6 +1,5 @@
 ---
 title: "Share Mount"
-date: 2025-8-3
 tags: ["NFS", "Mount", "SMB", "File System Mounting", "Enumeration", "Share", "Cifs", "File System Permissions Vulnerabilities", "Privilege Escalation", "uid"]
 ---
 

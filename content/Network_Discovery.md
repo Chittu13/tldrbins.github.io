@@ -1,6 +1,5 @@
 ---
 title: "Network Discovery"
-date: 2025-7-24
 tags: ["Port Scanning", "Arp", "Iptables", "Tcpdump", "Packet Sniffing", "Reconnaissance", "Port", "Network", "Discovery", "Ping", "Traceroute"]
 ---
 
@@ -65,7 +64,7 @@ Test-NetConnection <TARGET> -Port <TARGET_PORT>
 
 ```console
 # With Active Directory module installed
-Get-ADComputer -Filter * | ForEach-Object { $_ | Select-Object Name, @{Name='IPAddress';Expression={(Test-Connection -ComputerName $_.Name -Count 1).IPV4Address}}}
+Get-ADComputer -Filter * | ForEach-Object { $_ | Select-Object Name, @{Name='IPAddress';Expression={(Test-Connection -ComputerName $_.Name -Count 1).IPV4Address}}} | Format-Table -AutoSize
 ```
 
 {{< /tabcontent >}}
@@ -109,12 +108,12 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 byt
 
 ```console
 # Sniff on a port
-sudo tcpdump -i lo -nnXs 0 'port <PORT>'
+sudo tcpdump -i <INTERFACE> -nnXs 0 'port <PORT>'
 ```
 
 ```console
 # Sniff HTTPS traffic
-sudo ./mitmdump -p 443 --mode reverse:https://<DOMAIN> --ssl-insecure --set flow_detail=3
+sudo mitmdump -p 443 --mode reverse:https://<DOMAIN> --ssl-insecure --set flow_detail=3
 ```
 
 <small>*Ref: [mitmproxy](https://mitmproxy.org/)*</small>
@@ -143,6 +142,12 @@ for i in $(seq 1 254); do for j in $(seq 1 254); do (ping -c 1 <SUBNET>.${i}.${j
 {{< tabcontent set4 tab2 >}}
 
 ```console
+# CMD
+for /L %i in (1,1,254) do @ping -n 1 -w 100 <SUBNET>.%i | find "Reply"
+```
+
+```console
+# Powershell
 1..254 | % { $ip="<SUBNET>.$_"; if (Test-Connection $ip -Count 1 -Quiet) { "$ip is alive" } }
 ```
 

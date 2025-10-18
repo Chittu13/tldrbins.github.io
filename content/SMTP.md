@@ -1,6 +1,5 @@
 ---
 title: "SMTP"
-date: 2024-7-5
 tags: ["Nmap", "Enumeration", "SMTP", "Mail", "Email", "Template"]
 ---
 

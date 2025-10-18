@@ -1,6 +1,5 @@
 ---
 title: "NTP"
-date: 2024-7-22
 tags: ["NTP", "Time", "Network Time Protocol", "Faketime", "Ntpdate"]
 ---
 

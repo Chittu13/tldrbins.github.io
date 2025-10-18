@@ -1,6 +1,5 @@
 ---
 title: "AddMember"
-date: 2025-7-25
 tags: ["Powerview", "AddMember", "Domain Controller", "Active Directory", "Windows", "BloodyAD"]
 ---
 

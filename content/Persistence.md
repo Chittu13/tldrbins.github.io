@@ -1,6 +1,5 @@
 ---
 title: "Persistence"
-date: 2025-7-25
 tags: ["AddMember", "Account", "Windows", "Persistence"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Microsoft Oulook Email Folder"
-date: 2025-7-25
 tags: ["Outlook", "Email", "Windows", "Pst", "Ost", "Mbox"]
 ---
 

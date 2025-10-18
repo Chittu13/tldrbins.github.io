@@ -1,6 +1,5 @@
 ---
 title: "Create custom dll"
-date: 2024-7-29
 tags: ["Dll Hijacking", "Dll", "cpp", "Template"]
 ---
 

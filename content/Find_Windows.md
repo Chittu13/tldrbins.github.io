@@ -1,6 +1,5 @@
 ---
 title: "Find (Windows)"
-date: 2025-7-25
 tags: ["File Metadata", "Hidden Files", "File Attributes", "Find", "Files", "Windows"]
 ---
 
@@ -22,11 +21,8 @@ Get-ChildItem -Path '<PATH>' -Recurse -Force 2>$Null
 ### Find a File
 
 ```console
-ls -path '<PATH>' -Filter '<FILE>' -recurse -erroraction silent
-```
-
-```console
-where /R '<PATH>' '<FILE>'
+# Find files with keyword
+Get-ChildItem -Path "<PATH>" -Recurse -Force -File -Filter "*<KEYWORD>*" 2>$Null
 ```
 
 ```console
@@ -44,6 +40,10 @@ Mode                 LastWriteTime         Length Name
 -a----        10/27/2017   4:02 PM             24 flag.txt
 
 ---[SNIP]---
+```
+
+```console
+where /R '<PATH>' '<FILE>'
 ```
 
 ### Find a File, with Rules

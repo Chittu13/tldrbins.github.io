@@ -1,6 +1,5 @@
 ---
 title: "Compressed Files"
-date: 2024-6-26
 tags: ["Compress", "Decompress", "Extract", "Zip", "Unzip", "Gz", "Tar", "Rar", "7Z", "Bz"]
 ---
 

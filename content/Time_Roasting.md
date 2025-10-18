@@ -1,6 +1,5 @@
 ---
 title: "Time Roasting"
-date: 2025-7-11
 tags: ["NTP", "Hash Cracking", "Time Roasting", "Enumeration", "Domain Controller", "Active Directory", "Windows"]
 ---
 

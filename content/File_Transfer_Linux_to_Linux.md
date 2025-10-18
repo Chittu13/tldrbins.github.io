@@ -1,6 +1,5 @@
 ---
 title: "File Transfer (Linux To Linux)"
-date: 2024-6-26
 tags: ["scp", "Http File Transfer", "File Transfer", "nc"]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Constrained Delegation"
-date: 2025-7-18
 tags: ["Credential Dumping", "Impacket", "Pass-The-Ticket", "Silver Ticket", "Ticket Granting Ticket", "Constrained Delegation", "Active Directory", "Windows", "RBCD", "KCD"]
 ---
 

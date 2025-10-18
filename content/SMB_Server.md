@@ -1,7 +1,6 @@
 ---
 title: "SMB Server"
-date: 2024-6-26
-tags: ["Smbclient", "File Transfer", "Windows", "Ntlm"]
+tags: ["SMB Server", "File Transfer", "Windows", "NTLM", "SMB", "Windows", "Share", "NET"]
 ---
 
 ### Start a SMB Server for File Transfer
@@ -65,6 +64,32 @@ Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 [*] Config file parsed
 [*] Config file parsed
 [*] Config file parsed
+```
+
+{{< /tabcontent >}}
+
+---
+
+### Share a Folder
+
+{{< tab set2 tab1 >}}Windows{{< /tab >}}
+{{< tabcontent set2 tab1 >}}
+
+#### 1. Create a New Folder \[Optional\]
+
+```console
+mkdir -Path <PATH>
+```
+
+#### 2. Share the Folder
+
+```console
+net share <NEW_SHARE_NAME>=<PATH> /grant:everyone,full
+```
+
+```console {class="sample-code"}
+net share temp=C:\temp /grant:everyone,full
+temp was shared successfully.
 ```
 
 {{< /tabcontent >}}

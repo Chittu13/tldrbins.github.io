@@ -1,6 +1,5 @@
 ---
 title: "Joomla"
-date: 2024-7-8
 tags: ["Joomla", "Cms", "Web Exploitation"]
 ---
 

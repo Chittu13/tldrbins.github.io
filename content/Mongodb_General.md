@@ -1,6 +1,5 @@
 ---
 title: "MongoDB General"
-date: 2025-7-25
 tags: ["Database Dumping", "Mongodb", "Database", "Enumeration"]
 ---
 

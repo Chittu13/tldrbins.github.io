@@ -1,6 +1,5 @@
 ---
 title: "File Transfer (Windows To Windows)"
-date: 2024-10-5
 tags: ["Smb", "File System Mounting", "Remote File Inclusion", "File Transfer", "Windows"]
 ---
 

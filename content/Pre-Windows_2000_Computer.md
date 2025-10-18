@@ -1,6 +1,5 @@
 ---
 title: "Pre-Windows 2000 Computer"
-date: 2025-7-10
 tags: ["Domain Controller", "Pre-Windows 2000 Computer", "Active Directory", "Windows", "pre2k", "Pre-Created Computer", "STATUS_PASSWORD_MUST_CHANGE"]
 ---
 

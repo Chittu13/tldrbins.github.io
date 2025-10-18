@@ -1,6 +1,5 @@
 ---
 title: "Flask Cookie"
-date: 2024-6-27
 tags: ["Flask", "Python", "Cookie", "Sign", "Unsign", "Web Exploitation"]
 ---
 

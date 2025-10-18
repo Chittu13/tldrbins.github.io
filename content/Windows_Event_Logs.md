@@ -1,6 +1,5 @@
 ---
 title: "Windows Event Logs"
-date: 2025-7-25
 tags: ["Forensics", "Evtx", "Event Logs", "Windows", "DIFR"]
 ---
 

