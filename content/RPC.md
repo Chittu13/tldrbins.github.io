@@ -1,6 +1,6 @@
 ---
 title: "RPC"
-tags: ["Impacket", "Domain Controller", "Nxc", "Active Directory", "Windows", "Enumeration", "SID"]
+tags: ["Active Directory", "RPC", "Domain Controller", "Enumeration", "Impacket", "Nxc", "SID", "Windows"]
 ---
 
 ### Remote Procedure Call

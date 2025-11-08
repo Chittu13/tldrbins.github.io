@@ -412,6 +412,8 @@
   </url><url>
     <loc>https://tldrbins.github.io/@email/</loc>
   </url><url>
+    <loc>https://tldrbins.github.io/@enable-account/</loc>
+  </url><url>
     <loc>https://tldrbins.github.io/@encrypted-file/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/@encryption/</loc>
@@ -539,6 +541,8 @@
     <loc>https://tldrbins.github.io/@getchanges/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/getchanges_getchangesall/</loc>
+  </url><url>
+    <loc>https://tldrbins.github.io/@getchanges/getchangesall/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/@getchangesall/</loc>
   </url><url>
@@ -756,6 +760,8 @@
   </url><url>
     <loc>https://tldrbins.github.io/ldap_relay/</loc>
   </url><url>
+    <loc>https://tldrbins.github.io/@ldap-relay/</loc>
+  </url><url>
     <loc>https://tldrbins.github.io/@ldap-search/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/@ldap-signing/</loc>
@@ -902,6 +908,8 @@
   </url><url>
     <loc>https://tldrbins.github.io/nxc/</loc>
   </url><url>
+    <loc>https://tldrbins.github.io/@netexec-nxc/</loc>
+  </url><url>
     <loc>https://tldrbins.github.io/@netsh/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/@network/</loc>
@@ -951,6 +959,8 @@
     <loc>https://tldrbins.github.io/@ntlm-relay/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/ntlm_relay_attack/</loc>
+  </url><url>
+    <loc>https://tldrbins.github.io/@ntlm-relay-attack/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/@ntlm-replay/</loc>
   </url><url>
@@ -1176,6 +1186,8 @@
   </url><url>
     <loc>https://tldrbins.github.io/rbcd/</loc>
   </url><url>
+    <loc>https://tldrbins.github.io/@rbcd-attack/</loc>
+  </url><url>
     <loc>https://tldrbins.github.io/@rce/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/rdp/</loc>
@@ -1214,6 +1226,8 @@
   </url><url>
     <loc>https://tldrbins.github.io/@remote-file-inclusion/</loc>
   </url><url>
+    <loc>https://tldrbins.github.io/@remote-management/</loc>
+  </url><url>
     <loc>https://tldrbins.github.io/@remote-method-invocation/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/@remotepotato0/</loc>
@@ -1251,6 +1265,8 @@
     <loc>https://tldrbins.github.io/@routing/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/rpc/</loc>
+  </url><url>
+    <loc>https://tldrbins.github.io/@rpc/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/@rsa/</loc>
   </url><url>
@@ -1310,7 +1326,7 @@
   </url><url>
     <loc>https://tldrbins.github.io/secretsdump/</loc>
   </url><url>
-    <loc>https://tldrbins.github.io/@secretsdump/</loc>
+    <loc>https://tldrbins.github.io/@secrets-dump/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/secure_string/</loc>
   </url><url>
@@ -1510,6 +1526,8 @@
   </url><url>
     <loc>https://tldrbins.github.io/tftp/</loc>
   </url><url>
+    <loc>https://tldrbins.github.io/@tgt/</loc>
+  </url><url>
     <loc>https://tldrbins.github.io/@ticket-granting-ticket/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/@time/</loc>
@@ -1658,11 +1676,15 @@
   </url><url>
     <loc>https://tldrbins.github.io/server_operators/</loc>
   </url><url>
+    <loc>https://tldrbins.github.io/@windows-services/</loc>
+  </url><url>
     <loc>https://tldrbins.github.io/@winrm/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/winrm/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/winrm_from_windows_vm/</loc>
+  </url><url>
+    <loc>https://tldrbins.github.io/@winrm-from-windows-vm/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/@wordlist/</loc>
   </url><url>
@@ -1683,6 +1705,8 @@
     <loc>https://tldrbins.github.io/@writegplink/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/@writeowner/</loc>
+  </url><url>
+    <loc>https://tldrbins.github.io/@writeowner/own/</loc>
   </url><url>
     <loc>https://tldrbins.github.io/writeowner/</loc>
   </url><url>

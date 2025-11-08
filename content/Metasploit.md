@@ -169,8 +169,13 @@ options
 ```
 
 ```console
-# Set option, e.g.
-set rhosts <TARGET>
+# Avoid error
+set ValidateArch false
+```
+
+```console
+# Avoid error
+set ValidatePlatform false
 ```
 
 ```console

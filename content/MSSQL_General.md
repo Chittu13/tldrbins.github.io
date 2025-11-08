@@ -3,25 +3,49 @@ title: "MSSQL General"
 tags: ["Database Dumping", "Privilege Escalation In Databases", "MSSQL", "Database", "Windows"]
 ---
 
-### Connect to MSSQL DB
+{{< filter_buttons >}}
+
+### Connection
 
 {{< tab set1 tab1 >}}Linux{{< /tab >}}
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
-```console
+```console {class="password"}
 # Password
 impacket-mssqlclient '<USER>:<PASSWORD>@<TARGET>'
 ```
 
-```console
-# Windows auth
-impacket-mssqlclient -windows-auth '<USER>:<PASSWORD>@<TARGET>'
+```console {class="ntlm"}
+# NTLM
+impacket-mssqlclient '<USER>@<TARGET>' -hashes :<HASH>
 ```
 
-```console
-# Kerberos
-impacket-mssqlclient -k <TARGET>
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-mssqlclient '<USER>:<PASSWORD>@<TARGET>' -k -dc-ip <DC_IP>
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-mssqlclient '<USER>@<TARGET>' -hashes :<HASH> -k -dc-ip <DC_IP>
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-mssqlclient '<USER>@<TARGET>' -k -no-pass -dc-ip <DC_IP>
+```
+
+#### Windows Auth
+
+```console {class="password"}
+# Password
+impacket-mssqlclient '<USER>:<PASSWORD>@<TARGET>' -windows-auth
+```
+
+```console {class="ntlm"}
+# NTLM
+impacket-mssqlclient '<USER>@<TARGET>' -hashes :<HASH> -windows-auth
 ```
 
 {{< /tabcontent >}}

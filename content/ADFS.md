@@ -1,6 +1,6 @@
 ---
 title: "ADFS"
-tags: ["SAML", "Token-Based Authentication", "ADFS", "Active Directory", "Windows", "Federation Services"]
+tags: ["Active Directory", "ADFS", "Federation Services", "SAML", "Token-Based Authentication", "Windows"]
 ---
 
 ### Abuse #1: Generate a SAML 2.0 Token for Some APP

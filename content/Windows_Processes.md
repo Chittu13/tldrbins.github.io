@@ -37,6 +37,16 @@ tasklist /FI "USERNAME eq NT AUTHORITY\SYSTEM"
 tasklist /?
 ```
 
+```console
+# Or
+Get-Process
+```
+
+```console
+# Service-related registry
+Get-ChildItem -Path HKLM:\SYSTEM\CurrentControlSet\services | Get-ItemProperty | Select-Object ImagePath | Select-String <PROCESS>
+```
+
 {{< /tabcontent >}}
 
 

@@ -3,7 +3,9 @@ title: "SMB Enum"
 tags: ["Kerberos", "nmap", "SID", "smbclient", "Mount", "Enumeration", "SMB", "Impacket", "Reconnaissance", "Windows", "ADS", "GPP", "Group Policy Preference", "SYSVOL"]
 ---
 
-### SMB Share Enum
+{{< filter_buttons >}}
+
+### Enumeration
 
 {{< tab set1 tab1 >}}nmap{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
@@ -31,19 +33,20 @@ Nmap done: 1 IP address (1 host up) scanned in 7.96 seconds
 
 {{< tab set2 tab1 >}}smbmap{{< /tab >}}
 {{< tab set2 tab2 >}}smbclient{{< /tab >}}
-{{< tab set2 tab3 >}}impacket{{< /tab >}}
 {{< tabcontent set2 tab1 >}}
 
 ```console
+# List shares
 smbmap -H <TARGET> --no-banner
 ```
 
 ```console
+# List shares
 smbmap -H <TARGET> -u null --no-banner
 ```
 
 ```console
-# List known share
+# List target share
 smbmap -H <TARGET> -r <SHARE>
 ```
 
@@ -51,6 +54,7 @@ smbmap -H <TARGET> -r <SHARE>
 {{< tabcontent set2 tab2 >}}
 
 ```console
+# List shares
 smbclient -N -L \\\\<TARGET>\\
 ```
 
@@ -72,7 +76,7 @@ Unable to connect with SMB1 -- no workgroup available
 ```
 
 ```console
-# After found an accessible share
+# Connect target share
 smbclient -N \\\\<TARGET>\\<SHARE>\\
 ```
 
@@ -88,36 +92,6 @@ smbclient -N -L \\\\<TARGET>\\ --option='client min protocol=NT1'
 ```
 
 {{< /tabcontent >}}
-{{< tabcontent set2 tab3 >}}
-
-```console
-# SID brute, if null auth allowed
-impacket-lookupsid test@<DOMAIN> -no-pass
-```
-
-```console {class="sample-code"}
-$ impacket-lookupsid test@coder.htb -no-pass
-Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
-
-[*] Brute forcing SIDs at coder.htb
-[*] StringBinding ncacn_np:coder.htb[\pipe\lsarpc]
-[*] Domain SID is: S-1-5-21-2608251805-3526430372-1546376444
-498: CODER\Enterprise Read-only Domain Controllers (SidTypeGroup)
-500: CODER\Administrator (SidTypeUser)
----[SNIP]---
-1000: CODER\DC01$ (SidTypeUser)
-1101: CODER\DnsAdmins (SidTypeAlias)
-1102: CODER\DnsUpdateProxy (SidTypeGroup)
-1106: CODER\e.black (SidTypeUser)
-1107: CODER\c.cage (SidTypeUser)
-1108: CODER\j.briggs (SidTypeUser)
-1109: CODER\l.kang (SidTypeUser)
-1110: CODER\s.blade (SidTypeUser)
-2101: CODER\PKI Admins (SidTypeGroup)
-3601: CODER\Software Developers (SidTypeGroup)
-```
-
-{{< /tabcontent >}}
 
 #### Authenticated
 
@@ -126,8 +100,11 @@ Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 {{< tab set3 tab3 >}}nxc{{< /tab >}}
 {{< tabcontent set3 tab1 >}}
 
-```console
-smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' --no-banner
+#### List Shares
+
+```console {class="password"}
+# Password
+smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> --no-banner
 ```
 
 ```console {class="sample-code"}
@@ -148,9 +125,31 @@ $ smbmap -H 10.10.11.102 -u 'localadmin' -p 'Secret123' --no-banner
 [*] Closed 1 connections
 ```
 
-```console
-# List known share
-smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' -r <SHARE> --depth 2 --no-banner
+```console {class="ntlm"}
+# NTLM
+smbmap -H <TARGET> -u '<USER>' -p ':<HASH>' -d <DOMAIN> --no-banner
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --dc-ip <DC_IP> --no-banner
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -p ':<HASH>' -d <DOMAIN> -k --dc-ip <DC_IP> --no-banner
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -d <DOMAIN> -k --no-pass --dc-ip <DC_IP> --no-banner
+```
+
+#### List Target Share
+
+```console {class="password"}
+# Password
+smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -r <SHARE> --depth 2 --no-banner
 ```
 
 ```console {class="sample-code"}
@@ -193,9 +192,31 @@ $ smbmap -H 10.10.11.102 -u 'localadmin' -p 'Secret123' -r Shared --depth 2 --no
 [*] Closed 1 connections
 ```
 
-```console
-# Download file
-smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' --download '<PATH_TO_FILE>' --no-banner
+```console {class="ntlm"}
+# NTLM
+smbmap -H <TARGET> -u '<USER>' -p ':<HASH>' -d <DOMAIN> -r <SHARE> --depth 2 --no-banner
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --dc-ip <DC_IP> -r <SHARE> --depth 2 --no-banner
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -p ':<HASH>' -d <DOMAIN> -k --dc-ip <DC_IP> -r <SHARE> --depth 2 --no-banner
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -d <DOMAIN> -k --no-pass --dc-ip <DC_IP> -r <SHARE> --depth 2 --no-banner
+```
+
+#### Download File
+
+```console {class="password"}
+# Password
+smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> --download '<PATH_TO_FILE>' --no-banner
 ```
 
 ```console {class="sample-code"}
@@ -207,9 +228,31 @@ $ smbmap -H 10.10.11.102 -u 'localadmin' -p 'Secret123' --download 'Shared\Docum
 [*] Closed 1 connections
 ```
 
-```console
-# List files with regex pattern
-smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' -r <SHARE> --depth 2 -A <FILE_PATTERN> --no-banner
+```console {class="ntlm"}
+# NTLM
+smbmap -H <TARGET> -u '<USER>' -p ':<HASH>' -d <DOMAIN> --download '<PATH_TO_FILE>' --no-banner
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --dc-ip <DC_IP> --download '<PATH_TO_FILE>' --no-banner
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -p ':<HASH>' -d <DOMAIN> -k --dc-ip <DC_IP> --download '<PATH_TO_FILE>' --no-banner
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -d <DOMAIN> -k --no-pass --dc-ip <DC_IP> --download '<PATH_TO_FILE>' --no-banner
+```
+
+#### List Files with Regex Pattern
+
+```console {class="password"}
+# Password
+smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -r <SHARE> --depth 2 -A <FILE_PATTERN> --no-banner
 ```
 
 ```console {class="sample-code"}
@@ -232,11 +275,32 @@ $ smbmap -H 10.10.11.102 -u 'localadmin' -p 'Secret123' -r Shared --depth 2 -A '
 [*] Closed 1 connections
 ```
 
+```console {class="ntlm"}
+# NTLM
+smbmap -H <TARGET> -u '<USER>' -p ':<HASH>' -d <DOMAIN> -r <SHARE> --depth 2 -A <FILE_PATTERN> --no-banner
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --dc-ip <DC_IP> -r <SHARE> --depth 2 -A <FILE_PATTERN> --no-banner
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -p ':<HASH>' -d <DOMAIN> -k --dc-ip <DC_IP> -r <SHARE> --depth 2 -A <FILE_PATTERN> --no-banner
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+smbmap -H <TARGET> -u '<USER>' -d <DOMAIN> -k --no-pass --dc-ip <DC_IP> -r <SHARE> --depth 2 -A <FILE_PATTERN> --no-banner
+```
+
 {{< /tabcontent >}}
 {{< tabcontent set3 tab2 >}}
 
+#### List Shares
 
-```console
+```console {class="password"}
 # Password
 smbclient -L \\\\<TARGET>\\ -U '<DOMAIN>/<USER>%<PASSWORD>'
 ```
@@ -258,13 +322,15 @@ do_connect: Connection to 10.10.11.102 failed (Error NT_STATUS_IO_TIMEOUT)
 Unable to connect with SMB1 -- no workgroup available
 ```
 
-```console
+```console {class="ntlm"}
 # NTLM
 smbclient -L \\\\<TARGET>\\ -U '<DOMAIN>/<USER>%<HASH>' --pw-nt-hash
 ```
 
-```console
-# After found an accessible share
+#### Interactive
+
+```console {class="password"}
+# Password
 smbclient \\\\<TARGET>\\<SHARE>\\ -U '<DOMAIN>/<USER>%<PASSWORD>'
 ```
 
@@ -274,36 +340,25 @@ Try "help" to get a list of possible commands.
 smb: \>
 ```
 
-{{< /tabcontent >}}
-{{< tabcontent set3 tab3 >}}
-
-```console
-# Spidering Shares
-nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M spider_plus
+```console {class="ntlm"}
+# NTLM
+smbclient \\\\<TARGET>\\<SHARE>\\ -U '<DOMAIN>/<USER>%<HASH>' --pw-nt-hash
 ```
 
-```console
-# Send a File to the Remote Target
-nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> --share <SHARE> --put-file <FILE> \\<FILE>
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-smbclient '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' -k -dc-ip <DC_IP>
 ```
 
-```console
-# Get a File From the Remote Target
-nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> --share <SHARE> --get-file \\<FILE> <FILE>
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-smbclient '<DOMAIN>/<USER>@<TARGET>' -hashes <HASH> -k -dc-ip <DC_IP>
 ```
 
-{{< /tabcontent >}}
-
-#### Authenticated with Kerberos
-
-{{< tab set4 tab1 >}}impacket{{< /tab >}}
-{{< tabcontent set4 tab1 >}}
-
-```console
-impacket-smbclient '<DOMAIN>/<USER>:<PASSWORD>@<TARGET_DOMAIN>' -k -no-pass
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-smbclient '<DOMAIN>/<USER>@<TARGET>' -k -no-pass -dc-ip <DC_IP>
 ```
-
-{{< /tabcontent >}}
 
 #### General
 
@@ -349,21 +404,106 @@ allinfo <FILE>
 get "<FILE>:Password"
 ```
 
+{{< /tabcontent >}}
+{{< tabcontent set3 tab3 >}}
+
+#### Spidering Shares
+
+```console {class="password"}
+# Password
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -M spider_plus
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' -M spider_plus
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --kdcHost <DC> -M spider_plus
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' -k --kdcHost <DC> -M spider_plus
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -k --kdcHost <DC> --use-kcache -M spider_plus
+```
+
+#### Send a File to Remote Target
+
+```console {class="password"}
+# Password
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --share <SHARE> --put-file <FILE> \\<FILE>
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' --share <SHARE> --put-file <FILE> \\<FILE>
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --kdcHost <DC> --share <SHARE> --put-file <FILE> \\<FILE>
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' -k --kdcHost <DC> --share <SHARE> --put-file <FILE> \\<FILE>
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -k --kdcHost <DC> --use-kcache --share <SHARE> --put-file <FILE> \\<FILE>
+```
+
+#### Get a File From Remote Target
+
+```console {class="password"}
+# Password
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --share <SHARE> --get-file \\<FILE> <FILE>
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' --share <SHARE> --get-file \\<FILE> <FILE>
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --kdcHost <DC> --share <SHARE> --get-file \\<FILE> <FILE>
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' -k --kdcHost <DC> --share <SHARE> --get-file \\<FILE> <FILE>
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -k --kdcHost <DC> --use-kcache --share <SHARE> --get-file \\<FILE> <FILE>
+```
+
+{{< /tabcontent >}}
 
 ---
 
 ### Mount SMB Share
 
-{{< tab set5 tab1 >}}Anonymous{{< /tab >}}
-{{< tab set5 tab2 >}}Authenticated{{< /tab >}}
-{{< tabcontent set5 tab1 >}}
+{{< tab set4 tab1 >}}Anonymous{{< /tab >}}
+{{< tab set4 tab2 >}}Authenticated{{< /tab >}}
+{{< tabcontent set4 tab1 >}}
 
 ```console
 sudo mount -t cifs //<TARGET>/<SHARE> /mnt
 ```
 
 {{< /tabcontent >}}
-{{< tabcontent set5 tab2 >}}
+{{< tabcontent set4 tab2 >}}
 
 ```console
 sudo mount -t cifs -o ro,user='<USER>',password='<PASSWORD>' //<TARGET>/<SHARE> /mnt
@@ -402,13 +542,13 @@ smbpasswd -r <TARGET> -U <USER>
 
 ### Enum GPP (Group Policy Perference)
 
-{{< tab set6 tab1 >}}Linux{{< /tab >}}
-{{< tab set6 tab2 >}}Windows{{< /tab >}}
-{{< tabcontent set6 tab1 >}}
+{{< tab set5 tab1 >}}Linux{{< /tab >}}
+{{< tab set5 tab2 >}}Windows{{< /tab >}}
+{{< tabcontent set5 tab1 >}}
 
-```console
+```console {class="password"}
 # Password
-nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M gpp_password
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -M gpp_password
 ```
 
 ```console {class="sample-code"}
@@ -449,8 +589,28 @@ GPP_PASS... 224.0.0.1       445    DC            subAuthority: RID_ADMIN
 GPP_PASS... 224.0.0.1       445    DC            userName: Administrator (built-in)
 ```
 
+```console {class="ntlm"}
+# NTLM
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' -M gpp_password
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --kdcHost <DC> -M gpp_password
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -H '<HASH>' -k --kdcHost <DC> -M gpp_password
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc smb <TARGET> -d <DOMAIN> -u '<USER>' -k --kdcHost <DC> --use-kcache -M gpp_password
+```
+
 {{< /tabcontent >}}
-{{< tabcontent set6 tab2 >}}
+{{< tabcontent set5 tab2 >}}
 
 #### 1. Enum
 
@@ -465,3 +625,5 @@ gpp-decrypt <HASH>
 ```
 
 {{< /tabcontent >}}
+
+<br>

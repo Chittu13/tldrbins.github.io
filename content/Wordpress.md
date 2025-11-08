@@ -10,6 +10,7 @@ tags: ["Wpscan", "Wordpress", "Reconnaissance", "Enumeration"]
 ```
 
 {{< tab set1 tab1 >}}wpscan{{< /tab >}}
+{{< tab set1 tab2 >}}wpprobe{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
 ```console
@@ -33,5 +34,15 @@ wpscan --url <TARGET> --passwords <WORDLIST> --usernames admin
 ```
 
 <small>*Ref: [Wpscan API key](https://wpscan.com/)*</small>
+
+{{< /tabcontent >}}
+{{< tabcontent set1 tab2 >}}
+
+```console
+# HTTP
+wpprobe scan --url <TARGET>
+```
+
+<small>*Ref: [wpprobe](https://github.com/Chocapikk/wpprobe)*</small>
 
 {{< /tabcontent >}}

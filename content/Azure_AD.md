@@ -1,6 +1,6 @@
 ---
 title: "Azure AD Connect"
-tags: ["Azure AD Connect", "Secretsdump", "ADSync", "Password", "Active Directory", "Windows"]
+tags: ["Active Directory", "Azure AD Connect", "ADSync", "Password", "Secrets Dump", "Windows"]
 ---
 
 ### Abuse #1: Azure AD Connect Password Extraction

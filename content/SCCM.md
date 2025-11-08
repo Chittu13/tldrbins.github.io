@@ -1,9 +1,9 @@
 ---
 title: "SCCM"
-tags: ["SCCM", "System Center Configuration Manager", "Active Directory", "Windows", "Configuration Management"]
+tags: ["Active Directory", "SCCM", "Configuration Management", "System Center Configuration Manager", "Windows"]
 ---
 
-### Enum
+### Enumeration
 
 {{< tab set1 tab1 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
@@ -139,7 +139,7 @@ PSComputerName                 : SCCM
 
 ---
 
-### Abuse #1: Steal NTLM
+### Capture NTLM Hash
 
 {{< tab set2 tab1 >}}Windows{{< /tab >}}
 {{< tabcontent set2 tab1 >}}
@@ -182,7 +182,7 @@ sudo responder -I tun0
 
 ---
 
-### Abuse #2: Add Custom Script
+### Add Custom Script
 
 #### 1. Import Module
 

@@ -1156,6 +1156,13 @@
       <description></description>
     </item>
     <item>
+      <title>Enable Account</title>
+      <link>https://tldrbins.github.io/@enable-account/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@enable-account/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Encrypted File</title>
       <link>https://tldrbins.github.io/@encrypted-file/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -1475,6 +1482,13 @@
       <link>https://tldrbins.github.io/@getchanges/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://tldrbins.github.io/@getchanges/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>GetChanges/GetChangesAll</title>
+      <link>https://tldrbins.github.io/@getchanges/getchangesall/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@getchanges/getchangesall/</guid>
       <description></description>
     </item>
     <item>
@@ -2066,6 +2080,13 @@
       <description></description>
     </item>
     <item>
+      <title>LDAP Relay</title>
+      <link>https://tldrbins.github.io/@ldap-relay/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@ldap-relay/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Ldap Search</title>
       <link>https://tldrbins.github.io/@ldap-search/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -2437,6 +2458,13 @@
       <description></description>
     </item>
     <item>
+      <title>NetExec (Nxc)</title>
+      <link>https://tldrbins.github.io/@netexec-nxc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@netexec-nxc/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Netsh</title>
       <link>https://tldrbins.github.io/@netsh/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -2567,6 +2595,13 @@
       <link>https://tldrbins.github.io/@ntlm-relay/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://tldrbins.github.io/@ntlm-relay/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>NTLM Relay Attack</title>
+      <link>https://tldrbins.github.io/@ntlm-relay-attack/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@ntlm-relay-attack/</guid>
       <description></description>
     </item>
     <item>
@@ -3221,6 +3256,13 @@
       <description></description>
     </item>
     <item>
+      <title>RBCD Attack</title>
+      <link>https://tldrbins.github.io/@rbcd-attack/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@rbcd-attack/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>RCE</title>
       <link>https://tldrbins.github.io/@rce/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -3316,6 +3358,13 @@
       <link>https://tldrbins.github.io/@remote-file-inclusion/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://tldrbins.github.io/@remote-file-inclusion/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Remote Management</title>
+      <link>https://tldrbins.github.io/@remote-management/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@remote-management/</guid>
       <description></description>
     </item>
     <item>
@@ -3435,6 +3484,13 @@
       <link>https://tldrbins.github.io/@routing/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://tldrbins.github.io/@routing/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>RPC</title>
+      <link>https://tldrbins.github.io/@rpc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@rpc/</guid>
       <description></description>
     </item>
     <item>
@@ -3585,10 +3641,10 @@
       <description></description>
     </item>
     <item>
-      <title>Secretsdump</title>
-      <link>https://tldrbins.github.io/@secretsdump/</link>
+      <title>Secrets Dump</title>
+      <link>https://tldrbins.github.io/@secrets-dump/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://tldrbins.github.io/@secretsdump/</guid>
+      <guid>https://tldrbins.github.io/@secrets-dump/</guid>
       <description></description>
     </item>
     <item>
@@ -4124,6 +4180,13 @@
       <description></description>
     </item>
     <item>
+      <title>TGT</title>
+      <link>https://tldrbins.github.io/@tgt/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@tgt/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Ticket Granting Ticket</title>
       <link>https://tldrbins.github.io/@ticket-granting-ticket/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -4509,10 +4572,24 @@
       <description></description>
     </item>
     <item>
+      <title>Windows Services</title>
+      <link>https://tldrbins.github.io/@windows-services/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@windows-services/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Winrm</title>
       <link>https://tldrbins.github.io/@winrm/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://tldrbins.github.io/@winrm/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Winrm From Windows VM</title>
+      <link>https://tldrbins.github.io/@winrm-from-windows-vm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@winrm-from-windows-vm/</guid>
       <description></description>
     </item>
     <item>
@@ -4562,6 +4639,13 @@
       <link>https://tldrbins.github.io/@writeowner/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://tldrbins.github.io/@writeowner/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>WriteOwner/Own</title>
+      <link>https://tldrbins.github.io/@writeowner/own/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://tldrbins.github.io/@writeowner/own/</guid>
       <description></description>
     </item>
     <item>

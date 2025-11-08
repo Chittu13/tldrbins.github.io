@@ -1,6 +1,6 @@
 ---
 title: "Cross Session Relay"
-tags: ["Ntlm", "Pass-The-Hash", "Authentication", "Cross Session Relay", "Active Directory", "Windows", "Krbrelay", "Remotepotato0"]
+tags: ["Cross Session Relay", "Authentication", "Krbrelay", "NTLM", "Pass-The-Hash", "Remotepotato0", "Windows"]
 ---
 
 ### Display Information about the Session Host
@@ -29,7 +29,7 @@ qwinsta *
 
 ---
 
-### Abuse #1: Steal NTLM Hash
+### Abuse #1: Capture NTLM Hash
 
 {{< tab set2 tab1 >}}RemotePotato0{{< /tab >}}
 {{< tab set2 tab2 >}}KrbRelay{{< /tab >}}

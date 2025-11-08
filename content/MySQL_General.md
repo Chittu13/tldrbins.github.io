@@ -5,8 +5,8 @@ tags: ["Database Dumping", "Privilege Escalation In Databases", "Mysql", "Databa
 
 ### Default Password Spraying
 
-{{< tab set1 tab1 >}}Nmap{{< /tab >}}
-{{< tab set1 tab2 >}}Metasploit{{< /tab >}}
+{{< tab set1 tab1 >}}nmap{{< /tab >}}
+{{< tab set1 tab2 >}}metasploit{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
 ```console 

